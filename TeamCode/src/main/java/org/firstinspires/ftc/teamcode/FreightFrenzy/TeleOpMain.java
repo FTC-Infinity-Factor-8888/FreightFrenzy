@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.FreightFrenzy;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@TeleOp(name = "JediMasterTeleOp (Blocks to Java)")
+@TeleOp(name = "TeleOpMain")
 public class TeleOpMain extends LinearOpMode {
 
     private DcMotor lfMotor;
