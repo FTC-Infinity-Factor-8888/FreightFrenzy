@@ -18,11 +18,13 @@ public class TeleOpMain extends LinearOpMode {
         double lSpeed;
         double maxSpeed = 0.80;
         double normalSpeed = 0.50;
+        double duckWheelSpeed = 0.25;
 
         DcMotor RFMotor = hardwareMap.get(DcMotor.class, "RFMotor");
         DcMotor RRMotor = hardwareMap.get(DcMotor.class, "RRMotor");
         DcMotor LFMotor = hardwareMap.get(DcMotor.class, "LFMotor");
         DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor");
+        DcMotor DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor");
 
         // Put initialization blocks here.
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -40,7 +42,9 @@ public class TeleOpMain extends LinearOpMode {
                     rSpeed = gamepad1.right_stick_y * normalSpeed;
                     lSpeed = gamepad1.left_stick_y * normalSpeed;
                 }
-
+                if (gamepad1.y) {
+                    DuckWheelMotor.setPower(1 * duckWheelSpeed);
+                }
                 if (gamepad1.right_bumper) {
                     if (gamepad1.right_trigger >= 0.5) {
                         LFMotor.setPower(-1 * maxSpeed);
