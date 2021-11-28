@@ -14,17 +14,22 @@ public class TeleOpMain extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
-        double rSpeed;
-        double lSpeed;
+        double lfSpeed;
+        double rfSpeed;
+        double lrSpeed;
+        double rrSpeed;
+
         double maxSpeed = 0.80;
         double normalSpeed = 0.50;
         double duckWheelSpeed = 0.25;
+        double liftSpeed = 0.05;
 
         DcMotor RFMotor = hardwareMap.get(DcMotor.class, "RFMotor");
         DcMotor RRMotor = hardwareMap.get(DcMotor.class, "RRMotor");
         DcMotor LFMotor = hardwareMap.get(DcMotor.class, "LFMotor");
         DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor");
         DcMotor DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor");
+        DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
 
         // Put initialization blocks here.
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -34,57 +39,58 @@ public class TeleOpMain extends LinearOpMode {
             // Put run blocks here.
             while (opModeIsActive()) {
                 // Put loop blocks here.
-                if (gamepad1.right_trigger >= 0.5) {
-                    rSpeed = gamepad1.right_stick_y * maxSpeed;
-                    lSpeed = gamepad1.left_stick_y * maxSpeed;
+
+                double forwardInput = gamepad1.left_stick_y;
+                double strafeInput = gamepad1.left_stick_x;
+                double rotateInput = gamepad1.right_stick_x;
+
+                double accelerator = gamepad1.right_trigger;
+                if (accelerator > maxSpeed) {
+                    accelerator = maxSpeed;
                 }
-                else {
-                    rSpeed = gamepad1.right_stick_y * normalSpeed;
-                    lSpeed = gamepad1.left_stick_y * normalSpeed;
+
+
+                lfSpeed = (forwardInput + strafeInput - rotateInput * normalSpeed);
+                rfSpeed = (forwardInput - strafeInput + rotateInput * normalSpeed);
+                lrSpeed = (forwardInput - strafeInput - rotateInput * normalSpeed);
+                rrSpeed = (forwardInput + strafeInput + rotateInput * normalSpeed);
+
+                double leftMax = Math.max(Math.abs(lfSpeed), Math.abs(lrSpeed));
+                double rightMax = Math.max(Math.abs(rfSpeed), Math.abs(rrSpeed));
+                double max = Math.max (leftMax, rightMax);
+
+                if(max > 1.0) {
+                    lfSpeed /= max;
+                    rfSpeed /= max;
+                    lrSpeed /= max;
+                    rrSpeed /= max;
                 }
-                if (gamepad1.y) {
+
+                if (gamepad1.x) { // Might change to y
                     DuckWheelMotor.setPower(1 * duckWheelSpeed);
                 }
+
                 if (gamepad1.right_bumper) {
-                    if (gamepad1.right_trigger >= 0.5) {
-                        LFMotor.setPower(-1 * maxSpeed);
-                        LRMotor.setPower(1 * maxSpeed);
-                        RFMotor.setPower(1 * maxSpeed);
-                        RRMotor.setPower(-1 * maxSpeed);
-                    }
-                    else {
-                        LFMotor.setPower(-1 * normalSpeed);
-                        LRMotor.setPower(1 * normalSpeed);
-                        RFMotor.setPower(1 * normalSpeed);
-                        RRMotor.setPower(-1 * normalSpeed);
-                    }
+                    LiftMotor.setPower(1 * liftSpeed);
                 }
-                else if (gamepad1.left_bumper) {
-                    if (gamepad1.right_trigger >= 0.5) {
-                        LFMotor.setPower(1 * maxSpeed);
-                        LRMotor.setPower(-1 * maxSpeed);
-                        RFMotor.setPower(-1 * maxSpeed);
-                        RRMotor.setPower(1 * maxSpeed);
-                    }
-                    else {
-                        LFMotor.setPower(1 * normalSpeed);
-                        LRMotor.setPower(-1 * normalSpeed);
-                        RFMotor.setPower(-1 * normalSpeed);
-                        RRMotor.setPower(1 * normalSpeed);
-                    }
+
+                if (gamepad1.left_bumper) {
+                    LiftMotor.setPower(-1 * liftSpeed);
                 }
-                else {
-                    LFMotor.setPower(lSpeed);
-                    LRMotor.setPower(lSpeed);
-                    RFMotor.setPower(rSpeed);
-                    RRMotor.setPower(rSpeed);
-                }
-                telemetry.addData("Left stick", lSpeed);
-                telemetry.addData("Right stick", rSpeed);
+
+                LFMotor.setPower(lfSpeed + lfSpeed * accelerator);
+                RFMotor.setPower(rfSpeed + rfSpeed * accelerator);
+                LRMotor.setPower(lrSpeed + lrSpeed * accelerator);
+                RRMotor.setPower(rrSpeed + rrSpeed * accelerator);
+
+                // TODO: Add Telemetry Data
+                telemetry.addData("LF Motor", lfSpeed);
+                telemetry.addData("RF Motor", rfSpeed);
+                telemetry.addData("LR Motor", lrSpeed);
+                telemetry.addData("RR Motor", rrSpeed);
+                telemetry.addData("Lift", LiftMotor.getCurrentPosition());
                 telemetry.update();
             }
         }
     }
 }
-
-//Billywoy wuz heer
