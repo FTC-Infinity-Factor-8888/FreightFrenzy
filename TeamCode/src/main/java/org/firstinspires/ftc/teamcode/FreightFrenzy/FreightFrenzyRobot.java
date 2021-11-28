@@ -12,6 +12,7 @@ public class FreightFrenzyRobot implements iRobot {
     DcMotor RRMotor;
     DcMotor LFMotor;
     DcMotor LRMotor;
+    DcMotor DWMotor;
 
     public FreightFrenzyRobot (LinearOpMode creator){
         this.hardwareMap = creator.hardwareMap;
@@ -22,10 +23,31 @@ public class FreightFrenzyRobot implements iRobot {
         RRMotor = hardwareMap.get(DcMotor.class, "RRMotor");
         LFMotor = hardwareMap.get(DcMotor.class, "LFMotor");
         LRMotor = hardwareMap.get(DcMotor.class, "LRMotor");
+        DWMotor = hardwareMap.get(DcMotor.class, "DWMotor");
+    }
+
+    public void duckWheel (double power) {
+        DWMotor.setPower(power);
+    }
+
+    public void slideMotor ( double power) {
+
     }
 
     @Override
     public void drive(double y, double x) {
+        if( x < 0.03) {
+            RFMotor.setPower(y);
+            RRMotor.setPower(y);
+            LFMotor.setPower(y);
+            LRMotor.setPower(y);
+        }
+        else if( y < 0.03) {
+            RFMotor.setPower(x);
+            RRMotor.setPower(x);
+            LFMotor.setPower(x);
+            LRMotor.setPower(x);
+        }
 
     }
 
