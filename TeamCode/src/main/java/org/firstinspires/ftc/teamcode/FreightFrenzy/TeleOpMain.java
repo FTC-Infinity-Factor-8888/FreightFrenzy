@@ -70,12 +70,26 @@ public class TeleOpMain extends LinearOpMode {
                     DuckWheelMotor.setPower(1 * duckWheelSpeed);
                 }
 
+                int liftPosition0 = 1; // 1 is a mockup value
+                int liftPosition1 = 2; // 2 is a mockup value
+                int liftPosition2 = 3; // 3 is a mockup value
+                int liftPosition3 = 4; // 4 is a mockup value
+                int currentLiftPosition = liftPosition0;
+                int desiredLiftPosition = 0;
                 if (gamepad1.right_bumper) {
-                    LiftMotor.setPower(1 * liftSpeed);
+                    if (currentLiftPosition != liftPosition3) {
+                        desiredLiftPosition = liftPosition1;
+                        currentLiftPosition++;
+                    }
+                else if (gamepad1.left_bumper) {
+                        if (currentLiftPosition != liftPosition0) {
+
+                        }
+                    }
                 }
 
-                if (gamepad1.left_bumper) {
-                    LiftMotor.setPower(-1 * liftSpeed);
+                if (currentLiftPosition != 0) {
+                    LiftMotor.setTargetPosition(desiredLiftPosition);
                 }
 
                 LFMotor.setPower(lfSpeed + lfSpeed * accelerator);
