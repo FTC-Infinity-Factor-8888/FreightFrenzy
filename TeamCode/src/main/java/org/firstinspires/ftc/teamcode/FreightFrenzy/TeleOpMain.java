@@ -22,7 +22,11 @@ public class TeleOpMain extends LinearOpMode {
         double maxSpeed = 0.80;
         double normalSpeed = 0.50;
         double duckWheelSpeed = 0.25;
-        double liftSpeed = 0.05;
+
+        double liftSpeed = 0.3;
+        int maxLiftPosition = 923;
+        int minLiftPosition = 0;
+
 
         DcMotor RFMotor = hardwareMap.get(DcMotor.class, "RFMotor");
         DcMotor RRMotor = hardwareMap.get(DcMotor.class, "RRMotor");
@@ -31,9 +35,20 @@ public class TeleOpMain extends LinearOpMode {
         DcMotor DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor");
         DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
 
+        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         // Put initialization blocks here.
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         RRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        boolean currentLiftUp = false;
+        boolean currentLiftDown = false;
+        boolean currentDuckWheel = false;
+
+        boolean priorLiftUp = false;
+        boolean priorLiftDown = false;
+        boolean priorDuckWheel = false;
+
         waitForStart();
         if (opModeIsActive()) {
             // Put run blocks here.
@@ -43,12 +58,50 @@ public class TeleOpMain extends LinearOpMode {
                 double forwardInput = gamepad1.left_stick_y;
                 double strafeInput = gamepad1.left_stick_x;
                 double rotateInput = gamepad1.right_stick_x;
-
                 double accelerator = gamepad1.right_trigger;
+                currentLiftUp = gamepad1.right_bumper;
+                currentLiftDown = gamepad1.left_bumper;
+                currentDuckWheel = gamepad1.x;
+
+                /*
+                Lift requirements:
+                    The first button pressed sets the direction.
+                    Holding both buttons stops the motion.
+                    Releasing one of those two buttons heads in the direction of the remaining button.
+                    Releasing both buttons stops the motion.
+
+                Lift requirements (video game option, not chosen):
+                    The first button to be pressed sets the direction that we are going.
+                    The other button is ignored while the first button is being held down.
+                    Both buttons must be released to stop the lift
+                    or if it reaches its target position.
+                    The lift must be stopped in order to switch direction.
+
+                DuckWheel requirements:
+
+                 */
+                if(currentLiftUp != priorLiftUp || currentLiftDown != priorLiftDown) {
+                    // 0 = no motion, 1 = up, -1 = down
+                    int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0); // Ask Pranai
+
+                    if(direction == 1) {
+                        LiftMotor.setTargetPosition(maxLiftPosition);
+                        LiftMotor.setPower(liftSpeed);
+                    }
+                    else if(direction == -1) {
+                        LiftMotor.setTargetPosition(minLiftPosition);
+                        LiftMotor.setPower(-liftSpeed);
+                    }
+                }
+
+                if(currentDuckWheel != priorDuckWheel) {
+                    double power = (currentDuckWheel?duckWheelSpeed:0); // Also ask Pranai
+                    DuckWheelMotor.setPower(power);
+                }
+
                 if (accelerator > maxSpeed) {
                     accelerator = maxSpeed;
                 }
-
 
                 lfSpeed = (forwardInput + strafeInput - rotateInput * normalSpeed);
                 rfSpeed = (forwardInput - strafeInput + rotateInput * normalSpeed);
@@ -66,32 +119,6 @@ public class TeleOpMain extends LinearOpMode {
                     rrSpeed /= max;
                 }
 
-                if (gamepad1.x) { // Might change to y
-                    DuckWheelMotor.setPower(1 * duckWheelSpeed);
-                }
-
-                int liftPosition0 = 1; // 1 is a mockup value
-                int liftPosition1 = 2; // 2 is a mockup value
-                int liftPosition2 = 3; // 3 is a mockup value
-                int liftPosition3 = 4; // 4 is a mockup value
-                int currentLiftPosition = liftPosition0;
-                int desiredLiftPosition = 0;
-                if (gamepad1.right_bumper) {
-                    if (currentLiftPosition != liftPosition3) {
-                        desiredLiftPosition = liftPosition1;
-                        currentLiftPosition++;
-                    }
-                else if (gamepad1.left_bumper) {
-                        if (currentLiftPosition != liftPosition0) {
-
-                        }
-                    }
-                }
-
-                if (currentLiftPosition != 0) {
-                    LiftMotor.setTargetPosition(desiredLiftPosition);
-                }
-
                 LFMotor.setPower(lfSpeed + lfSpeed * accelerator);
                 RFMotor.setPower(rfSpeed + rfSpeed * accelerator);
                 LRMotor.setPower(lrSpeed + lrSpeed * accelerator);
@@ -104,6 +131,10 @@ public class TeleOpMain extends LinearOpMode {
                 telemetry.addData("RR Motor", rrSpeed);
                 telemetry.addData("Lift", LiftMotor.getCurrentPosition());
                 telemetry.update();
+
+                priorLiftUp = currentLiftUp;
+                priorLiftDown = currentLiftDown;
+                priorDuckWheel = currentDuckWheel;
             }
         }
     }
