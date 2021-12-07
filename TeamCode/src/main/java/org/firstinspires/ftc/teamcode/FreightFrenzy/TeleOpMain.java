@@ -35,7 +35,6 @@ public class TeleOpMain extends LinearOpMode {
         DcMotor DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor");
         DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
 
-        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Put initialization blocks here.
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -84,14 +83,19 @@ public class TeleOpMain extends LinearOpMode {
                     // 0 = no motion, 1 = up, -1 = down
                     int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0); // Ask Pranai
 
+                    LiftMotor.setPower(liftSpeed);
+                    int currentLiftPosition = LiftMotor.getCurrentPosition();
+
                     if(direction == 1) {
                         LiftMotor.setTargetPosition(maxLiftPosition);
-                        LiftMotor.setPower(liftSpeed);
                     }
                     else if(direction == -1) {
                         LiftMotor.setTargetPosition(minLiftPosition);
-                        LiftMotor.setPower(-liftSpeed);
                     }
+                    else {
+                        LiftMotor.setTargetPosition(currentLiftPosition);
+                    }
+                    LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
 
                 if(currentDuckWheel != priorDuckWheel) {
@@ -112,7 +116,7 @@ public class TeleOpMain extends LinearOpMode {
                 double rightMax = Math.max(Math.abs(rfSpeed), Math.abs(rrSpeed));
                 double max = Math.max (leftMax, rightMax);
 
-                if(max > 1.0) {
+                if(max > 0.5) {
                     lfSpeed /= max;
                     rfSpeed /= max;
                     lrSpeed /= max;
@@ -125,11 +129,12 @@ public class TeleOpMain extends LinearOpMode {
                 RRMotor.setPower(rrSpeed + rrSpeed * accelerator);
 
                 // TODO: Add Telemetry Data
-                telemetry.addData("LF Motor", lfSpeed);
-                telemetry.addData("RF Motor", rfSpeed);
-                telemetry.addData("LR Motor", lrSpeed);
-                telemetry.addData("RR Motor", rrSpeed);
+                telemetry.addData("LF Motor", lfSpeed + lfSpeed * accelerator);
+                telemetry.addData("RF Motor", rfSpeed + rfSpeed * accelerator);
+                telemetry.addData("LR Motor", lrSpeed + lrSpeed * accelerator);
+                telemetry.addData("RR Motor", rrSpeed + rrSpeed * accelerator);
                 telemetry.addData("Lift", LiftMotor.getCurrentPosition());
+                telemetry.addData("Accelerator", gamepad1.right_trigger);
                 telemetry.update();
 
                 priorLiftUp = currentLiftUp;

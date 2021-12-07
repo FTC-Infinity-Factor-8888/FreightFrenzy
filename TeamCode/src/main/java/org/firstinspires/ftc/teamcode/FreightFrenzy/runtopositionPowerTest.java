@@ -12,12 +12,12 @@ public class runtopositionPowerTest extends LinearOpMode {
     public void runOpMode() {
         DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor");
         DuckWheelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        DuckWheelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         DuckWheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         waitForStart();
 
         if(opModeIsActive()) {
             DuckWheelMotor.setTargetPosition(1000);
+            DuckWheelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             DuckWheelMotor.setPower(1);
 
             while(opModeIsActive() && DuckWheelMotor.isBusy()) {
