@@ -2,18 +2,24 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Utilities.iRobot;
 
 public class FreightFrenzyRobot implements iRobot {
     private final HardwareMap hardwareMap;
+    public Telemetry telemetry;
     DcMotor RFMotor;
     DcMotor RRMotor;
     DcMotor LFMotor;
     DcMotor LRMotor;
     DcMotor DWMotor;
-
+   // todo set x!
+   //  double x = Gamepad.
     public FreightFrenzyRobot (LinearOpMode creator){
         this.hardwareMap = creator.hardwareMap;
     }
@@ -24,6 +30,45 @@ public class FreightFrenzyRobot implements iRobot {
         LFMotor = hardwareMap.get(DcMotor.class, "LFMotor");
         LRMotor = hardwareMap.get(DcMotor.class, "LRMotor");
         DWMotor = hardwareMap.get(DcMotor.class, "DWMotor");
+
+        RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        RRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     public void duckWheel (double power) {
@@ -36,18 +81,6 @@ public class FreightFrenzyRobot implements iRobot {
 
     @Override
     public void drive(double y, double x) {
-        if( x < 0.03) {
-            RFMotor.setPower(y);
-            RRMotor.setPower(y);
-            LFMotor.setPower(y);
-            LRMotor.setPower(y);
-        }
-        else if( y < 0.03) {
-            RFMotor.setPower(x);
-            RRMotor.setPower(x);
-            LFMotor.setPower(x);
-            LRMotor.setPower(x);
-        }
 
     }
 
