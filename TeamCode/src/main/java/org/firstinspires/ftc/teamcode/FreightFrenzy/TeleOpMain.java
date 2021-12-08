@@ -21,7 +21,7 @@ public class TeleOpMain extends LinearOpMode {
 
         double maxSpeed = 0.80;
         double normalSpeed = 0.50;
-        double duckWheelSpeed = 0.25;
+        double duckWheelSpeed = 0.4;
 
         double liftSpeed = 0.3;
         int maxLiftPosition = 923;
@@ -40,13 +40,15 @@ public class TeleOpMain extends LinearOpMode {
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         RRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        boolean currentLiftUp = false;
-        boolean currentLiftDown = false;
-        boolean currentDuckWheel = false;
+        boolean currentLiftUp;
+        boolean currentLiftDown;
+        boolean duckWheelLeft;
+        boolean duckWheelRight;
 
         boolean priorLiftUp = false;
         boolean priorLiftDown = false;
-        boolean priorDuckWheel = false;
+        boolean priorDuckWheelLeft = false;
+        boolean priorDuckWheelRight = false;
 
         waitForStart();
         if (opModeIsActive()) {
@@ -60,7 +62,9 @@ public class TeleOpMain extends LinearOpMode {
                 double accelerator = gamepad1.right_trigger;
                 currentLiftUp = gamepad1.right_bumper;
                 currentLiftDown = gamepad1.left_bumper;
-                currentDuckWheel = gamepad1.x;
+                duckWheelLeft = gamepad1.x;
+                duckWheelRight = gamepad1.b;
+
 
                 /*
                 Lift requirements:
@@ -98,8 +102,8 @@ public class TeleOpMain extends LinearOpMode {
                     LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
 
-                if(currentDuckWheel != priorDuckWheel) {
-                    double power = (currentDuckWheel?duckWheelSpeed:0); // Also ask Pranai
+                if(duckWheelLeft != priorDuckWheelLeft || duckWheelRight != priorDuckWheelRight) {
+                    double power = (duckWheelLeft?1:0) + (duckWheelRight?-1:0);
                     DuckWheelMotor.setPower(power);
                 }
 
@@ -139,7 +143,8 @@ public class TeleOpMain extends LinearOpMode {
 
                 priorLiftUp = currentLiftUp;
                 priorLiftDown = currentLiftDown;
-                priorDuckWheel = currentDuckWheel;
+                priorDuckWheelLeft = duckWheelLeft;
+                priorDuckWheelRight = duckWheelRight;
             }
         }
     }
