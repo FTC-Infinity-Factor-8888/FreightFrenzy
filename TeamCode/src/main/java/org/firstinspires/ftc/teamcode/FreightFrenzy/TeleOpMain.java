@@ -28,12 +28,12 @@ public class TeleOpMain extends LinearOpMode {
         int minLiftPosition = 0;
 
 
-        DcMotor RFMotor = hardwareMap.get(DcMotor.class, "RFMotor");
-        DcMotor RRMotor = hardwareMap.get(DcMotor.class, "RRMotor");
-        DcMotor LFMotor = hardwareMap.get(DcMotor.class, "LFMotor");
-        DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor");
-        DcMotor DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor");
-        DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        DcMotor RFMotor = hardwareMap.get(DcMotor.class, "RFMotor"); // Port: 2
+        DcMotor RRMotor = hardwareMap.get(DcMotor.class, "RRMotor"); // Port: 3
+        DcMotor LFMotor = hardwareMap.get(DcMotor.class, "LFMotor"); // Port: 0
+        DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor"); // Port: 1
+        DcMotor DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor"); // Port: 1 exp.
+        DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "LiftMotor"); // Port: 0 exp.
 
 
         // Put initialization blocks here.
@@ -83,6 +83,8 @@ public class TeleOpMain extends LinearOpMode {
                 DuckWheel requirements:
 
                  */
+
+                // To control the lift
                 if(currentLiftUp != priorLiftUp || currentLiftDown != priorLiftDown) {
                     // 0 = no motion, 1 = up, -1 = down
                     int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0); // Ask Pranai
@@ -102,8 +104,16 @@ public class TeleOpMain extends LinearOpMode {
                     LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
 
+                // To control the duck wheel
                 if(duckWheelLeft != priorDuckWheelLeft || duckWheelRight != priorDuckWheelRight) {
-                    double power = (duckWheelLeft?1:0) + (duckWheelRight?-1:0);
+                    int direction = (duckWheelLeft?1:0) + (duckWheelRight?-1:0);
+                    double power = 0;
+                    if(direction == 1) {
+                        power = duckWheelSpeed;
+                    }
+                    else if(direction == -1) {
+                        power = -duckWheelSpeed;
+                    }
                     DuckWheelMotor.setPower(power);
                 }
 
@@ -111,14 +121,14 @@ public class TeleOpMain extends LinearOpMode {
                     accelerator = maxSpeed;
                 }
 
-                lfSpeed = (forwardInput + strafeInput - rotateInput * normalSpeed);
-                rfSpeed = (forwardInput - strafeInput + rotateInput * normalSpeed);
-                lrSpeed = (forwardInput - strafeInput - rotateInput * normalSpeed);
-                rrSpeed = (forwardInput + strafeInput + rotateInput * normalSpeed);
+                lfSpeed = (forwardInput - strafeInput - rotateInput * normalSpeed);
+                rfSpeed = (forwardInput + strafeInput + rotateInput * normalSpeed);
+                lrSpeed = (forwardInput + strafeInput - rotateInput * normalSpeed);
+                rrSpeed = (forwardInput - strafeInput + rotateInput * normalSpeed);
 
                 double leftMax = Math.max(Math.abs(lfSpeed), Math.abs(lrSpeed));
                 double rightMax = Math.max(Math.abs(rfSpeed), Math.abs(rrSpeed));
-                double max = Math.max (leftMax, rightMax);
+                double max = Math.max(leftMax, rightMax);
 
                 if(max > 0.5) {
                     lfSpeed /= max;
