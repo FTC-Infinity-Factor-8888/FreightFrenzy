@@ -14,37 +14,43 @@ public class TeleOpMain extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
-        double lfSpeed;
-        double rfSpeed;
-        double lrSpeed;
-        double rrSpeed;
+        double lfSpeed; // Left Front motor speed.
+        double rfSpeed; // Right Front motor speed.
+        double lrSpeed; // Left Rear motor speed.
+        double rrSpeed; // Right Rear motor speed.
 
-        double maxSpeed = 0.80;
-        double normalSpeed = 0.50;
-        double duckWheelSpeed = 0.4;
+        double maxSpeed = 0.80; // The maximum speed we want our robot to drive at.
+        double normalSpeed = 0.50; // The normal speed our robot should be driving at.
+        double duckWheelSpeed = 0.4; // The speed the wheel to turn the duck carousel moves at.
 
-        double liftSpeed = 0.3;
-        int maxLiftPosition = 923;
-        int minLiftPosition = 0;
+        double liftSpeed = 0.3; // The speed the lift moves at.
+        int maxLiftPosition = 923;  // The maximum amount of degrees the motor turns before the lift
+        // reaches its maximum height.
+        int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
+        // reaches its minimum height.
 
-
+        // Declaring our motors. "exp." means expansion hub.
         DcMotor RFMotor = hardwareMap.get(DcMotor.class, "RFMotor"); // Port: 2
         DcMotor RRMotor = hardwareMap.get(DcMotor.class, "RRMotor"); // Port: 3
         DcMotor LFMotor = hardwareMap.get(DcMotor.class, "LFMotor"); // Port: 0
         DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor"); // Port: 1
-        DcMotor DuckWheelMotor = hardwareMap.get(DcMotor.class, "DWMotor"); // Port: 1 exp.
+        DcMotor DWMotor = hardwareMap.get(DcMotor.class, "DWMotor"); // Port: 1 exp.
         DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "LiftMotor"); // Port: 0 exp.
 
 
         // Put initialization blocks here.
+
+        // We reverse these motors because of the way that they are mounted.
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         RRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        // Declaring the buttons may quickly change.
         boolean currentLiftUp;
         boolean currentLiftDown;
         boolean duckWheelLeft;
         boolean duckWheelRight;
 
+        // Declaring the former values of the buttons so we can tell if they changed.
         boolean priorLiftUp = false;
         boolean priorLiftDown = false;
         boolean priorDuckWheelLeft = false;
@@ -56,14 +62,15 @@ public class TeleOpMain extends LinearOpMode {
             while (opModeIsActive()) {
                 // Put loop blocks here.
 
-                double forwardInput = gamepad1.left_stick_y;
-                double strafeInput = gamepad1.left_stick_x;
-                double rotateInput = gamepad1.right_stick_x;
+                double forwardInput = gamepad1.left_stick_y; // Controls for moving back-and-forth.
+                double strafeInput = gamepad1.left_stick_x; // Controls for strafing.
+                double rotateInput = gamepad1.right_stick_x; // Controls for pivoting.
+                // Controls to allow our robot to reach speeds up to maxSpeed.
                 double accelerator = gamepad1.right_trigger;
-                currentLiftUp = gamepad1.right_bumper;
-                currentLiftDown = gamepad1.left_bumper;
-                duckWheelLeft = gamepad1.x;
-                duckWheelRight = gamepad1.b;
+                currentLiftUp = gamepad1.right_bumper; // Controls for moving the lift up.
+                currentLiftDown = gamepad1.left_bumper; // Controls for moving the lift down.
+                duckWheelLeft = gamepad1.x; // Controls for rotating the duck wheel left.
+                duckWheelRight = gamepad1.b; // Controls for moving the duck wheel right.
 
 
                 /*
@@ -84,65 +91,99 @@ public class TeleOpMain extends LinearOpMode {
 
                  */
 
-                // To control the lift
+                // To control the lift.
+                // Checking to see whether the buttons are still pressed.
                 if(currentLiftUp != priorLiftUp || currentLiftDown != priorLiftDown) {
                     // 0 = no motion, 1 = up, -1 = down
-                    int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0); // Ask Pranai
+                    // Checking to see which buttons are pushed.
+                    int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0);
 
+                    // Setting the speed that the lift moves at.
                     LiftMotor.setPower(liftSpeed);
+                    // The current degrees that the LiftMotor is at.
                     int currentLiftPosition = LiftMotor.getCurrentPosition();
 
+                    // If the up button is pressed move the lift up.
                     if(direction == 1) {
                         LiftMotor.setTargetPosition(maxLiftPosition);
                     }
+                    // If the down button is pressed move the lift down.
                     else if(direction == -1) {
                         LiftMotor.setTargetPosition(minLiftPosition);
                     }
+                    // If no button (or both buttons [are]) is pressed, stay where you are.
                     else {
                         LiftMotor.setTargetPosition(currentLiftPosition);
                     }
+                    // Move to the position as specified above.
                     LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
 
-                // To control the duck wheel
+                // To control the duck wheel.
+                // Checking to see whether the buttons are still pressed.
                 if(duckWheelLeft != priorDuckWheelLeft || duckWheelRight != priorDuckWheelRight) {
+                    // 1 = rotate left, -1 = rotate right, 0 = don't move.
+                    // Checking to see which buttons are pressed.
                     int direction = (duckWheelLeft?1:0) + (duckWheelRight?-1:0);
-                    double power = 0;
+                    double power = 0; // By default the wheel should not rotate.
+                    // If the rotate left button is pressed, rotate left.
                     if(direction == 1) {
                         power = duckWheelSpeed;
                     }
+                    // If the rotate right button is pressed, rotate right.
                     else if(direction == -1) {
                         power = -duckWheelSpeed;
                     }
-                    DuckWheelMotor.setPower(power);
+                    // Setting the power the duck wheel motor should move at.
+                    DWMotor.setPower(power);
                 }
 
+                /*
+                If the accelerator control is asking the robot to move faster than the maximum
+                robot speed, it should normalize to the maximum robot speed.
+                 */
                 if (accelerator > maxSpeed) {
                     accelerator = maxSpeed;
                 }
 
-                lfSpeed = (forwardInput - strafeInput - rotateInput * normalSpeed);
-                rfSpeed = (forwardInput + strafeInput + rotateInput * normalSpeed);
-                lrSpeed = (forwardInput + strafeInput - rotateInput * normalSpeed);
-                rrSpeed = (forwardInput - strafeInput + rotateInput * normalSpeed);
+                /*
+                Because we use Mecanum wheels, we can move forward, rotate, and strafe.
+                Here, we are taking into account the direction each wheel should travel at in
+                order to move in the direction we want the robot to move.
+                 */
+                lfSpeed = ((forwardInput - strafeInput - rotateInput) * normalSpeed);
+                rfSpeed = ((forwardInput + strafeInput + rotateInput) * normalSpeed);
+                lrSpeed = ((forwardInput + strafeInput - rotateInput) * normalSpeed);
+                rrSpeed = ((forwardInput - strafeInput + rotateInput) * normalSpeed);
 
+                /* Here we are checking to make sure that no wheel is trying to move faster than
+                the allowed speed, normalSpeed (0.5). Math.max() checks which number is
+                the greatest that you input into it. Math.abs() takes the absolute value of the
+                value entered into it.
+                 */
+                // Math.max() only takes two numbers at a time.
                 double leftMax = Math.max(Math.abs(lfSpeed), Math.abs(lrSpeed));
                 double rightMax = Math.max(Math.abs(rfSpeed), Math.abs(rrSpeed));
                 double max = Math.max(leftMax, rightMax);
 
-                if(max > 0.5) {
+                /* Now, if the motors are moving faster normalSpeed, we divide them by the motor
+                that was trying to move the fastest. */
+                if(max > normalSpeed) {
                     lfSpeed /= max;
                     rfSpeed /= max;
                     lrSpeed /= max;
                     rrSpeed /= max;
                 }
 
+                /* Here we are setting the motor speed plus the speed of the motor while
+                accelerating. */
                 LFMotor.setPower(lfSpeed + lfSpeed * accelerator);
                 RFMotor.setPower(rfSpeed + rfSpeed * accelerator);
                 LRMotor.setPower(lrSpeed + lrSpeed * accelerator);
                 RRMotor.setPower(rrSpeed + rrSpeed * accelerator);
 
-                // TODO: Add Telemetry Data
+                /* Here we show values on the driver hub that may be useful to know while driving
+                the robot or during testing. */
                 telemetry.addData("LF Motor", lfSpeed + lfSpeed * accelerator);
                 telemetry.addData("RF Motor", rfSpeed + rfSpeed * accelerator);
                 telemetry.addData("LR Motor", lrSpeed + lrSpeed * accelerator);
@@ -151,6 +192,11 @@ public class TeleOpMain extends LinearOpMode {
                 telemetry.addData("Accelerator", gamepad1.right_trigger);
                 telemetry.update();
 
+                /* Here we set the current button positions to the prior button position so we have
+                updated data as we loop back.
+
+                Note: This loops multiple times per millisecond.
+                 */
                 priorLiftUp = currentLiftUp;
                 priorLiftDown = currentLiftDown;
                 priorDuckWheelLeft = duckWheelLeft;
