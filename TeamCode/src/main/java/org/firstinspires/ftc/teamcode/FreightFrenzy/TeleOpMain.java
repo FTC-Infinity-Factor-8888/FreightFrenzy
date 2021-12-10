@@ -21,6 +21,7 @@ public class TeleOpMain extends LinearOpMode {
 
         double maxSpeed = 0.80; // The maximum speed we want our robot to drive at.
         double normalSpeed = 0.50; // The normal speed our robot should be driving at.
+        double accelerationSpeed = maxSpeed - normalSpeed; // The acceleration speed set on normal speed.
         double duckWheelSpeed = 0.4; // The speed the wheel to turn the duck carousel moves at.
 
         double liftSpeed = 0.3; // The speed the lift moves at.
@@ -149,38 +150,119 @@ public class TeleOpMain extends LinearOpMode {
                 lrSpeed = ((forwardInput + strafeInput - rotateInput) * normalSpeed);
                 rrSpeed = ((forwardInput - strafeInput + rotateInput) * normalSpeed);
 
-                /* Here we are checking to make sure that no wheel is trying to move faster than
-                the allowed speed, normalSpeed (0.5). Math.max() checks which number is
-                the greatest that you input into it. Math.abs() takes the absolute value of the
-                value entered into it.
-                 */
-                // Math.max() only takes two numbers at a time.
-                double leftMax = Math.max(Math.abs(lfSpeed), Math.abs(lrSpeed));
-                double rightMax = Math.max(Math.abs(rfSpeed), Math.abs(rrSpeed));
-                double max = Math.max(leftMax, rightMax);
+//                /* Here we are checking to make sure that no wheel is trying to move faster than
+//                the allowed speed, normalSpeed (0.5). Math.max() checks which number is
+//                the greatest that you input into it. Math.abs() takes the absolute value of the
+//                value entered into it.
+//                 */
+//                // Math.max() only takes two numbers at a time.
+//                double leftMax = Math.max(Math.abs(lfSpeed), Math.abs(lrSpeed));
+//                double rightMax = Math.max(Math.abs(rfSpeed), Math.abs(rrSpeed));
+//                double max = Math.max(leftMax, rightMax);
+//
+//                /* Now, if the motors are moving faster normalSpeed, we divide them by the motor
+//                that was trying to move the fastest. */
+//                if(max > normalSpeed) {
+//                    lfSpeed /= max;
+//                    rfSpeed /= max;
+//                    lrSpeed /= max;
+//                    rrSpeed /= max;
+//                }
 
-                /* Now, if the motors are moving faster normalSpeed, we divide them by the motor
-                that was trying to move the fastest. */
-                if(max > normalSpeed) {
-                    lfSpeed /= max;
-                    rfSpeed /= max;
-                    lrSpeed /= max;
-                    rrSpeed /= max;
+                if(Math.abs(lfSpeed) > normalSpeed) {
+                    if(lfSpeed > 0) {
+                        lfSpeed = normalSpeed;
+                    }
+                    if(lfSpeed < 0) {
+                        lfSpeed = -normalSpeed;
+                    }
                 }
 
-                /* Here we are setting the motor speed plus the speed of the motor while
-                accelerating. */
-                LFMotor.setPower(lfSpeed + lfSpeed * accelerator);
-                RFMotor.setPower(rfSpeed + rfSpeed * accelerator);
-                LRMotor.setPower(lrSpeed + lrSpeed * accelerator);
-                RRMotor.setPower(rrSpeed + rrSpeed * accelerator);
+                if(Math.abs(lrSpeed) > normalSpeed) {
+                    if(lrSpeed > 0) {
+                        lrSpeed = normalSpeed;
+                    }
+                    if(lrSpeed < 0) {
+                        lrSpeed = -normalSpeed;
+                    }
+                }
+
+                if(Math.abs(rfSpeed) > normalSpeed) {
+                    if(rfSpeed > 0) {
+                        rfSpeed = normalSpeed;
+                    }
+                    if(rfSpeed < 0) {
+                        rfSpeed = -normalSpeed;
+                    }
+                }
+
+                if(Math.abs(rrSpeed) > normalSpeed) {
+                    if(rrSpeed > 0) {
+                        rrSpeed = normalSpeed;
+                    }
+                    if(rrSpeed < 0) {
+                        rrSpeed = -normalSpeed;
+                    }
+                }
+
+                if(Math.abs(lfSpeed) + accelerationSpeed * accelerator > maxSpeed) {
+                    if(Math.abs(lfSpeed) > normalSpeed) {
+                        if(lfSpeed > 0) {
+                            lfSpeed = normalSpeed;
+                            LFMotor.setPower(lfSpeed + accelerationSpeed * accelerator);
+                        }
+                        if(lfSpeed < 0) {
+                            lfSpeed = -normalSpeed;
+                            LFMotor.setPower(lfSpeed - accelerationSpeed * accelerator);
+                        }
+                    }
+                }
+
+                if(Math.abs(rfSpeed) + accelerationSpeed * accelerator > maxSpeed) {
+                    if(Math.abs(rfSpeed) > normalSpeed) {
+                        if(rfSpeed > 0) {
+                            rfSpeed = normalSpeed;
+                            RFMotor.setPower(rfSpeed + accelerationSpeed * accelerator);
+                        }
+                        if(rfSpeed < 0) {
+                            rfSpeed = -normalSpeed;
+                            RFMotor.setPower(rfSpeed - accelerationSpeed * accelerator);
+                        }
+                    }
+                }
+
+                if(Math.abs(lrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
+                    if(Math.abs(lrSpeed) > normalSpeed) {
+                        if(lrSpeed > 0) {
+                            lrSpeed = normalSpeed;
+                            LRMotor.setPower(lrSpeed + accelerationSpeed * accelerator);
+                        }
+                        if(lrSpeed < 0) {
+                            lrSpeed = -normalSpeed;
+                            LRMotor.setPower(lrSpeed - accelerationSpeed * accelerator);
+                        }
+                    }
+                }
+
+                if(Math.abs(rrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
+                    if(Math.abs(rrSpeed) > normalSpeed) {
+                        if(rrSpeed > 0) {
+                            rrSpeed = normalSpeed;
+                            RRMotor.setPower(rrSpeed + accelerationSpeed * accelerator);
+                        }
+                        if(rrSpeed < 0) {
+                            rrSpeed = -normalSpeed;
+                            RRMotor.setPower(rrSpeed - accelerationSpeed * accelerator);
+                        }
+                    }
+                }
 
                 /* Here we show values on the driver hub that may be useful to know while driving
                 the robot or during testing. */
-                telemetry.addData("LF Motor", lfSpeed + lfSpeed * accelerator);
-                telemetry.addData("RF Motor", rfSpeed + rfSpeed * accelerator);
-                telemetry.addData("LR Motor", lrSpeed + lrSpeed * accelerator);
-                telemetry.addData("RR Motor", rrSpeed + rrSpeed * accelerator);
+                telemetry.addData("LF Motor", LFMotor.getPower());
+                telemetry.addData("RF Motor", RFMotor.getPower());
+                telemetry.addData("LR Motor", LRMotor.getPower());
+                telemetry.addData("RR Motor", RRMotor.getPower());
                 telemetry.addData("Lift", LiftMotor.getCurrentPosition());
                 telemetry.addData("Accelerator", gamepad1.right_trigger);
                 telemetry.update();
