@@ -138,13 +138,6 @@ public class TeleOpMain extends LinearOpMode {
                     DWMotor.setPower(power);
                 }
 
-                /*
-                If the accelerator control is asking the robot to move faster than the maximum
-                robot speed, it should normalize to the maximum robot speed.
-                 */
-                if (accelerator > maxSpeed) {
-                    accelerator = maxSpeed;
-                }
 
                 /*
                 Because we use Mecanum wheels, we can move forward, rotate, and strafe.
