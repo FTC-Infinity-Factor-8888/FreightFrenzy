@@ -150,61 +150,6 @@ public class TeleOpMain extends LinearOpMode {
                 lrSpeed = ((forwardInput + strafeInput - rotateInput) * normalSpeed);
                 rrSpeed = ((forwardInput - strafeInput + rotateInput) * normalSpeed);
 
-//                /* Here we are checking to make sure that no wheel is trying to move faster than
-//                the allowed speed, normalSpeed (0.5). Math.max() checks which number is
-//                the greatest that you input into it. Math.abs() takes the absolute value of the
-//                value entered into it.
-//                 */
-//                // Math.max() only takes two numbers at a time.
-//                double leftMax = Math.max(Math.abs(lfSpeed), Math.abs(lrSpeed));
-//                double rightMax = Math.max(Math.abs(rfSpeed), Math.abs(rrSpeed));
-//                double max = Math.max(leftMax, rightMax);
-//
-//                /* Now, if the motors are moving faster normalSpeed, we divide them by the motor
-//                that was trying to move the fastest. */
-//                if(max > normalSpeed) {
-//                    lfSpeed /= max;
-//                    rfSpeed /= max;
-//                    lrSpeed /= max;
-//                    rrSpeed /= max;
-//                }
-
-                if(Math.abs(lfSpeed) > normalSpeed) {
-                    if(lfSpeed > 0) {
-                        lfSpeed = normalSpeed;
-                    }
-                    if(lfSpeed < 0) {
-                        lfSpeed = -normalSpeed;
-                    }
-                }
-
-                if(Math.abs(lrSpeed) > normalSpeed) {
-                    if(lrSpeed > 0) {
-                        lrSpeed = normalSpeed;
-                    }
-                    if(lrSpeed < 0) {
-                        lrSpeed = -normalSpeed;
-                    }
-                }
-
-                if(Math.abs(rfSpeed) > normalSpeed) {
-                    if(rfSpeed > 0) {
-                        rfSpeed = normalSpeed;
-                    }
-                    if(rfSpeed < 0) {
-                        rfSpeed = -normalSpeed;
-                    }
-                }
-
-                if(Math.abs(rrSpeed) > normalSpeed) {
-                    if(rrSpeed > 0) {
-                        rrSpeed = normalSpeed;
-                    }
-                    if(rrSpeed < 0) {
-                        rrSpeed = -normalSpeed;
-                    }
-                }
-
                 if(Math.abs(lfSpeed) + accelerationSpeed * accelerator > maxSpeed) {
                     if(Math.abs(lfSpeed) > normalSpeed) {
                         if(lfSpeed > 0) {
@@ -216,6 +161,9 @@ public class TeleOpMain extends LinearOpMode {
                             LFMotor.setPower(lfSpeed - accelerationSpeed * accelerator);
                         }
                     }
+                }
+                else {
+                    LFMotor.setPower(lfSpeed + accelerationSpeed * accelerator);
                 }
 
                 if(Math.abs(rfSpeed) + accelerationSpeed * accelerator > maxSpeed) {
@@ -230,6 +178,9 @@ public class TeleOpMain extends LinearOpMode {
                         }
                     }
                 }
+                else {
+                    RFMotor.setPower(rfSpeed + accelerationSpeed * accelerator);
+                }
 
                 if(Math.abs(lrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
                     if(Math.abs(lrSpeed) > normalSpeed) {
@@ -243,6 +194,9 @@ public class TeleOpMain extends LinearOpMode {
                         }
                     }
                 }
+                else {
+                    LRMotor.setPower(lrSpeed + accelerationSpeed * accelerator);
+                }
 
                 if(Math.abs(rrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
                     if(Math.abs(rrSpeed) > normalSpeed) {
@@ -255,6 +209,9 @@ public class TeleOpMain extends LinearOpMode {
                             RRMotor.setPower(rrSpeed - accelerationSpeed * accelerator);
                         }
                     }
+                }
+                else {
+                    RRMotor.setPower(rrSpeed + accelerationSpeed * accelerator);
                 }
 
                 /* Here we show values on the driver hub that may be useful to know while driving
