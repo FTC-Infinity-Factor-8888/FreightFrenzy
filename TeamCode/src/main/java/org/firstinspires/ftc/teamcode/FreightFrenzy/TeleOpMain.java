@@ -23,8 +23,9 @@ public class TeleOpMain extends LinearOpMode {
         double normalSpeed = 0.50; // The normal speed our robot should be driving at.
         double accelerationSpeed = maxSpeed - normalSpeed; // The acceleration speed set on normal speed.
         double duckWheelSpeed = 0.4; // The speed the wheel to turn the duck carousel moves at.
+        double spintakeSpeed = 0.4;
 
-        double liftSpeed = 0.2; // The speed the lift moves at.
+        double liftSpeed = 0.3; // The speed the lift moves at.
         int maxLiftPosition = 923;  // The maximum amount of degrees the motor turns before the lift
         // reaches its maximum height.
         int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
@@ -37,6 +38,7 @@ public class TeleOpMain extends LinearOpMode {
         DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor"); // Port: 1
         DcMotor DWMotor = hardwareMap.get(DcMotor.class, "DWMotor"); // Port: 1 exp.
         DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "LiftMotor"); // Port: 0 exp.d
+        DcMotor SpintakeMotor = hardwareMap.get(DcMotor.class, "SpintakeMotor");
 
         // Put initialization blocks here.
 
@@ -49,12 +51,16 @@ public class TeleOpMain extends LinearOpMode {
         boolean currentLiftDown;
         boolean duckWheelLeft;
         boolean duckWheelRight;
+        boolean spintakeIntake;
+        boolean spintakeOuttake;
 
         // Declaring the former values of the buttons so we can tell if they changed.
         boolean priorLiftUp = false;
         boolean priorLiftDown = false;
         boolean priorDuckWheelLeft = false;
         boolean priorDuckWheelRight = false;
+        boolean priorSpintakeIntake = false;
+        boolean priorSpintakeOuttake = false;
 
         waitForStart();
         if (opModeIsActive()) {
@@ -67,10 +73,12 @@ public class TeleOpMain extends LinearOpMode {
                 double rotateInput = gamepad1.right_stick_x; // Controls for pivoting.
                 // Controls to allow our robot to reach speeds up to maxSpeed.
                 double accelerator = gamepad1.right_trigger;
-                currentLiftUp = gamepad1.right_bumper; // Controls for moving the lift up.
-                currentLiftDown = gamepad1.left_bumper; // Controls for moving the lift down.
-                duckWheelLeft = gamepad1.x; // Controls for rotating the duck wheel left.
-                duckWheelRight = gamepad1.b; // Controls for moving the duck wheel right.
+                currentLiftUp = gamepad2.right_bumper; // Controls for moving the lift up.
+                currentLiftDown = gamepad2.left_bumper; // Controls for moving the lift down.
+                duckWheelLeft = gamepad2.x; // Controls for rotating the duck wheel left.
+                duckWheelRight = gamepad2.b; // Controls for moving the duck wheel right.
+                spintakeIntake = gamepad2.y;
+                spintakeOuttake = gamepad2.a;
 
 
                 /*
@@ -100,9 +108,6 @@ public class TeleOpMain extends LinearOpMode {
 
                     // Setting the speed that the lift moves at.
                     LiftMotor.setPower(liftSpeed);
-                    // The current degrees that the LiftMotor is at.
-                    int currentLiftPosition = LiftMotor.getCurrentPosition();
-
                     // If the up button is pressed move the lift up.
                     if(direction == 1) {
                         LiftMotor.setTargetPosition(maxLiftPosition);
@@ -136,6 +141,18 @@ public class TeleOpMain extends LinearOpMode {
                     }
                     // Setting the power the duck wheel motor should move at.
                     DWMotor.setPower(power);
+                }
+
+                if(spintakeIntake != priorSpintakeIntake || spintakeOuttake != priorSpintakeOuttake) {
+                    int direction = (spintakeIntake?1:0) + (spintakeOuttake?-1:0);
+                    double power = 0;
+                    if(direction == 1) {
+                        power = spintakeSpeed;
+                    }
+                    else if(direction == -1) {
+                        power = -spintakeSpeed;
+                    }
+                    SpintakeMotor.setPower(power);
                 }
 
 
@@ -276,6 +293,8 @@ public class TeleOpMain extends LinearOpMode {
                 priorLiftDown = currentLiftDown;
                 priorDuckWheelLeft = duckWheelLeft;
                 priorDuckWheelRight = duckWheelRight;
+                priorSpintakeIntake = spintakeIntake;
+                priorSpintakeOuttake = spintakeOuttake;
             }
         }
     }
