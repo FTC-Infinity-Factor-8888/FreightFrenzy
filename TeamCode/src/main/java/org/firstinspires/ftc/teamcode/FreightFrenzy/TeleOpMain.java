@@ -24,7 +24,7 @@ public class TeleOpMain extends LinearOpMode {
         double accelerationSpeed = maxSpeed - normalSpeed; // The acceleration speed set on normal speed.
         double duckWheelSpeed = 0.4; // The speed the wheel to turn the duck carousel moves at.
 
-        double liftSpeed = 0.3; // The speed the lift moves at.
+        double liftSpeed = 0.2; // The speed the lift moves at.
         int maxLiftPosition = 923;  // The maximum amount of degrees the motor turns before the lift
         // reaches its maximum height.
         int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
@@ -36,8 +36,7 @@ public class TeleOpMain extends LinearOpMode {
         DcMotor LFMotor = hardwareMap.get(DcMotor.class, "LFMotor"); // Port: 0
         DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor"); // Port: 1
         DcMotor DWMotor = hardwareMap.get(DcMotor.class, "DWMotor"); // Port: 1 exp.
-        DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "LiftMotor"); // Port: 0 exp.
-
+        DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "LiftMotor"); // Port: 0 exp.d
 
         // Put initialization blocks here.
 
@@ -63,7 +62,7 @@ public class TeleOpMain extends LinearOpMode {
             while (opModeIsActive()) {
                 // Put loop blocks here.
 
-                double forwardInput = gamepad1.left_stick_y; // Controls for moving back-and-forth.
+                double forwardInput = gamepad1.left_stick_y; // Controls for moving back and forward.
                 double strafeInput = gamepad1.left_stick_x; // Controls for strafing.
                 double rotateInput = gamepad1.right_stick_x; // Controls for pivoting.
                 // Controls to allow our robot to reach speeds up to maxSpeed.
@@ -114,7 +113,7 @@ public class TeleOpMain extends LinearOpMode {
                     }
                     // If no button (or both buttons [are]) is pressed, stay where you are.
                     else {
-                        LiftMotor.setTargetPosition(currentLiftPosition);
+                        LiftMotor.setPower(0);
                     }
                     // Move to the position as specified above.
                     LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -156,14 +155,25 @@ public class TeleOpMain extends LinearOpMode {
                             lfSpeed = normalSpeed;
                             LFMotor.setPower(lfSpeed + accelerationSpeed * accelerator);
                         }
-                        if(lfSpeed < 0) {
+                        else if(lfSpeed < 0) {
                             lfSpeed = -normalSpeed;
                             LFMotor.setPower(lfSpeed - accelerationSpeed * accelerator);
+                        }
+                        else {
+                            LFMotor.setPower(0);
                         }
                     }
                 }
                 else {
-                    LFMotor.setPower(lfSpeed + accelerationSpeed * accelerator);
+                    if(lfSpeed > 0) {
+                        LFMotor.setPower(lfSpeed + accelerationSpeed * accelerator);
+                    }
+                    else if(lfSpeed < 0) {
+                        LFMotor.setPower(lfSpeed - accelerationSpeed * accelerator);
+                    }
+                    else {
+                        LFMotor.setPower(0);
+                    }
                 }
 
                 if(Math.abs(rfSpeed) + accelerationSpeed * accelerator > maxSpeed) {
@@ -172,14 +182,25 @@ public class TeleOpMain extends LinearOpMode {
                             rfSpeed = normalSpeed;
                             RFMotor.setPower(rfSpeed + accelerationSpeed * accelerator);
                         }
-                        if(rfSpeed < 0) {
+                        else if(rfSpeed < 0) {
                             rfSpeed = -normalSpeed;
                             RFMotor.setPower(rfSpeed - accelerationSpeed * accelerator);
+                        }
+                        else {
+                            RFMotor.setPower(0);
                         }
                     }
                 }
                 else {
-                    RFMotor.setPower(rfSpeed + accelerationSpeed * accelerator);
+                    if(rfSpeed > 0) {
+                        RFMotor.setPower(rfSpeed + accelerationSpeed * accelerator);
+                    }
+                    else if(rfSpeed < 0) {
+                        RFMotor.setPower(rfSpeed - accelerationSpeed * accelerator);
+                    }
+                    else {
+                        RFMotor.setPower(0);
+                    }
                 }
 
                 if(Math.abs(lrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
@@ -188,14 +209,25 @@ public class TeleOpMain extends LinearOpMode {
                             lrSpeed = normalSpeed;
                             LRMotor.setPower(lrSpeed + accelerationSpeed * accelerator);
                         }
-                        if(lrSpeed < 0) {
+                        else if(lrSpeed < 0) {
                             lrSpeed = -normalSpeed;
                             LRMotor.setPower(lrSpeed - accelerationSpeed * accelerator);
+                        }
+                        else {
+                            LRMotor.setPower(0);
                         }
                     }
                 }
                 else {
-                    LRMotor.setPower(lrSpeed + accelerationSpeed * accelerator);
+                    if(lrSpeed > 0) {
+                        LRMotor.setPower(lrSpeed + accelerationSpeed * accelerator);
+                    }
+                    else if(lrSpeed < 0) {
+                        LRMotor.setPower(lrSpeed - accelerationSpeed * accelerator);
+                    }
+                    else {
+                        LRMotor.setPower(0);
+                    }
                 }
 
                 if(Math.abs(rrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
@@ -204,14 +236,25 @@ public class TeleOpMain extends LinearOpMode {
                             rrSpeed = normalSpeed;
                             RRMotor.setPower(rrSpeed + accelerationSpeed * accelerator);
                         }
-                        if(rrSpeed < 0) {
+                        else if(rrSpeed < 0) {
                             rrSpeed = -normalSpeed;
                             RRMotor.setPower(rrSpeed - accelerationSpeed * accelerator);
+                        }
+                        else {
+                            RRMotor.setPower(0);
                         }
                     }
                 }
                 else {
-                    RRMotor.setPower(rrSpeed + accelerationSpeed * accelerator);
+                    if(rrSpeed > 0) {
+                        RRMotor.setPower(rrSpeed + accelerationSpeed * accelerator);
+                    }
+                    else if(rrSpeed < 0) {
+                        RRMotor.setPower(rrSpeed - accelerationSpeed * accelerator);
+                    }
+                    else {
+                        RRMotor.setPower(0);
+                    }
                 }
 
                 /* Here we show values on the driver hub that may be useful to know while driving
