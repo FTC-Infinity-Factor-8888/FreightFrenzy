@@ -22,11 +22,11 @@ public class TeleOpMain extends LinearOpMode {
         double maxSpeed = 0.80; // The maximum speed we want our robot to drive at.
         double normalSpeed = 0.50; // The normal speed our robot should be driving at.
         double accelerationSpeed = maxSpeed - normalSpeed; // The acceleration speed set on normal speed.
-        double duckWheelSpeed = 0.4; // The speed the wheel to turn the duck carousel moves at.
-        double spintakeSpeed = 0.4;
+        double duckWheelSpeed = 0.6; // The speed the wheel to turn the duck carousel moves at.
+        double spintakeSpeed = 0.6;
 
         double liftSpeed = 0.3; // The speed the lift moves at.
-        int maxLiftPosition = 923;  // The maximum amount of degrees the motor turns before the lift
+        int maxLiftPosition = 824;  // The maximum amount of degrees the motor turns before the lift
         // reaches its maximum height.
         int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
         // reaches its minimum height.
@@ -67,7 +67,7 @@ public class TeleOpMain extends LinearOpMode {
             // Put run blocks here.
             while (opModeIsActive()) {
                 // Put loop blocks here.
-
+                
                 double forwardInput = gamepad1.left_stick_y; // Controls for moving back and forward.
                 double strafeInput = gamepad1.left_stick_x; // Controls for strafing.
                 double rotateInput = gamepad1.right_stick_x; // Controls for pivoting.
@@ -75,8 +75,8 @@ public class TeleOpMain extends LinearOpMode {
                 double accelerator = gamepad1.right_trigger;
                 currentLiftUp = gamepad2.right_bumper; // Controls for moving the lift up.
                 currentLiftDown = gamepad2.left_bumper; // Controls for moving the lift down.
-                duckWheelLeft = gamepad2.x; // Controls for rotating the duck wheel left.
-                duckWheelRight = gamepad2.b; // Controls for moving the duck wheel right.
+                duckWheelLeft = gamepad2.b; // Controls for rotating the duck wheel left.
+                duckWheelRight = gamepad2.x; // Controls for moving the duck wheel right.
                 spintakeIntake = gamepad2.y;
                 spintakeOuttake = gamepad2.a;
 
