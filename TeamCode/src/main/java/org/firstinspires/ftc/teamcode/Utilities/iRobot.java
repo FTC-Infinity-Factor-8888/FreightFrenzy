@@ -42,4 +42,9 @@ public interface iRobot {
      */
     void stopAll();
 
+    /**
+     * normalizeHeading is a TeleOp method that
+     */
+    double normalizeHeading(double heading);
+
 }
