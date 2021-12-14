@@ -23,14 +23,15 @@ public interface iRobot {
     void rotate(double degrees);
 
     /**
-     * driveXYR is a TeleOp method that moves the robot on the x axis the y axis and rotates.
+     * driveXYRB is a TeleOp method that moves the robot on the x axis the y axis and rotates.
      * All inputs are relative to the front of the robot.
      *
      * @param y Accepts between -1.0 and 1.0 Negative y is backwards, and positive y is forwards
      * @param x Accepts between -1.0 and 1.0 Negative x is left, and positive x is right
      * @param r Accepts between -1.0 and 1.0 Negative degrees is counterclockwise, and positive degrees is clockwise.
+     * @param b Accepts between 0 and 1.0. The percentage of extra speed that you want the robot to go past the normalSpeed.
      */
-    void driveXYR(double y, double x, double r);
+    void driveXYRB(double y, double x, double r, double b);
 
     /**
      * driveStop is a TeleOp method that stops the robot driving by stopping the wheels

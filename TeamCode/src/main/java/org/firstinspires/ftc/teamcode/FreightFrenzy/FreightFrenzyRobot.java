@@ -23,6 +23,15 @@ public class FreightFrenzyRobot implements iRobot {
     DcMotor DWMotor;
     private BNO055IMU imu;
 
+    double lfSpeed; // Left Front motor speed.
+    double rfSpeed; // Right Front motor speed.
+    double lrSpeed; // Left Rear motor speed.
+    double rrSpeed; // Right Rear motor speed.
+
+    double maxSpeed = 0.80; // The maximum speed we want our robot to drive at.
+    double normalSpeed = 0.50; // The normal speed our robot should be driving at.
+    double accelerationSpeed = maxSpeed - normalSpeed; // The acceleration speed set on normal speed.
+
     private double wheelCircumferenceInInches = (96/25.4) * Math.PI;
   //  private int maximumTicksPerSecond = 2800;
     private double ticksPerMotorRevolution = 530.3;
@@ -69,50 +78,125 @@ public class FreightFrenzyRobot implements iRobot {
 
     }
 
-    private double powerPercentage(double delta) {
-        double powerPercent = -0.000027 * Math.pow(Math.abs(delta) - 180, 2) + 1;
-        if (powerPercent > 1 || powerPercent < 0) {
-            System.out.println("*** WARNING! POWER PERCENT IS OUT OF RANGE: delta = " + delta + ", " +
-                    "powerPercent = " + powerPercent + " ***");
-        }
-
-        return powerPercent;
-    }
-
-    public void rotate(double desiredHeading) {
-        double minTurnSpeed = 0.1;
-        double currentHeading = getIMUHeading();
-        delta = normalizeHeading(desiredHeading - currentHeading);
-        double priorDelta = delta;
-        int ringingCount = 0;
-        while (SithApprenticeAutonomous.opModeIsActive() && Math.abs(delta) > turnDeltaThreshold && ringingCount <= 3) {
-            currentHeading = getIMUHeading();
-            delta = normalizeHeading(desiredHeading - currentHeading);
-            double deltaPercentage =  powerPercentage(delta);
-            double currentTurnSpeed = turnSpeed * deltaPercentage + minTurnSpeed;
-            if (delta < 0) {
-                currentTurnSpeed = -currentTurnSpeed;
-            }
-            leftSpeed = -currentTurnSpeed;
-            rightSpeed = currentTurnSpeed;
-            powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-            telemetryDashboard("Turn(" + (int) desiredHeading + ")");
-            if (Math.signum(delta) != Math.signum(priorDelta) && delta != 0 && priorDelta != 0) {
-                ringingCount++;
-            }
-            priorDelta = delta;
-        }
-        if(!creator.opModeIsActive()) {
-            throw new EmergencyStopException("Turn");
-        }
-
-        powerTheWheels(0, 0, 0, 0);
-        hold(desiredHeading);
-    }
-
     @Override
-    public void driveXYR(double y, double x, double r) {
+    public void driveXYRB(double y, double x, double r, double b) {
+        /*
+                Because we use Mecanum wheels, we can move forward, rotate, and strafe.
+                Here, we are taking into account the direction each wheel should travel at in
+                order to move in the direction we want the robot to move.
+                 */
+        lfSpeed = ((y - x - r) * normalSpeed);
+        rfSpeed = ((y + x + r) * normalSpeed);
+        lrSpeed = ((y + x - r) * normalSpeed);
+        rrSpeed = ((y - x + r) * normalSpeed);
 
+        if(Math.abs(lfSpeed) + accelerationSpeed * b > maxSpeed) {
+            if(Math.abs(lfSpeed) > normalSpeed) {
+                if(lfSpeed > 0) {
+                    lfSpeed = normalSpeed;
+                    LFMotor.setPower(lfSpeed + accelerationSpeed * b);
+                }
+                else if(lfSpeed < 0) {
+                    lfSpeed = -normalSpeed;
+                    LFMotor.setPower(lfSpeed - accelerationSpeed * b);
+                }
+                else {
+                    LFMotor.setPower(0);
+                }
+            }
+        }
+        else {
+            if(lfSpeed > 0) {
+                LFMotor.setPower(lfSpeed + accelerationSpeed * b);
+            }
+            else if(lfSpeed < 0) {
+                LFMotor.setPower(lfSpeed - accelerationSpeed * b);
+            }
+            else {
+                LFMotor.setPower(0);
+            }
+        }
+
+        if(Math.abs(rfSpeed) + accelerationSpeed * b > maxSpeed) {
+            if(Math.abs(rfSpeed) > normalSpeed) {
+                if(rfSpeed > 0) {
+                    rfSpeed = normalSpeed;
+                    RFMotor.setPower(rfSpeed + accelerationSpeed * b);
+                }
+                else if(rfSpeed < 0) {
+                    rfSpeed = -normalSpeed;
+                    RFMotor.setPower(rfSpeed - accelerationSpeed * b);
+                }
+                else {
+                    RFMotor.setPower(0);
+                }
+            }
+        }
+        else {
+            if(rfSpeed > 0) {
+                RFMotor.setPower(rfSpeed + accelerationSpeed * b);
+            }
+            else if(rfSpeed < 0) {
+                RFMotor.setPower(rfSpeed - accelerationSpeed * b);
+            }
+            else {
+                RFMotor.setPower(0);
+            }
+        }
+
+        if(Math.abs(lrSpeed) + accelerationSpeed * b > maxSpeed) {
+            if(Math.abs(lrSpeed) > normalSpeed) {
+                if(lrSpeed > 0) {
+                    lrSpeed = normalSpeed;
+                    LRMotor.setPower(lrSpeed + accelerationSpeed * b);
+                }
+                else if(lrSpeed < 0) {
+                    lrSpeed = -normalSpeed;
+                    LRMotor.setPower(lrSpeed - accelerationSpeed * b);
+                }
+                else {
+                    LRMotor.setPower(0);
+                }
+            }
+        }
+        else {
+            if(lrSpeed > 0) {
+                LRMotor.setPower(lrSpeed + accelerationSpeed * b);
+            }
+            else if(lrSpeed < 0) {
+                LRMotor.setPower(lrSpeed - accelerationSpeed * b);
+            }
+            else {
+                LRMotor.setPower(0);
+            }
+        }
+
+        if(Math.abs(rrSpeed) + accelerationSpeed * b > maxSpeed) {
+            if(Math.abs(rrSpeed) > normalSpeed) {
+                if(rrSpeed > 0) {
+                    rrSpeed = normalSpeed;
+                    RRMotor.setPower(rrSpeed + accelerationSpeed * b);
+                }
+                else if(rrSpeed < 0) {
+                    rrSpeed = -normalSpeed;
+                    RRMotor.setPower(rrSpeed - accelerationSpeed * b);
+                }
+                else {
+                    RRMotor.setPower(0);
+                }
+            }
+        }
+        else {
+            if(rrSpeed > 0) {
+                RRMotor.setPower(rrSpeed + accelerationSpeed * b);
+            }
+            else if(rrSpeed < 0) {
+                RRMotor.setPower(rrSpeed - accelerationSpeed * b);
+            }
+            else {
+                RRMotor.setPower(0);
+            }
+        }
     }
 
     @Override
@@ -137,9 +221,12 @@ public class FreightFrenzyRobot implements iRobot {
             }
             else if (heading < -180.0) {
                 heading += 360.0;
-                //Helen is mad at the computer
             }
         }
         return heading;
+    }
+
+    @Override
+    public void rotate(double desiredHeading) {
     }
 }

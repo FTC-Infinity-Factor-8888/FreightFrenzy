@@ -8,20 +8,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name = "TeleOpMain")
 public class TeleOpMain extends LinearOpMode {
+    double accelerator;
 
     /**
      * This function is executed when this Op Mode is selected from the Driver Station.
      */
     @Override
     public void runOpMode() {
-        double lfSpeed; // Left Front motor speed.
-        double rfSpeed; // Right Front motor speed.
-        double lrSpeed; // Left Rear motor speed.
-        double rrSpeed; // Right Rear motor speed.
 
-        double maxSpeed = 0.80; // The maximum speed we want our robot to drive at.
-        double normalSpeed = 0.50; // The normal speed our robot should be driving at.
-        double accelerationSpeed = maxSpeed - normalSpeed; // The acceleration speed set on normal speed.
+
+
         double duckWheelSpeed = 0.6; // The speed the wheel to turn the duck carousel moves at.
         double spintakeSpeed = 0.6;
 
@@ -31,20 +27,12 @@ public class TeleOpMain extends LinearOpMode {
         int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
         // reaches its minimum height.
 
-        // Declaring our motors. "exp." means expansion hub.
-        DcMotor RFMotor = hardwareMap.get(DcMotor.class, "RFMotor"); // Port: 2
-        DcMotor RRMotor = hardwareMap.get(DcMotor.class, "RRMotor"); // Port: 3
-        DcMotor LFMotor = hardwareMap.get(DcMotor.class, "LFMotor"); // Port: 0
-        DcMotor LRMotor = hardwareMap.get(DcMotor.class, "LRMotor"); // Port: 1
+
         DcMotor DWMotor = hardwareMap.get(DcMotor.class, "DWMotor"); // Port: 1 exp.
         DcMotor LiftMotor = hardwareMap.get(DcMotor.class, "LiftMotor"); // Port: 0 exp.d
         DcMotor SpintakeMotor = hardwareMap.get(DcMotor.class, "SpintakeMotor");
 
         // Put initialization blocks here.
-
-        // We reverse these motors because of the way that they are mounted.
-        RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        RRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Declaring the buttons may quickly change.
         boolean currentLiftUp;
@@ -67,12 +55,12 @@ public class TeleOpMain extends LinearOpMode {
             // Put run blocks here.
             while (opModeIsActive()) {
                 // Put loop blocks here.
-                
+
                 double forwardInput = gamepad1.left_stick_y; // Controls for moving back and forward.
                 double strafeInput = gamepad1.left_stick_x; // Controls for strafing.
                 double rotateInput = gamepad1.right_stick_x; // Controls for pivoting.
                 // Controls to allow our robot to reach speeds up to maxSpeed.
-                double accelerator = gamepad1.right_trigger;
+                accelerator = gamepad1.right_trigger;
                 currentLiftUp = gamepad2.right_bumper; // Controls for moving the lift up.
                 currentLiftDown = gamepad2.left_bumper; // Controls for moving the lift down.
                 duckWheelLeft = gamepad2.b; // Controls for rotating the duck wheel left.
@@ -156,130 +144,10 @@ public class TeleOpMain extends LinearOpMode {
                 }
 
 
-                /*
-                Because we use Mecanum wheels, we can move forward, rotate, and strafe.
-                Here, we are taking into account the direction each wheel should travel at in
-                order to move in the direction we want the robot to move.
-                 */
-                lfSpeed = ((forwardInput - strafeInput - rotateInput) * normalSpeed);
-                rfSpeed = ((forwardInput + strafeInput + rotateInput) * normalSpeed);
-                lrSpeed = ((forwardInput + strafeInput - rotateInput) * normalSpeed);
-                rrSpeed = ((forwardInput - strafeInput + rotateInput) * normalSpeed);
 
-                if(Math.abs(lfSpeed) + accelerationSpeed * accelerator > maxSpeed) {
-                    if(Math.abs(lfSpeed) > normalSpeed) {
-                        if(lfSpeed > 0) {
-                            lfSpeed = normalSpeed;
-                            LFMotor.setPower(lfSpeed + accelerationSpeed * accelerator);
-                        }
-                        else if(lfSpeed < 0) {
-                            lfSpeed = -normalSpeed;
-                            LFMotor.setPower(lfSpeed - accelerationSpeed * accelerator);
-                        }
-                        else {
-                            LFMotor.setPower(0);
-                        }
-                    }
-                }
-                else {
-                    if(lfSpeed > 0) {
-                        LFMotor.setPower(lfSpeed + accelerationSpeed * accelerator);
-                    }
-                    else if(lfSpeed < 0) {
-                        LFMotor.setPower(lfSpeed - accelerationSpeed * accelerator);
-                    }
-                    else {
-                        LFMotor.setPower(0);
-                    }
-                }
-
-                if(Math.abs(rfSpeed) + accelerationSpeed * accelerator > maxSpeed) {
-                    if(Math.abs(rfSpeed) > normalSpeed) {
-                        if(rfSpeed > 0) {
-                            rfSpeed = normalSpeed;
-                            RFMotor.setPower(rfSpeed + accelerationSpeed * accelerator);
-                        }
-                        else if(rfSpeed < 0) {
-                            rfSpeed = -normalSpeed;
-                            RFMotor.setPower(rfSpeed - accelerationSpeed * accelerator);
-                        }
-                        else {
-                            RFMotor.setPower(0);
-                        }
-                    }
-                }
-                else {
-                    if(rfSpeed > 0) {
-                        RFMotor.setPower(rfSpeed + accelerationSpeed * accelerator);
-                    }
-                    else if(rfSpeed < 0) {
-                        RFMotor.setPower(rfSpeed - accelerationSpeed * accelerator);
-                    }
-                    else {
-                        RFMotor.setPower(0);
-                    }
-                }
-
-                if(Math.abs(lrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
-                    if(Math.abs(lrSpeed) > normalSpeed) {
-                        if(lrSpeed > 0) {
-                            lrSpeed = normalSpeed;
-                            LRMotor.setPower(lrSpeed + accelerationSpeed * accelerator);
-                        }
-                        else if(lrSpeed < 0) {
-                            lrSpeed = -normalSpeed;
-                            LRMotor.setPower(lrSpeed - accelerationSpeed * accelerator);
-                        }
-                        else {
-                            LRMotor.setPower(0);
-                        }
-                    }
-                }
-                else {
-                    if(lrSpeed > 0) {
-                        LRMotor.setPower(lrSpeed + accelerationSpeed * accelerator);
-                    }
-                    else if(lrSpeed < 0) {
-                        LRMotor.setPower(lrSpeed - accelerationSpeed * accelerator);
-                    }
-                    else {
-                        LRMotor.setPower(0);
-                    }
-                }
-
-                if(Math.abs(rrSpeed) + accelerationSpeed * accelerator > maxSpeed) {
-                    if(Math.abs(rrSpeed) > normalSpeed) {
-                        if(rrSpeed > 0) {
-                            rrSpeed = normalSpeed;
-                            RRMotor.setPower(rrSpeed + accelerationSpeed * accelerator);
-                        }
-                        else if(rrSpeed < 0) {
-                            rrSpeed = -normalSpeed;
-                            RRMotor.setPower(rrSpeed - accelerationSpeed * accelerator);
-                        }
-                        else {
-                            RRMotor.setPower(0);
-                        }
-                    }
-                }
-                else {
-                    if(rrSpeed > 0) {
-                        RRMotor.setPower(rrSpeed + accelerationSpeed * accelerator);
-                    }
-                    else if(rrSpeed < 0) {
-                        RRMotor.setPower(rrSpeed - accelerationSpeed * accelerator);
-                    }
-                    else {
-                        RRMotor.setPower(0);
-                    }
-                }
 
                 /* Here we show values on the driver hub that may be useful to know while driving
                 the robot or during testing. */
-                telemetry.addData("LF Motor", LFMotor.getPower());
-                telemetry.addData("RF Motor", RFMotor.getPower());
-                telemetry.addData("LR Motor", LRMotor.getPower());
-                telemetry.addData("RR Motor", RRMotor.getPower());
                 telemetry.addData("Lift", LiftMotor.getCurrentPosition());
                 telemetry.addData("Accelerator", gamepad1.right_trigger);
                 telemetry.update();
