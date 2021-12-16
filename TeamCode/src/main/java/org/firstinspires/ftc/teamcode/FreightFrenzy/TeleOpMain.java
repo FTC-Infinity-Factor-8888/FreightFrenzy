@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name = "TeleOpMain")
 public class TeleOpMain extends LinearOpMode {
+    FreightFrenzyRobot yoda = new FreightFrenzyRobot(this);
     double accelerator;
 
     /**
@@ -22,10 +23,7 @@ public class TeleOpMain extends LinearOpMode {
         double spintakeSpeed = 0.6;
 
         double liftSpeed = 0.3; // The speed the lift moves at.
-        int maxLiftPosition = 824;  // The maximum amount of degrees the motor turns before the lift
-        // reaches its maximum height.
-        int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
-        // reaches its minimum height.
+
 
 
         DcMotor DWMotor = hardwareMap.get(DcMotor.class, "DWMotor"); // Port: 1 exp.
@@ -49,6 +47,8 @@ public class TeleOpMain extends LinearOpMode {
         boolean priorDuckWheelRight = false;
         boolean priorSpintakeIntake = false;
         boolean priorSpintakeOuttake = false;
+
+        yoda.initHardware();
 
         waitForStart();
         if (opModeIsActive()) {
@@ -93,23 +93,7 @@ public class TeleOpMain extends LinearOpMode {
                     // 0 = no motion, 1 = up, -1 = down
                     // Checking to see which buttons are pushed.
                     int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0);
-
-                    // Setting the speed that the lift moves at.
-                    LiftMotor.setPower(liftSpeed);
-                    // If the up button is pressed move the lift up.
-                    if(direction == 1) {
-                        LiftMotor.setTargetPosition(maxLiftPosition);
-                    }
-                    // If the down button is pressed move the lift down.
-                    else if(direction == -1) {
-                        LiftMotor.setTargetPosition(minLiftPosition);
-                    }
-                    // If no button (or both buttons [are]) is pressed, stay where you are.
-                    else {
-                        LiftMotor.setPower(0);
-                    }
-                    // Move to the position as specified above.
-                    LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    yoda.liftMotor(liftSpeed,direction);
                 }
 
                 // To control the duck wheel.

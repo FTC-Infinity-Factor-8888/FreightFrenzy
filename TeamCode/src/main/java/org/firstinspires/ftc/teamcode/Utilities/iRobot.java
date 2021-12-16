@@ -6,6 +6,11 @@ package org.firstinspires.ftc.teamcode.Utilities;
  */
 public interface iRobot {
     /**
+     * initHardware maps and initializes neccesary hardware at the beginning of the match.
+     */
+    void initHardware();
+
+    /**
      * drive is a TeleOp method that moves the robot.
      * All inputs are relative to the front of the robot.
      *
@@ -28,8 +33,8 @@ public interface iRobot {
      *
      * @param y Accepts between -1.0 and 1.0 Negative y is backwards, and positive y is forwards
      * @param x Accepts between -1.0 and 1.0 Negative x is left, and positive x is right
-     * @param r Accepts between -1.0 and 1.0 Negative degrees is counterclockwise, and positive degrees is clockwise.
-     * @param b Accepts between 0 and 1.0. The percentage of extra speed that you want the robot to go past the normalSpeed.
+     * @param r (rotate)Accepts between -1.0 and 1.0 Negative degrees is counterclockwise, and positive degrees is clockwise.
+     * @param b (boost) Accepts between 0 and 1.0. The percentage of extra speed that you want the robot to go past the normalSpeed.
      */
     void driveXYRB(double y, double x, double r, double b);
 
