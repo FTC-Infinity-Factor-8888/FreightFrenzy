@@ -11,32 +11,40 @@ public interface iRobot {
     void initHardware();
 
     /**
-     * drive is a TeleOp method that moves the robot.
+     * drive is a Autonomous method that moves the robot forwards or backwards ONLY.
      * All inputs are relative to the front of the robot.
      *
-     * @param y Accepts between -1.0 and 1.0 Negative y is backwards, and positive y is forwards
-     * @param x Accepts between -1.0 and 1.0 Negative x is left, and positive x is right
+     * @param distance Accepts a positive or negative number representing the number of inches to move
+     *                 Negative is backwards, and positive is forwards
      */
-    void drive(double y, double x);
+    void drive(double distance);
 
     /**
-     * rotate is a TeleOp method that rotates the robot.
+     * drive is a Autonomous method that moves the robot right or left ONLY.
+     * All inputs are relative to the front of the robot (looking at it from behind, as the robot)
+     *
+     * @param distance Accepts a positive or negative number representing the number of inches to move.
+     *                 Negative is left, and positive is right
+     */
+    void strafe(double distance);
+
+    /**
+     * rotate is a Autonomous method that rotates the robot.
      * All inputs are relative to the front of the robot being 0°.
      *
-     * @param degrees Accepts between -1.0 and 1.0 Negative degrees is counterclockwise, and positive degrees is clockwise.
+     * @param degrees Accepts between -180 and 180 Negative degrees is counterclockwise, and positive degrees is clockwise.
      */
     void rotate(double degrees);
 
     /**
      * driveXYRB is a TeleOp method that moves the robot on the x axis the y axis and rotates.
      * All inputs are relative to the front of the robot.
-     *
+     *  @param x Accepts between -1.0 and 1.0 Negative x is left, and positive x is right
      * @param y Accepts between -1.0 and 1.0 Negative y is backwards, and positive y is forwards
-     * @param x Accepts between -1.0 and 1.0 Negative x is left, and positive x is right
      * @param r (rotate)Accepts between -1.0 and 1.0 Negative degrees is counterclockwise, and positive degrees is clockwise.
      * @param b (boost) Accepts between 0 and 1.0. The percentage of extra speed that you want the robot to go past the normalSpeed.
      */
-    void driveXYRB(double y, double x, double r, double b);
+    void driveXYRB(double x, double y, double r, double b);
 
     /**
      * driveStop is a TeleOp method that stops the robot driving by stopping the wheels
