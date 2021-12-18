@@ -63,18 +63,10 @@ public class FreightFrenzyRobot implements iRobot {
     private double deltaThreshold = 1;
     private double turnDeltaThreshold = 5;
 
-    // todo set x!
-    //  double x = Gamepad.
     public FreightFrenzyRobot(LinearOpMode creator) {
         this.creator = creator;
         this.hardwareMap = creator.hardwareMap;
         this.telemetry = creator.telemetry;
-    }
-
-    private double getIMUHeading() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,
-                AngleUnit.DEGREES);
-        return angles.firstAngle;
     }
 
     @Override
@@ -86,8 +78,42 @@ public class FreightFrenzyRobot implements iRobot {
         dwMotor = hardwareMap.get(DcMotor.class, "DWMotor");
         LiftMotor = hardwareMap.get(DcMotorEx.class, "LiftMotor"); // Port: 0 exp.d
         SpintakeMotor = hardwareMap.get(DcMotor.class, "SpintakeMotor");
-        rfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        lrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lrMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rrMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        System.out.print("LF: ");
+        setPIDFValues(lfMotor, lfMotorMaxTps);
+        System.out.print("RF : ");
+        setPIDFValues(rfMotor, rfMotorMaxTps);
+        System.out.print("LR: ");
+        setPIDFValues(lrMotor, lrMotorMaxTps);
+        System.out.print("RR: ");
+        setPIDFValues(rrMotor, rrMotorMaxTps);
+
+        initializeIMU();
+    }
+
+    private void initializeIMU() {
+        BNO055IMU.Parameters imuParameters;
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        telemetry.addData("Status", "Calibrating IMU...");
+        telemetry.update();
+        imuParameters = new BNO055IMU.Parameters();
+        imuParameters.mode = BNO055IMU.SensorMode.IMU;
+        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        imuParameters.loggingEnabled = false;
+        imu.initialize(imuParameters);
+        telemetry.addData("Status", "Calibrating UMU...done");
+        telemetry.update();
     }
 
     // TODO: JavaDoc
@@ -289,10 +315,10 @@ public class FreightFrenzyRobot implements iRobot {
                 Here, we are taking into account the direction each wheel should travel at in
                 order to move in the direction we want the robot to move.
                  */
-        lfSpeed = ((y - x - r) * normalSpeed);
-        rfSpeed = ((y + x + r) * normalSpeed);
-        lrSpeed = ((y + x - r) * normalSpeed);
-        rrSpeed = ((y - x + r) * normalSpeed);
+        lfSpeed = -((y - x - r) * normalSpeed);
+        rfSpeed = -((y + x + r) * normalSpeed);
+        lrSpeed = -((y + x - r) * normalSpeed);
+        rrSpeed = -((y - x + r) * normalSpeed);
 
         if (Math.abs(lfSpeed) + accelerationSpeed * b > MAX_ROBOT_SPEED) {
             if (Math.abs(lfSpeed) > normalSpeed) {
@@ -416,6 +442,12 @@ public class FreightFrenzyRobot implements iRobot {
             }
         }
         return heading;
+    }
+
+    private double getIMUHeading() {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,
+                AngleUnit.DEGREES);
+        return angles.firstAngle;
     }
 
     private void setMotorMode(DcMotor.RunMode mode) {
@@ -543,5 +575,15 @@ public class FreightFrenzyRobot implements iRobot {
         double motorPositionAverage = (lfPosition + rfPosition + lrPosition + rrPosition) / 4;
 
         return motorPositionAverage / ticksPerInch;
+    }
+
+    private void setPIDFValues(DcMotorEx motor, int tps) {
+        double D = 0;
+        double F = 32767.0 / tps;
+        double P = 0.1 * F;
+        double I = 0.1 * P;
+        System.out.printf("Max %d, P %.4f, I %.4f, D %.0f, F %.4f\n", tps, P, I, D, F);
+        motor.setVelocityPIDFCoefficients(P, I, D, F);
+        motor.setPositionPIDFCoefficients(drivePositionPIDF);
     }
 }
