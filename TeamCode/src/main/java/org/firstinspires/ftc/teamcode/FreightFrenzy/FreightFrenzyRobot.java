@@ -90,7 +90,7 @@ public class FreightFrenzyRobot implements iRobot {
 
         System.out.print("LF: ");
         setPIDFValues(lfMotor, lfMotorMaxTps);
-        System.out.print("RF : ");
+        System.out.print("RF: ");
         setPIDFValues(rfMotor, rfMotorMaxTps);
         System.out.print("LR: ");
         setPIDFValues(lrMotor, lrMotorMaxTps);
@@ -112,7 +112,7 @@ public class FreightFrenzyRobot implements iRobot {
         imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imuParameters.loggingEnabled = false;
         imu.initialize(imuParameters);
-        telemetry.addData("Status", "Calibrating UMU...done");
+        telemetry.addData("Status", "Calibrating IMU...done");
         telemetry.update();
     }
 
