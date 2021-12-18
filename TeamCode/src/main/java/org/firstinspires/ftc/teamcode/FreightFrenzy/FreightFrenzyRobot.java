@@ -48,6 +48,7 @@ public class FreightFrenzyRobot implements iRobot {
     private int rrMotorMaxTps = 2615;
     private final double ticksPerMotorRevolution = 530.3;
     private final double ticksPerInch = ticksPerMotorRevolution / wheelCircumferenceInInches;
+    private final double drivePositionPIDF = 5.0; // 4.5
 
     private final int maxLiftPosition = 824;  // The maximum amount of degrees the motor turns before the lift
     // reaches its maximum height.
