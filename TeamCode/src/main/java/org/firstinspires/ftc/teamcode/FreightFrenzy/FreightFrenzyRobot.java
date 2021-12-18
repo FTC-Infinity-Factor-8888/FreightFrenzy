@@ -12,16 +12,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Utilities.EmergencyStopException;
 import org.firstinspires.ftc.teamcode.Utilities.iRobot;
 
 public class FreightFrenzyRobot implements iRobot {
+    private final LinearOpMode creator;
     private final HardwareMap hardwareMap;
     public Telemetry telemetry;
-    private DcMotorEx RFMotor;
-    private DcMotorEx RRMotor;
-    private DcMotorEx LFMotor;
-    private DcMotorEx LRMotor;
-    private DcMotor DWMotor;
+    private DcMotorEx rfMotor;
+    private DcMotorEx rrMotor;
+    private DcMotorEx lfMotor;
+    private DcMotorEx lrMotor;
+    private DcMotor dwMotor;
     private DcMotorEx LiftMotor;
     private DcMotor SpintakeMotor;
     private BNO055IMU imu;
@@ -36,9 +38,14 @@ public class FreightFrenzyRobot implements iRobot {
     private double MIN_ROBOT_SPEED = 0.20; // The minimum speed we can have our robot to drive at.
     private double normalSpeed = 0.50; // The normal speed our robot should be driving at.
     private double accelerationSpeed = MAX_ROBOT_SPEED - normalSpeed; // The acceleration speed set on normal speed.
+    private double correctionSpeed = 0.1; //
 
     private final double wheelCircumferenceInInches = (96 / 25.4) * Math.PI;
-    //  private int maximumTicksPerSecond = 2800;
+    // private int maximumRobotTps = 2610;
+    private int lfMotorMaxTps = 2655;
+    private int rfMotorMaxTps = 2650;
+    private int lrMotorMaxTps = 2610;
+    private int rrMotorMaxTps = 2615;
     private final double ticksPerMotorRevolution = 530.3;
     private final double ticksPerInch = ticksPerMotorRevolution / wheelCircumferenceInInches;
 
@@ -58,7 +65,9 @@ public class FreightFrenzyRobot implements iRobot {
     // todo set x!
     //  double x = Gamepad.
     public FreightFrenzyRobot(LinearOpMode creator) {
+        this.creator = creator;
         this.hardwareMap = creator.hardwareMap;
+        this.telemetry = creator.telemetry;
     }
 
     private double getIMUHeading() {
@@ -69,15 +78,73 @@ public class FreightFrenzyRobot implements iRobot {
 
     @Override
     public void initHardware() {
-        LFMotor = hardwareMap.get(DcMotor.class, "LFMotor");
-        LRMotor = hardwareMap.get(DcMotor.class, "LRMotor");
-        RFMotor = hardwareMap.get(DcMotor.class, "RFMotor");
-        RRMotor = hardwareMap.get(DcMotor.class, "RRMotor");
-        DWMotor = hardwareMap.get(DcMotor.class, "DWMotor");
-        LiftMotor = hardwareMap.get(DcMotor.class, "LiftMotor"); // Port: 0 exp.d
+        lfMotor = hardwareMap.get(DcMotorEx.class, "LFMotor");
+        lrMotor = hardwareMap.get(DcMotorEx.class, "LRMotor");
+        rfMotor = hardwareMap.get(DcMotorEx.class, "RFMotor");
+        rrMotor = hardwareMap.get(DcMotorEx.class, "RRMotor");
+        dwMotor = hardwareMap.get(DcMotor.class, "DWMotor");
+        LiftMotor = hardwareMap.get(DcMotorEx.class, "LiftMotor"); // Port: 0 exp.d
         SpintakeMotor = hardwareMap.get(DcMotor.class, "SpintakeMotor");
-        RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        RRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    // TODO: JavaDoc
+    public void telemetryDashboard(String method) {
+        /*telemetry.addData(method, "SL: %d, TZ: %d, Prox: %.1f", creator.getStartLine(), targetZone,
+                proximitySensor.getDistance(DistanceUnit.INCH)); */
+
+        telemetry.addData("Heading", "Desired: %.0f, Current: %.0f, Delta: %.0f",
+                getIMUHeading(), getIMUHeading(), delta);
+
+        telemetry.addData("Target", "LF: %d, LR: %d, RF: %d, RR: %d",
+                lfMotor.getTargetPosition(), lrMotor.getTargetPosition(), rfMotor.getTargetPosition(), rrMotor.getTargetPosition());
+        telemetry.addData("Position", "LF: %d, LR: %d, RF: %d, RR: %d",
+                lfMotor.getCurrentPosition(), lrMotor.getCurrentPosition(), rfMotor.getCurrentPosition(), rrMotor.getCurrentPosition());
+        telemetry.addData("Power", "LF: %.1f, LR: %.1f, RF: %.1f, RR: %.1f",
+                lfMotor.getPower(), lrMotor.getPower(), rfMotor.getPower(), rrMotor.getPower());
+
+       /* List<NavigationInfo> allVisibleTargets = ringDetector.getNavigationInfo();
+        if (allVisibleTargets != null) {
+            for (NavigationInfo visibleTarget : allVisibleTargets) {
+
+                float xPosition = visibleTarget.translation.get(0);
+                float yPosition = visibleTarget.translation.get(1);
+                float zPosition = visibleTarget.translation.get(2);
+                float vuforiaRoll = visibleTarget.rotation.firstAngle;
+                float vuforiaPitch = visibleTarget.rotation.secondAngle;
+                double vuforiaHeading = normalizeHeading(visibleTarget.rotation.thirdAngle);
+
+                lastKnownPositionAndHeading = new PositionAndHeading(xPosition, yPosition, vuforiaHeading, VUFORIA);
+
+                Position position = new Position(DistanceUnit.INCH, xPosition, yPosition, 0, System.nanoTime());
+                //Tells the IMU to start paying attention because the IMU is the backup to Vuforia.
+                imu.startAccelerationIntegration(position, null, 1);
+
+
+                telemetry.addData("Visible Target", visibleTarget.targetName);
+                telemetry.addData("Vuforia Position, Heading", "(%.1f, %.1f), %.0f",
+                        xPosition, yPosition, vuforiaHeading); */
+        //telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f",
+        //        vuforiaRoll, vuforiaPitch, vuforiaHeading);
+           /* }
+        } else {
+            telemetry.addData("Visible Target", "none");
+            /*
+            //IMU takes over
+            Position position = imu.getPosition().toUnit(DistanceUnit.INCH);
+            */
+        double imuHeading = getIMUHeading();
+        // Don't update X & Y; the IMU is too inaccurate
+         /*   lastKnownPositionAndHeading.heading = imuHeading;
+            lastKnownPositionAndHeading.valueSource = imu; */
+            /*
+            telemetry.addData("IMU Position, Heading", "(%.1f, %.1f), %.0f", position.x, position.y,
+                    heading);
+             */
+        telemetry.addData("IMU Heading", "%.0f", imuHeading);
+        //}
+        telemetry.update();
     }
 
     @Override
@@ -91,6 +158,9 @@ public class FreightFrenzyRobot implements iRobot {
 
         double accelInches;
         double decelInches;
+
+        double leftSpeed;
+        double rightSpeed;
 
         double halfSlope = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
 
@@ -131,7 +201,7 @@ public class FreightFrenzyRobot implements iRobot {
             }
             power *= direction;
 
-            double currentHeading = getImuHeading();
+            double currentHeading = getIMUHeading();
             delta = normalizeHeading(desiredHeading - currentHeading);
             double adjustSpeed = 0;
             if (Math.abs(delta) > deltaThreshold) {
@@ -177,7 +247,7 @@ public class FreightFrenzyRobot implements iRobot {
             power = -duckWheelSpeed;
         }
         // Setting the power the duck wheel motor should move at.
-        DWMotor.setPower(power);
+        dwMotor.setPower(power);
     }
 
     public void liftMotor(int direction) {
@@ -227,21 +297,21 @@ public class FreightFrenzyRobot implements iRobot {
             if (Math.abs(lfSpeed) > normalSpeed) {
                 if (lfSpeed > 0) {
                     lfSpeed = normalSpeed;
-                    LFMotor.setPower(lfSpeed + accelerationSpeed * b);
+                    lfMotor.setPower(lfSpeed + accelerationSpeed * b);
                 } else if (lfSpeed < 0) {
                     lfSpeed = -normalSpeed;
-                    LFMotor.setPower(lfSpeed - accelerationSpeed * b);
+                    lfMotor.setPower(lfSpeed - accelerationSpeed * b);
                 } else {
-                    LFMotor.setPower(0);
+                    lfMotor.setPower(0);
                 }
             }
         } else {
             if (lfSpeed > 0) {
-                LFMotor.setPower(lfSpeed + accelerationSpeed * b);
+                lfMotor.setPower(lfSpeed + accelerationSpeed * b);
             } else if (lfSpeed < 0) {
-                LFMotor.setPower(lfSpeed - accelerationSpeed * b);
+                lfMotor.setPower(lfSpeed - accelerationSpeed * b);
             } else {
-                LFMotor.setPower(0);
+                lfMotor.setPower(0);
             }
         }
 
@@ -249,21 +319,21 @@ public class FreightFrenzyRobot implements iRobot {
             if (Math.abs(rfSpeed) > normalSpeed) {
                 if (rfSpeed > 0) {
                     rfSpeed = normalSpeed;
-                    RFMotor.setPower(rfSpeed + accelerationSpeed * b);
+                    rfMotor.setPower(rfSpeed + accelerationSpeed * b);
                 } else if (rfSpeed < 0) {
                     rfSpeed = -normalSpeed;
-                    RFMotor.setPower(rfSpeed - accelerationSpeed * b);
+                    rfMotor.setPower(rfSpeed - accelerationSpeed * b);
                 } else {
-                    RFMotor.setPower(0);
+                    rfMotor.setPower(0);
                 }
             }
         } else {
             if (rfSpeed > 0) {
-                RFMotor.setPower(rfSpeed + accelerationSpeed * b);
+                rfMotor.setPower(rfSpeed + accelerationSpeed * b);
             } else if (rfSpeed < 0) {
-                RFMotor.setPower(rfSpeed - accelerationSpeed * b);
+                rfMotor.setPower(rfSpeed - accelerationSpeed * b);
             } else {
-                RFMotor.setPower(0);
+                rfMotor.setPower(0);
             }
         }
 
@@ -271,21 +341,21 @@ public class FreightFrenzyRobot implements iRobot {
             if (Math.abs(lrSpeed) > normalSpeed) {
                 if (lrSpeed > 0) {
                     lrSpeed = normalSpeed;
-                    LRMotor.setPower(lrSpeed + accelerationSpeed * b);
+                    lrMotor.setPower(lrSpeed + accelerationSpeed * b);
                 } else if (lrSpeed < 0) {
                     lrSpeed = -normalSpeed;
-                    LRMotor.setPower(lrSpeed - accelerationSpeed * b);
+                    lrMotor.setPower(lrSpeed - accelerationSpeed * b);
                 } else {
-                    LRMotor.setPower(0);
+                    lrMotor.setPower(0);
                 }
             }
         } else {
             if (lrSpeed > 0) {
-                LRMotor.setPower(lrSpeed + accelerationSpeed * b);
+                lrMotor.setPower(lrSpeed + accelerationSpeed * b);
             } else if (lrSpeed < 0) {
-                LRMotor.setPower(lrSpeed - accelerationSpeed * b);
+                lrMotor.setPower(lrSpeed - accelerationSpeed * b);
             } else {
-                LRMotor.setPower(0);
+                lrMotor.setPower(0);
             }
         }
 
@@ -293,35 +363,35 @@ public class FreightFrenzyRobot implements iRobot {
             if (Math.abs(rrSpeed) > normalSpeed) {
                 if (rrSpeed > 0) {
                     rrSpeed = normalSpeed;
-                    RRMotor.setPower(rrSpeed + accelerationSpeed * b);
+                    rrMotor.setPower(rrSpeed + accelerationSpeed * b);
                 } else if (rrSpeed < 0) {
                     rrSpeed = -normalSpeed;
-                    RRMotor.setPower(rrSpeed - accelerationSpeed * b);
+                    rrMotor.setPower(rrSpeed - accelerationSpeed * b);
                 } else {
-                    RRMotor.setPower(0);
+                    rrMotor.setPower(0);
                 }
             }
         } else {
             if (rrSpeed > 0) {
-                RRMotor.setPower(rrSpeed + accelerationSpeed * b);
+                rrMotor.setPower(rrSpeed + accelerationSpeed * b);
             } else if (rrSpeed < 0) {
-                RRMotor.setPower(rrSpeed - accelerationSpeed * b);
+                rrMotor.setPower(rrSpeed - accelerationSpeed * b);
             } else {
-                RRMotor.setPower(0);
+                rrMotor.setPower(0);
             }
         }
     }
 
     @Override
     public void driveStop() {
-        RFMotor.setPower(0.0);
-        RRMotor.setPower(0.0);
-        LFMotor.setPower(0.0);
-        LRMotor.setPower(0.0);
+        rfMotor.setPower(0.0);
+        rrMotor.setPower(0.0);
+        lfMotor.setPower(0.0);
+        lrMotor.setPower(0.0);
     }
 
     public void armsStop() {
-        DWMotor.setPower(0.0);
+        dwMotor.setPower(0.0);
 
     }
 
@@ -348,10 +418,10 @@ public class FreightFrenzyRobot implements iRobot {
     }
 
     private void setMotorMode(DcMotor.RunMode mode) {
-        LFMotor.setMode(mode);
-        LRMotor.setMode(mode);
-        RFMotor.setMode(mode);
-        RRMotor.setMode(mode);
+        lfMotor.setMode(mode);
+        lrMotor.setMode(mode);
+        rfMotor.setMode(mode);
+        rrMotor.setMode(mode);
     }
 
     /**
@@ -375,15 +445,15 @@ public class FreightFrenzyRobot implements iRobot {
         }
 
         double distanceInTicks = distance * ticksPerInch;
-        int leftFrontTargetPosition = (int) (LFMotor.getCurrentPosition() + distanceInTicks);
-        int leftRearTargetPosition = (int) (LRMotor.getCurrentPosition() + distanceInTicks);
-        int rightFrontTargetPosition = (int) (RFMotor.getCurrentPosition() + distanceInTicks);
-        int rightRearTargetPosition = (int) (RRMotor.getCurrentPosition() + distanceInTicks);
+        int leftFrontTargetPosition = (int) (lfMotor.getCurrentPosition() + distanceInTicks);
+        int leftRearTargetPosition = (int) (lrMotor.getCurrentPosition() + distanceInTicks);
+        int rightFrontTargetPosition = (int) (rfMotor.getCurrentPosition() + distanceInTicks);
+        int rightRearTargetPosition = (int) (rrMotor.getCurrentPosition() + distanceInTicks);
 
-        LFMotor.setTargetPosition(direction[0] * leftFrontTargetPosition);
-        LRMotor.setTargetPosition(direction[1] * leftRearTargetPosition);
-        RFMotor.setTargetPosition(direction[2] * rightFrontTargetPosition);
-        RRMotor.setTargetPosition(direction[3] * rightRearTargetPosition);
+        lfMotor.setTargetPosition(direction[0] * leftFrontTargetPosition);
+        lrMotor.setTargetPosition(direction[1] * leftRearTargetPosition);
+        rfMotor.setTargetPosition(direction[2] * rightFrontTargetPosition);
+        rrMotor.setTargetPosition(direction[3] * rightRearTargetPosition);
 
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
@@ -413,18 +483,18 @@ public class FreightFrenzyRobot implements iRobot {
             rrPower /= max;
         }
 
-        if (LFMotor.getMode().equals(DcMotor.RunMode.RUN_USING_ENCODER)) {
-            double lfVelocity = lfPower * maxRobotTps;
-            double lrVelocity = lrPower * maximumRobotTps;
-            double rfVelocity = rfPower * maximumRobotTps;
-            double rrVelocity = rrPower * maximumRobotTps;
+        if (lfMotor.getMode().equals(DcMotor.RunMode.RUN_USING_ENCODER)) {
+            double lfVelocity = lfPower * lfMotorMaxTps;
+            double lrVelocity = lrPower * lrMotorMaxTps;
+            double rfVelocity = rfPower * rfMotorMaxTps;
+            double rrVelocity = rrPower * rrMotorMaxTps;
 
             if (creator.opModeIsActive()) {
 
-                LFMotor.setVelocity(lfVelocity);
-                LRMotor.setVelocity(lrVelocity);
-                RFMotor.setVelocity(rfVelocity);
-                RRMotor.setVelocity(rrVelocity);
+                lfMotor.setVelocity(lfVelocity);
+                lrMotor.setVelocity(lrVelocity);
+                rfMotor.setVelocity(rfVelocity);
+                rrMotor.setVelocity(rrVelocity);
             }
             else {
                 throw new EmergencyStopException("PowerTheWheels");
@@ -433,10 +503,10 @@ public class FreightFrenzyRobot implements iRobot {
         else {
             // We assume that we will be using RUN_TO_POSITION mode.
             if(creator.opModeIsActive()) {
-                LFMotor.setPower(lfPower);
-                LRMotor.setPower(lrPower);
-                RFMotor.setPower(rfPower);
-                RRMotor.setPower(rrPower);
+                lfMotor.setPower(lfPower);
+                lrMotor.setPower(lrPower);
+                rfMotor.setPower(rfPower);
+                rrMotor.setPower(rrPower);
             }
             else {
                 throw new EmergencyStopException("PowerTheWheels");
@@ -444,4 +514,33 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
+    private boolean motorsShouldContinue(double distance, int[] motorDirection) {
+        boolean motorsAreBusy = lfMotor.isBusy() && rfMotor.isBusy() && lrMotor.isBusy() && rrMotor.isBusy();
+        boolean aMotorHasPassedPosition = false;
+        if (motorsAreBusy) {
+            aMotorHasPassedPosition = checkMotorPosition(lfMotor, distance * motorDirection[0])
+                    || checkMotorPosition(lrMotor, distance * motorDirection[1])
+                    || checkMotorPosition(rfMotor, distance * motorDirection[2])
+                    || checkMotorPosition(rrMotor, distance * motorDirection[3]);
+        }
+        return motorsAreBusy && !aMotorHasPassedPosition;
+    }
+
+    private boolean checkMotorPosition(DcMotorEx motor, double distance) {
+        if (distance > 0) {
+            return motor.getCurrentPosition() > motor.getTargetPosition();
+        }
+        return motor.getCurrentPosition() < motor.getTargetPosition();
+    }
+
+    private double getMotorPosition() {
+        double lfPosition = lfMotor.getCurrentPosition();
+        double rfPosition = rfMotor.getCurrentPosition();
+        double lrPosition = lrMotor.getCurrentPosition();
+        double rrPosition = rrMotor.getCurrentPosition();
+
+        double motorPositionAverage = (lfPosition + rfPosition + lrPosition + rrPosition) / 4;
+
+        return motorPositionAverage / ticksPerInch;
+    }
 }
