@@ -60,5 +60,4 @@ public interface iRobot {
      * normalizeHeading is a TeleOp method that
      */
     double normalizeHeading(double heading);
-
 }
