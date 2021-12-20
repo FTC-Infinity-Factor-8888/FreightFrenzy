@@ -25,7 +25,7 @@ public class WarehouseLine2 extends LinearOpMode {
 
             // Check to see if we are still active
             if (opModeIsActive()) {
-                ewok.drive(72);
+                ewok.drive(75);
             }
         }
     }

@@ -16,7 +16,7 @@ public class WarehouseLine1 extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()){
-            ewok.drive(24);
+            ewok.drive(27);
         }
     }
 }

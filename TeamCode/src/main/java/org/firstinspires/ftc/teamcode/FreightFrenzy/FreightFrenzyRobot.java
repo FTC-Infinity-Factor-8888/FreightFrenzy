@@ -282,7 +282,6 @@ public class FreightFrenzyRobot implements iRobot {
             LiftMotor.setPower(0);
         } else {
             // Move to the position as specified above.
-            LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Setting the speed that the lift moves at.
             // If the direction is positive move the lift up.
@@ -293,6 +292,7 @@ public class FreightFrenzyRobot implements iRobot {
             else if (direction == -1) {
                 LiftMotor.setTargetPosition(minLiftPosition);
             }
+            LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             LiftMotor.setPower(liftSpeed);
         }
     }
