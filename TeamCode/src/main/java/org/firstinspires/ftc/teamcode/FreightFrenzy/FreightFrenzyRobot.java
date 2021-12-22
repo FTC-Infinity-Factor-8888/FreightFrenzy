@@ -54,7 +54,8 @@ public class FreightFrenzyRobot implements iRobot {
     // reaches its maximum height.
     private final int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
     // reaches its minimum height.
-    private double duckWheelSpeed = 0.6; // The speed the wheel to turn the duck carousel moves at.
+    private double duckWheelSpeed = 0.65
+            ; // The speed the wheel to turn the duck carousel moves at.
     double liftSpeed = 0.3; // The speed the lift moves at.
     double spintakeSpeed = 0.6;
 
