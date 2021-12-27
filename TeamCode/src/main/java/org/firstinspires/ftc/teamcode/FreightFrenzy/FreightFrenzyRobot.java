@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -39,6 +40,8 @@ public class FreightFrenzyRobot implements iRobot {
     private double normalSpeed = 0.50; // The normal speed our robot should be driving at.
     private double accelerationSpeed = MAX_ROBOT_SPEED - normalSpeed; // The acceleration speed set on normal speed.
     private double correctionSpeed = 0.1; //
+    private double strafeRobotSpeed = 0.5;
+    private double driveAccelerationIncrement = 0.075;
 
     private final double wheelCircumferenceInInches = (96 / 25.4) * Math.PI;
     // private int maximumRobotTps = 2610;
@@ -49,6 +52,9 @@ public class FreightFrenzyRobot implements iRobot {
     private final double ticksPerMotorRevolution = 530.3;
     private final double ticksPerInch = ticksPerMotorRevolution / wheelCircumferenceInInches;
     private final double drivePositionPIDF = 5.0; // 4.5
+    private final double strafePositionPIDF = 6.5;
+    private double holdSpeed = 0.15;
+    private final static double HOLD_TIME = 1000; // In ms
 
     private final int maxLiftPosition = 824;  // The maximum amount of degrees the motor turns before the lift
     // reaches its maximum height.
@@ -256,12 +262,84 @@ public class FreightFrenzyRobot implements iRobot {
 
     @Override
     public void strafe(double distance) {
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        double strafeSlippage = 1.1;
+        double desiredHeading = getIMUHeading();
+        double leftSpeed;
+        double rightSpeed;
+        lfMotor.setPositionPIDFCoefficients(strafePositionPIDF);
+        rfMotor.setPositionPIDFCoefficients(strafePositionPIDF);
+        lrMotor.setPositionPIDFCoefficients(strafePositionPIDF);
+        rrMotor.setPositionPIDFCoefficients(strafePositionPIDF);
+        setMotorDistanceToTravel(distance * strafeSlippage, new int[]{-1, 1, 1, -1});
+        double speed = MIN_ROBOT_SPEED;
+        leftSpeed = speed;
+        rightSpeed = -speed;
+        powerTheWheels(rightSpeed, leftSpeed, leftSpeed, rightSpeed);
+        telemetryDashboard("Strafe(" + distance + ")");
+        while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{-1, 1, 1, -1})) {
+            double imuHeading = getIMUHeading();
+            delta = normalizeHeading(desiredHeading - imuHeading);
+            double adjustSpeed = 0;
+            if (Math.abs(delta) > deltaThreshold) {
+                adjustSpeed = correctionSpeed;
+                if (delta > 0) {
+                    adjustSpeed *= -1;
+                }
+            }
+            leftSpeed = speed + adjustSpeed;
+            rightSpeed = -speed - adjustSpeed;
+            powerTheWheels(rightSpeed, leftSpeed, leftSpeed, rightSpeed);
+            telemetryDashboard("Strafe(" + distance + ")");
 
+            if (speed < strafeRobotSpeed) {
+                speed += driveAccelerationIncrement;
+            }
+        }
+        if (!creator.opModeIsActive()) {
+            throw new EmergencyStopException("Strafe");
+        }
+        // Reset motor mode
+        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        powerTheWheels(0, 0, 0, 0);
+        lfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+        rfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+        lrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+        rrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
     }
 
     @Override
     public void rotate(double desiredHeading) {
+        double minTurnSpeed = 0.1;
+        double currentHeading = getIMUHeading();
+        double leftSpeed;
+        double rightSpeed;
+        delta = normalizeHeading(desiredHeading - currentHeading);
+        double priorDelta = delta;
+        int ringingCount = 0;
+        while (creator.opModeIsActive() && Math.abs(delta) > turnDeltaThreshold && ringingCount <= 3) {
+            currentHeading = getIMUHeading();
+            delta = normalizeHeading(desiredHeading - currentHeading);
+            double deltaPercentage =  powerPercentage(delta);
+            double currentTurnSpeed = turnSpeed * deltaPercentage + minTurnSpeed;
+            if (delta < 0) {
+                currentTurnSpeed = -currentTurnSpeed;
+            }
+            leftSpeed = -currentTurnSpeed;
+            rightSpeed = currentTurnSpeed;
+            powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
+            telemetryDashboard("Turn(" + (int) desiredHeading + ")");
+            if (Math.signum(delta) != Math.signum(priorDelta) && delta != 0 && priorDelta != 0) {
+                ringingCount++;
+            }
+            priorDelta = delta;
+        }
+        if(!creator.opModeIsActive()) {
+            throw new EmergencyStopException("Turn");
+        }
 
+        powerTheWheels(0, 0, 0, 0);
+        hold(desiredHeading);
     }
 
     public void duckWheelMotor(int direction) {
@@ -444,6 +522,37 @@ public class FreightFrenzyRobot implements iRobot {
         }
         return heading;
     }
+    public void hold(double desiredHeading) {
+        ElapsedTime timer;
+
+        double leftSpeed;
+        double rightSpeed;
+        double currentHeading = getIMUHeading();
+        delta = normalizeHeading(desiredHeading - currentHeading);
+        timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        timer.reset();
+        while (creator.opModeIsActive() && Math.abs(delta) > 0.5 && timer.time() < HOLD_TIME) {
+            if (delta > 0) {
+                leftSpeed = -holdSpeed;
+                rightSpeed = holdSpeed;
+            } else {
+                leftSpeed = holdSpeed;
+                rightSpeed = -holdSpeed;
+            }
+            powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
+            creator.sleep(75);
+            powerTheWheels(0, 0, 0, 0);
+            telemetryDashboard("Hold(" + (int) desiredHeading + ")");
+            currentHeading = getIMUHeading();
+            delta = normalizeHeading(desiredHeading - currentHeading);
+        }
+
+        if(!creator.opModeIsActive()) {
+            throw new EmergencyStopException("Hold");
+        }
+
+        powerTheWheels(0, 0, 0, 0);
+    }
 
     private double getIMUHeading() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,
@@ -576,6 +685,16 @@ public class FreightFrenzyRobot implements iRobot {
         double motorPositionAverage = (lfPosition + rfPosition + lrPosition + rrPosition) / 4;
 
         return motorPositionAverage / ticksPerInch;
+    }
+
+    private double powerPercentage(double delta) {
+        double powerPercent = -0.000027 * Math.pow(Math.abs(delta) - 180, 2) + 1;
+        if (powerPercent > 1 || powerPercent < 0) {
+            System.out.println("*** WARNING! POWER PERCENT IS OUT OF RANGE: delta = " + delta + ", " +
+                    "powerPercent = " + powerPercent + " ***");
+        }
+
+        return powerPercent;
     }
 
     private void setPIDFValues(DcMotorEx motor, int tps) {
