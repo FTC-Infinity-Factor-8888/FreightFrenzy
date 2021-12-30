@@ -63,7 +63,8 @@ public class FreightFrenzyRobot implements iRobot {
     private double duckWheelSpeed = 0.65
             ; // The speed the wheel to turn the duck carousel moves at.
     double liftSpeed = 0.3; // The speed the lift moves at.
-    double spintakeSpeed = 0.6;
+    double spintakeIntakeSpeed = 0.6;
+    double spintakeOuttakeSpeed = -0.4;
 
     private double turnSpeed = 0.1;
     private double delta;
@@ -379,10 +380,10 @@ public class FreightFrenzyRobot implements iRobot {
     public void spinTakeMotor (int direction) {
         double power = 0;
         if(direction == 1) {
-            power = spintakeSpeed;
+            power = spintakeIntakeSpeed;
         }
         else if(direction == -1) {
-            power = -spintakeSpeed;
+            power = spintakeOuttakeSpeed;
         }
         SpintakeMotor.setPower(power);
     }
