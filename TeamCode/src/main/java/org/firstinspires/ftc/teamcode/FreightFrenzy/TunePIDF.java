@@ -40,8 +40,10 @@ public class TunePIDF extends LinearOpMode {
 
         // Change these to optimize the robot
         double distance = 70;
-        double positionPIDF = 4.5;
-        double power = 0.75;
+        double positionPIDF = 2.8;
+        double maxPower = 0.75;
+        double power = 0.3;
+        double powerIncrement = 0.01;
 
         double WheelCircumferenceInInches = (96 / 25.4) * Math.PI; // 10.0625
 
@@ -74,6 +76,15 @@ public class TunePIDF extends LinearOpMode {
             rrMotor.setPower(power);
 
             while (opModeIsActive() && lfMotor.isBusy() && rfMotor.isBusy() && lrMotor.isBusy() && rrMotor.isBusy()) {
+
+                if(power < maxPower) {
+                    power += powerIncrement;
+                }
+
+                lfMotor.setPower(power);
+                rfMotor.setPower(power);
+                lrMotor.setPower(power);
+                rrMotor.setPower(power);
 
                 currentVelocity = lfMotor.getVelocity();
                 if (currentVelocity > lfMaxVelocity) {
@@ -113,6 +124,7 @@ public class TunePIDF extends LinearOpMode {
             lrMotor.setPower(0);
             rrMotor.setPower(0);
 
+            System.out.println(power);
             System.out.println("Robot has stopped");
         }
     }
