@@ -2,13 +2,12 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name="PIDFTest")
-public class FreightFrenzyPIDFTest extends LinearOpMode {
+@Autonomous(name="TunePIDFTest")
+public class TunePIDF extends LinearOpMode {
     DcMotorEx lfMotor;
     DcMotorEx rfMotor;
     DcMotorEx lrMotor;
@@ -34,16 +33,16 @@ public class FreightFrenzyPIDFTest extends LinearOpMode {
         lrMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rrMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        lfMotor.setVelocityPIDFCoefficients(1.2342, 0.1234, 0, 12.3416);
-        rfMotor.setVelocityPIDFCoefficients(1.2365, 0.1236, 0, 12.3649);
-        lrMotor.setVelocityPIDFCoefficients(1.2554, 0.1255, 0, 12.5544);
-        rrMotor.setVelocityPIDFCoefficients(1.2530, 0.1253, 0, 12.5304);
+        lfMotor.setVelocityPIDFCoefficients(1.22, 0.122, 0, 12.2);
+        rfMotor.setVelocityPIDFCoefficients(1.28, 0.128, 0, 12.8);
+        lrMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
+        rrMotor.setVelocityPIDFCoefficients(1.28, 0.128, 0, 12.8);
 
         // Change these to optimize the robot
-
         double distance = 70;
         double positionPIDF = 4.5;
         double power = 0.75;
+
         double WheelCircumferenceInInches = (96 / 25.4) * Math.PI; // 10.0625
 
         lfMotor.setPositionPIDFCoefficients(positionPIDF);

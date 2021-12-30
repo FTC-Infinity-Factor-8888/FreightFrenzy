@@ -159,7 +159,7 @@ public class FreightFrenzyRobot implements iRobot {
                 telemetry.addData("Visible Target", visibleTarget.targetName);
                 telemetry.addData("Vuforia Position, Heading", "(%.1f, %.1f), %.0f",
                         xPosition, yPosition, vuforiaHeading); */
-        //telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f",
+        // Telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f",
         //        vuforiaRoll, vuforiaPitch, vuforiaHeading);
            /* }
         } else {
