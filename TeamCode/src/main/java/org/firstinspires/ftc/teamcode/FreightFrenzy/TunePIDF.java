@@ -5,9 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import java.io.FileOutputStream;
+import java.util.Scanner;
 
 @Autonomous(name="TunePIDFTest")
 public class TunePIDF extends LinearOpMode {
+
+
     DcMotorEx lfMotor;
     DcMotorEx rfMotor;
     DcMotorEx lrMotor;
@@ -51,6 +55,11 @@ public class TunePIDF extends LinearOpMode {
         rfMotor.setPositionPIDFCoefficients(positionPIDF);
         lrMotor.setPositionPIDFCoefficients(positionPIDF);
         rrMotor.setPositionPIDFCoefficients(positionPIDF);
+
+        /*
+        TODO: Get some form of PIDF to graph functionality
+         FileOutputStream fos=new FileOutputStream("C:\\FFR-PIDF-CSV\\data.csv", true);  // true for append mode
+         */
 
         waitForStart();
 
