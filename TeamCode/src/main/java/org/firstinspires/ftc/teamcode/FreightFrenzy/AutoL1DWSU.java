@@ -16,9 +16,9 @@ public class AutoL1DWSU extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()){
-            ewok.drive(27);
+            ewok.drive(-27);
             ewok.duckWheelMotor(1);
-            ewok.strafe(24);
+            ewok.strafe(-24);
         }
     }
 }

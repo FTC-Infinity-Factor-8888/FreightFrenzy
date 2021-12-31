@@ -16,10 +16,10 @@ public class AutoL1DWWH extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()){
-            ewok.drive(27);
+            ewok.drive(-27);
             ewok.duckWheelMotor(1);
-            ewok.strafe(-2);
-            ewok.drive(-160);
+            ewok.strafe(2);
+            ewok.drive(160);
         }
     }
 }
