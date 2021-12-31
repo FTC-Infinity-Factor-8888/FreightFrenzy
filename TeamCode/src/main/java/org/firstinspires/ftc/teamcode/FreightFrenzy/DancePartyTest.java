@@ -15,7 +15,25 @@ public class DancePartyTest extends LinearOpMode {
         ewok = new FreightFrenzyRobot(this);
         ewok.initHardware();
 
+        waitForStart();        //we have landed on a moon of Endor.
+        ewok = new FreightFrenzyRobot(this);
+        ewok.initHardware();
+
         waitForStart();
+        if(opModeIsActive()){
+            ewok.drive(15);
+            ewok.duckWheelMotor(1);
+            ewok.armsStop();
+            ewok.rotate(90);
+            ewok.rotate(-100);
+            ewok.drive(-10);
+            ewok.strafe(15);
+            ewok.stopAll();
+            ewok.driveStop();
+            ewok.armsStop();
+            throw new EmergencyStopException("The dance party is done.");
+        }
+
         if(opModeIsActive()){
             ewok.drive(15);
             ewok.duckWheelMotor(1);

@@ -30,46 +30,27 @@ public class FreightFrenzyRobot implements iRobot {
     private BNO055IMU imu;
 
 
-    private double lfSpeed; // Left Front motor speed.
-    private double rfSpeed; // Right Front motor speed.
-    private double lrSpeed; // Left Rear motor speed.
-    private double rrSpeed; // Right Rear motor speed.
-
-    private double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
-    private double MIN_ROBOT_SPEED = 0.20; // The minimum speed we can have our robot to drive at.
-    private double normalSpeed = 0.50; // The normal speed our robot should be driving at.
-    private double accelerationSpeed = MAX_ROBOT_SPEED - normalSpeed; // The acceleration speed set on normal speed.
-    private double correctionSpeed = 0.1; //
-    private double strafeRobotSpeed = 0.5;
-    private double driveAccelerationIncrement = 0.075;
+    private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
+    private final double MIN_ROBOT_SPEED = 0.20; // The minimum speed we can have our robot to drive at.
+    private final double correctionSpeed = 0.1; //
 
     private final double wheelCircumferenceInInches = (96 / 25.4) * Math.PI;
     // private int maximumRobotTps = 2610;
-    private int lfMotorMaxTps = 2655;
-    private int rfMotorMaxTps = 2650;
-    private int lrMotorMaxTps = 2610;
-    private int rrMotorMaxTps = 2615;
+    private final int lfMotorMaxTps = 2655;
+    private final int rfMotorMaxTps = 2650;
+    private final int lrMotorMaxTps = 2610;
+    private final int rrMotorMaxTps = 2615;
     private final double ticksPerMotorRevolution = 530.3;
     private final double ticksPerInch = ticksPerMotorRevolution / wheelCircumferenceInInches;
     private final double drivePositionPIDF = 5.0; // 4.5
-    private final double strafePositionPIDF = 6.5;
-    private double holdSpeed = 0.15;
     private final static double HOLD_TIME = 1000; // In ms
 
-    private final int maxLiftPosition = 824;  // The maximum amount of degrees the motor turns before the lift
-    // reaches its maximum height.
-    private final int minLiftPosition = 0; // The minimum amount of degrees the motor turns before the lift
-    // reaches its minimum height.
-    private double duckWheelSpeed = 0.65
-            ; // The speed the wheel to turn the duck carousel moves at.
     double liftSpeed = 0.3; // The speed the lift moves at.
     double spintakeIntakeSpeed = 0.6;
     double spintakeOuttakeSpeed = -0.4;
 
-    private double turnSpeed = 0.1;
     private double delta;
-    private double deltaThreshold = 1;
-    private double turnDeltaThreshold = 5;
+    private final double deltaThreshold = 1;
 
     public FreightFrenzyRobot(LinearOpMode creator) {
         this.creator = creator;
@@ -268,6 +249,7 @@ public class FreightFrenzyRobot implements iRobot {
         double desiredHeading = getIMUHeading();
         double leftSpeed;
         double rightSpeed;
+        double strafePositionPIDF = 6.5;
         lfMotor.setPositionPIDFCoefficients(strafePositionPIDF);
         rfMotor.setPositionPIDFCoefficients(strafePositionPIDF);
         lrMotor.setPositionPIDFCoefficients(strafePositionPIDF);
@@ -293,7 +275,9 @@ public class FreightFrenzyRobot implements iRobot {
             powerTheWheels(rightSpeed, leftSpeed, leftSpeed, rightSpeed);
             telemetryDashboard("Strafe(" + distance + ")");
 
+            double strafeRobotSpeed = 0.5;
             if (speed < strafeRobotSpeed) {
+                double driveAccelerationIncrement = 0.075;
                 speed += driveAccelerationIncrement;
             }
         }
@@ -318,10 +302,12 @@ public class FreightFrenzyRobot implements iRobot {
         delta = normalizeHeading(desiredHeading - currentHeading);
         double priorDelta = delta;
         int ringingCount = 0;
+        double turnDeltaThreshold = 5;
         while (creator.opModeIsActive() && Math.abs(delta) > turnDeltaThreshold && ringingCount <= 3) {
             currentHeading = getIMUHeading();
             delta = normalizeHeading(desiredHeading - currentHeading);
             double deltaPercentage =  powerPercentage(delta);
+            double turnSpeed = 0.1;
             double currentTurnSpeed = turnSpeed * deltaPercentage + minTurnSpeed;
             if (delta < 0) {
                 currentTurnSpeed = -currentTurnSpeed;
@@ -346,6 +332,9 @@ public class FreightFrenzyRobot implements iRobot {
     public void duckWheelMotor(int direction) {
         double power = 0; // By default the wheel should not rotate.
         // If the rotate left button is pressed, rotate left.
+        // reaches its minimum height.
+        // The speed the wheel to turn the duck carousel moves at.
+        double duckWheelSpeed = 0.65;
         if(direction == 1) {
             power = duckWheelSpeed;
         }
@@ -366,10 +355,15 @@ public class FreightFrenzyRobot implements iRobot {
             // Setting the speed that the lift moves at.
             // If the direction is positive move the lift up.
             if (direction == 1) {
+                // The maximum amount of degrees the motor turns before the lift
+                int maxLiftPosition = 824;
                 LiftMotor.setTargetPosition(maxLiftPosition);
             }
             // If the direction is negative move the lift down.
             else if (direction == -1) {
+                // reaches its maximum height.
+                // The minimum amount of degrees the motor turns before the lift
+                int minLiftPosition = 0;
                 LiftMotor.setTargetPosition(minLiftPosition);
             }
             LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -395,11 +389,19 @@ public class FreightFrenzyRobot implements iRobot {
                 Here, we are taking into account the direction each wheel should travel at in
                 order to move in the direction we want the robot to move.
                  */
-        lfSpeed = -((y - x - r) * normalSpeed);
-        rfSpeed = -((y + x + r) * normalSpeed);
-        lrSpeed = -((y + x - r) * normalSpeed);
-        rrSpeed = -((y - x + r) * normalSpeed);
+        // Left Front motor speed.
+        // The normal speed our robot should be driving at.
+        double normalSpeed = 0.50;
+        double lfSpeed = -((y - x - r) * normalSpeed);
+        // Right Front motor speed.
+        double rfSpeed = -((y + x + r) * normalSpeed);
+        // Left Rear motor speed.
+        double lrSpeed = -((y + x - r) * normalSpeed);
+        // Right Rear motor speed.
+        double rrSpeed = -((y - x + r) * normalSpeed);
 
+        // The acceleration speed set on normal speed.
+        double accelerationSpeed = MAX_ROBOT_SPEED - normalSpeed;
         if (Math.abs(lfSpeed) + accelerationSpeed * b > MAX_ROBOT_SPEED) {
             if (Math.abs(lfSpeed) > normalSpeed) {
                 if (lfSpeed > 0) {
@@ -533,6 +535,7 @@ public class FreightFrenzyRobot implements iRobot {
         timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         timer.reset();
         while (creator.opModeIsActive() && Math.abs(delta) > 0.5 && timer.time() < HOLD_TIME) {
+            double holdSpeed = 0.15;
             if (delta > 0) {
                 leftSpeed = -holdSpeed;
                 rightSpeed = holdSpeed;
