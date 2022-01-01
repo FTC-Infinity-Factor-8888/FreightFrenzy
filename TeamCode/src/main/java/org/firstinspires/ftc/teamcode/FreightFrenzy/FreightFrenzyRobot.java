@@ -31,7 +31,7 @@ public class FreightFrenzyRobot implements iRobot {
 
 
     private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
-    private final double MIN_ROBOT_SPEED = 0.20; // The minimum speed we can have our robot to drive at.
+    private final double MIN_ROBOT_SPEED = 0.30; // The minimum speed we can have our robot to drive at.
     private final double correctionSpeed = 0.1; //
 
     private final double wheelCircumferenceInInches = (96 / 25.4) * Math.PI;
@@ -72,6 +72,7 @@ public class FreightFrenzyRobot implements iRobot {
 
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lrMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -349,7 +350,8 @@ public class FreightFrenzyRobot implements iRobot {
     public void liftMotor(int direction) {
         if (direction == 0) {
             LiftMotor.setPower(0);
-        } else {
+        }
+        else {
             // Move to the position as specified above.
 
             // Setting the speed that the lift moves at.
@@ -501,7 +503,7 @@ public class FreightFrenzyRobot implements iRobot {
 
     public void armsStop() {
         dwMotor.setPower(0.0);
-
+        LiftMotor.setPower(0.0);
     }
 
     @Override

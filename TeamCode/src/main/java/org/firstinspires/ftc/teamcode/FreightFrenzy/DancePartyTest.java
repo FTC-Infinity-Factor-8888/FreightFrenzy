@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Utilities.EmergencyStopException;
 
-@Autonomous (name = "Test-2.1")
+@Autonomous (name = "DancePartyTest")
 public class DancePartyTest extends LinearOpMode {
     FreightFrenzyRobot ewok;
     @Override
@@ -22,30 +22,18 @@ public class DancePartyTest extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()){
             ewok.drive(15);
-            ewok.duckWheelMotor(1);
-            ewok.armsStop();
-            ewok.rotate(90);
+            ewok.drive(-15);
+            ewok.rotate(100);
             ewok.rotate(-100);
-            ewok.drive(-10);
-            ewok.strafe(15);
-            ewok.stopAll();
-            ewok.driveStop();
-            ewok.armsStop();
-            throw new EmergencyStopException("The dance party is done.");
-        }
-
-        if(opModeIsActive()){
-            ewok.drive(15);
             ewok.duckWheelMotor(1);
-            ewok.armsStop();
-            ewok.rotate(90);
-            ewok.rotate(-100);
-            ewok.drive(-10);
+            ewok.duckWheelMotor(0);
+            ewok.duckWheelMotor(-1);
+            ewok.duckWheelMotor(0);
             ewok.strafe(15);
+            ewok.strafe(-15);
+            ewok.liftMotor(1);
+            ewok.liftMotor(-1);
             ewok.stopAll();
-            ewok.driveStop();
-            ewok.armsStop();
-            throw new EmergencyStopException("The dance party is done.");
         }
     }
 }
