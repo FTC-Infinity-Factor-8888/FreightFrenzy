@@ -5,12 +5,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import java.io.FileOutputStream;
-import java.util.Scanner;
+import java.io.PrintWriter; // To write to files
+import java.io.File;  // Import the File class
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
 
 @Autonomous(name="TunePIDFTest")
 public class TunePIDF extends LinearOpMode {
 
+    public String fileName = "TunePIDF";
+    public String fileExtension = ".csv";
+    public FileWriter fileWriter;
+    public PrintWriter printWriter;
 
     DcMotorEx lfMotor;
     DcMotorEx rfMotor;
@@ -21,6 +27,37 @@ public class TunePIDF extends LinearOpMode {
     double rfMaxVelocity = 0.0;
     double lrMaxVelocity = 0.0;
     double rrMaxVelocity = 0.0;
+
+    private String string(double num) {
+        return Double.toString(num);
+    }
+
+    private void createFile() {
+        try {
+            File myObj = new File(fileName + fileExtension);
+            int addNum = 1;
+            while(myObj.exists() && !myObj.isDirectory()) {
+                //noinspection StringConcatenationInLoop
+                fileName += "(" + string(addNum) + ")";
+                addNum++;
+                myObj = new File(fileName + fileExtension);
+            }
+            if (myObj.createNewFile()) {
+                System.out.println("File created: " + myObj.getName());
+            }
+            else {
+                System.out.println("File already exists.");
+            }
+        }
+        catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public void author(String quote) {
+        printWriter.print(quote);
+    }
 
     @Override
     public void runOpMode() {
@@ -56,11 +93,6 @@ public class TunePIDF extends LinearOpMode {
         lrMotor.setPositionPIDFCoefficients(positionPIDF);
         rrMotor.setPositionPIDFCoefficients(positionPIDF);
 
-        /*
-        TODO: Get some form of PIDF to graph functionality
-         FileOutputStream fos=new FileOutputStream("C:\\FFR-PIDF-CSV\\data.csv", true);  // true for append mode
-         */
-
         waitForStart();
 
         double ticksPerMotorRev = 530.3;
@@ -78,6 +110,15 @@ public class TunePIDF extends LinearOpMode {
         rrMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         if (opModeIsActive()) {
+            createFile();
+            try {
+                fileWriter = new FileWriter(fileName + fileExtension);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            printWriter = new PrintWriter(fileWriter);
+            author("LF, RF, LR, RR\n");
 
             lfMotor.setPower(power);
             rfMotor.setPower(power);
@@ -116,15 +157,19 @@ public class TunePIDF extends LinearOpMode {
 
                 telemetry.addData("LF", "TPS (%.0f)", lfMaxVelocity);
                 System.out.printf("LF - TPS (%.0f)\n", lfMaxVelocity);
+                author(string(lfMaxVelocity) + ",");
 
                 telemetry.addData("RF", "TPS (%.0f)", rfMaxVelocity);
                 System.out.printf("RF - TPS (%.0f)\n", rfMaxVelocity);
+                author(string(rfMaxVelocity) + ",");
 
                 telemetry.addData("LR", "TPS (%.0f)", lrMaxVelocity);
                 System.out.printf("LR - TPS (%.0f)\n", lrMaxVelocity);
+                author(string(lrMaxVelocity) + ",");
 
                 telemetry.addData("RR", "TPS (%.0f)", rrMaxVelocity);
                 System.out.printf("RR - TPS (%.0f)\n", rrMaxVelocity);
+                author(string(rrMaxVelocity) + "\n");
 
                 telemetry.update();
             }
