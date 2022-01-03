@@ -13,7 +13,7 @@ import java.io.IOException;  // Import the IOException class to handle errors
 @Autonomous(name="TunePIDFTest")
 public class TunePIDF extends LinearOpMode {
 
-    public String fileName = "TunePIDF";
+    public String fileName = "/sdcard/data/TunePIDF";
     public String fileExtension = ".csv";
     public FileWriter fileWriter;
     public PrintWriter printWriter;
@@ -118,6 +118,7 @@ public class TunePIDF extends LinearOpMode {
                 e.printStackTrace();
             }
             printWriter = new PrintWriter(fileWriter);
+
             author("LF, RF, LR, RR\n");
 
             lfMotor.setPower(power);
