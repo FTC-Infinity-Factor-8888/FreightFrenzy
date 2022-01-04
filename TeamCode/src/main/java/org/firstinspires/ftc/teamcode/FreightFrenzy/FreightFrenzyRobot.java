@@ -107,10 +107,7 @@ public class FreightFrenzyRobot implements iRobot {
     }
 
     // TODO: JavaDoc
-    public void telemetryDashboard(String method) {
-        /*telemetry.addData(method, "SL: %d, TZ: %d, Prox: %.1f", creator.getStartLine(), targetZone,
-                proximitySensor.getDistance(DistanceUnit.INCH)); */
-
+    public void telemetryDashboard() {
         telemetry.addData("Heading", "Desired: %.0f, Current: %.0f, Delta: %.0f",
                 getIMUHeading(), getIMUHeading(), delta);
 
@@ -121,53 +118,23 @@ public class FreightFrenzyRobot implements iRobot {
         telemetry.addData("Power", "LF: %.1f, LR: %.1f, RF: %.1f, RR: %.1f",
                 lfMotor.getPower(), lrMotor.getPower(), rfMotor.getPower(), rrMotor.getPower());
 
-       /* List<NavigationInfo> allVisibleTargets = ringDetector.getNavigationInfo();
-        if (allVisibleTargets != null) {
-            for (NavigationInfo visibleTarget : allVisibleTargets) {
-
-                float xPosition = visibleTarget.translation.get(0);
-                float yPosition = visibleTarget.translation.get(1);
-                float zPosition = visibleTarget.translation.get(2);
-                float vuforiaRoll = visibleTarget.rotation.firstAngle;
-                float vuforiaPitch = visibleTarget.rotation.secondAngle;
-                double vuforiaHeading = normalizeHeading(visibleTarget.rotation.thirdAngle);
-
-                lastKnownPositionAndHeading = new PositionAndHeading(xPosition, yPosition, vuforiaHeading, VUFORIA);
-
-                Position position = new Position(DistanceUnit.INCH, xPosition, yPosition, 0, System.nanoTime());
-                //Tells the IMU to start paying attention because the IMU is the backup to Vuforia.
-                imu.startAccelerationIntegration(position, null, 1);
-
-
-                telemetry.addData("Visible Target", visibleTarget.targetName);
-                telemetry.addData("Vuforia Position, Heading", "(%.1f, %.1f), %.0f",
-                        xPosition, yPosition, vuforiaHeading); */
-        // Telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f",
-        //        vuforiaRoll, vuforiaPitch, vuforiaHeading);
-           /* }
-        } else {
-            telemetry.addData("Visible Target", "none");
-            /*
-            //IMU takes over
-            Position position = imu.getPosition().toUnit(DistanceUnit.INCH);
-            */
         double imuHeading = getIMUHeading();
-        // Don't update X & Y; the IMU is too inaccurate
-         /*   lastKnownPositionAndHeading.heading = imuHeading;
-            lastKnownPositionAndHeading.valueSource = imu; */
-            /*
-            telemetry.addData("IMU Position, Heading", "(%.1f, %.1f), %.0f", position.x, position.y,
-                    heading);
-             */
+
         telemetry.addData("IMU Heading", "%.0f", imuHeading);
-        //}
         telemetry.update();
     }
 
+    /*
+    TODO: Drive method is not driving backwards.
+    Things to check:
+        setMotorDistanceToTravel();
+        Setting the power at the beginning to move forwards regardless of the direction the motors should be moving in.
+     */
     @Override
     public void drive(double distance) {
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         double desiredHeading = getIMUHeading();
+        // TODO: Might be causing reverse problem
         setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
 
         double absDistance = Math.abs(distance);
@@ -198,11 +165,13 @@ public class FreightFrenzyRobot implements iRobot {
 
         double wholeAccelSlope = halfSlope / accelInches;
         double wholeDecelSlope = -halfSlope / decelInches;
-
-        System.out.println("FLLDrive: distance " + distance + ", wholeAccelSlope " + wholeAccelSlope + ", wholeDecelSlope " + wholeDecelSlope);
-
-        powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
-        telemetryDashboard("FLLDrive(" + distance + ")");
+        if(direction > 0) {
+            powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
+        }
+        else {
+            powerTheWheels(-MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED);
+        }
+        telemetryDashboard();
         while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{1, 1, 1, 1})) {
             double motorPosition = getMotorPosition();
             double power = 0;
@@ -232,7 +201,7 @@ public class FreightFrenzyRobot implements iRobot {
 
             System.out.println("FLLDrive: motorPosition " + motorPosition + " power " + power);
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-            telemetryDashboard("FLLDrive(" + distance + ")");
+            telemetryDashboard();
         }
 
         if (!creator.opModeIsActive()) {
@@ -260,7 +229,7 @@ public class FreightFrenzyRobot implements iRobot {
         leftSpeed = speed;
         rightSpeed = -speed;
         powerTheWheels(rightSpeed, leftSpeed, leftSpeed, rightSpeed);
-        telemetryDashboard("Strafe(" + distance + ")");
+        telemetryDashboard();
         while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{-1, 1, 1, -1})) {
             double imuHeading = getIMUHeading();
             delta = normalizeHeading(desiredHeading - imuHeading);
@@ -274,7 +243,7 @@ public class FreightFrenzyRobot implements iRobot {
             leftSpeed = speed + adjustSpeed;
             rightSpeed = -speed - adjustSpeed;
             powerTheWheels(rightSpeed, leftSpeed, leftSpeed, rightSpeed);
-            telemetryDashboard("Strafe(" + distance + ")");
+            telemetryDashboard();
 
             double strafeRobotSpeed = 0.5;
             if (speed < strafeRobotSpeed) {
@@ -316,7 +285,7 @@ public class FreightFrenzyRobot implements iRobot {
             leftSpeed = -currentTurnSpeed;
             rightSpeed = currentTurnSpeed;
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-            telemetryDashboard("Turn(" + (int) desiredHeading + ")");
+            telemetryDashboard();
             if (Math.signum(delta) != Math.signum(priorDelta) && delta != 0 && priorDelta != 0) {
                 ringingCount++;
             }
@@ -331,15 +300,15 @@ public class FreightFrenzyRobot implements iRobot {
     }
 
     public void duckWheelMotor(int direction) {
-        double power = 0; // By default the wheel should not rotate.
-        // If the rotate left button is pressed, rotate left.
+        double power = 0; // By default, the wheel should not rotate.
+        // If the rotate-left button is pressed, rotate left.
         // reaches its minimum height.
         // The speed the wheel to turn the duck carousel moves at.
         double duckWheelSpeed = 0.65;
         if(direction == 1) {
             power = duckWheelSpeed;
         }
-        // If the rotate right button is pressed, rotate right.
+        // If the rotate-right button is pressed, rotate right.
         else if(direction == -1) {
             power = -duckWheelSpeed;
         }
@@ -355,7 +324,7 @@ public class FreightFrenzyRobot implements iRobot {
             // Move to the position as specified above.
 
             // Setting the speed that the lift moves at.
-            // If the direction is positive move the lift up.
+            // If the direction is positive move the lift, up.
             if (direction == 1) {
                 // The maximum amount of degrees the motor turns before the lift
                 int maxLiftPosition = 824;
@@ -521,7 +490,8 @@ public class FreightFrenzyRobot implements iRobot {
         while (heading >= 180.0 || heading < -180.0) {
             if (heading >= 180.0) {
                 heading -= 360.0;
-            } else if (heading < -180.0) {
+            }
+            else {
                 heading += 360.0;
             }
         }
@@ -548,7 +518,7 @@ public class FreightFrenzyRobot implements iRobot {
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
             creator.sleep(75);
             powerTheWheels(0, 0, 0, 0);
-            telemetryDashboard("Hold(" + (int) desiredHeading + ")");
+            telemetryDashboard();
             currentHeading = getIMUHeading();
             delta = normalizeHeading(desiredHeading - currentHeading);
         }
