@@ -126,6 +126,7 @@ public class FreightFrenzyRobot implements iRobot {
 
     /*
     TODO: Drive method is not driving backwards.
+    TODO: JavaDoc - Will not accept inches value between -5 and 5
     Things to check:
         setMotorDistanceToTravel();
         Setting the power at the beginning to move forwards regardless of the direction the motors should be moving in.
@@ -161,6 +162,11 @@ public class FreightFrenzyRobot implements iRobot {
         }
         else {
             decelInches = absDistance / 6;
+        }
+
+        if(direction == -1) {
+            accelInches *= -1;
+            decelInches *= -1;
         }
 
         double wholeAccelSlope = halfSlope / accelInches;
@@ -646,10 +652,18 @@ public class FreightFrenzyRobot implements iRobot {
     }
 
     private boolean checkMotorPosition(DcMotorEx motor, double distance) {
+        //checks to see if we have gotten there yet
         if (distance > 0) {
+            /*
+            if(motor.getCurrentPosition() > motor.getTargetPosition()) {
+                return motor.getCurrentPosition;
+            }
+             */
             return motor.getCurrentPosition() > motor.getTargetPosition();
         }
-        return motor.getCurrentPosition() < motor.getTargetPosition();
+        else{
+            return motor.getCurrentPosition() < motor.getTargetPosition();
+        }
     }
 
     private double getMotorPosition() {
