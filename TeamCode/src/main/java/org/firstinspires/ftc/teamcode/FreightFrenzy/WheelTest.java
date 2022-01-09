@@ -31,9 +31,9 @@ public class WheelTest extends LinearOpMode {
 
     public void testAWheel (DcMotorEx motor, String motorName) {
         if (opModeIsActive()) {
-            motor.setPower(1.0);
+            motor.setPower(0.5);
             telemetryDashboard(motor, motorName);
-            motor.setPower(-1.0);
+            motor.setPower(-0.5);
             telemetryDashboard(motor, motorName);
             motor.setPower(0.0);
         }

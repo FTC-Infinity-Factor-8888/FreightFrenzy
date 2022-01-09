@@ -211,7 +211,10 @@ public class FreightFrenzyRobot implements iRobot {
 
             System.out.println("FLLDrive: motorPosition " + motorPosition + " power " + power);
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-            telemetryDashboard();
+            telemetry.addData("Left Power: ", leftSpeed);
+            telemetry.addData("Right Power: ", rightSpeed);
+            telemetry.update();
+//            telemetryDashboard();
         }
 
         if (!creator.opModeIsActive()) {
