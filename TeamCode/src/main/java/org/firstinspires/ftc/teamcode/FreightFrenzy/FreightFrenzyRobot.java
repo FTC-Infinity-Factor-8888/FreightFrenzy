@@ -31,8 +31,10 @@ public class FreightFrenzyRobot implements iRobot {
 
 
     private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
-    private final double MIN_ROBOT_SPEED = 0.30; // The minimum speed we can have our robot to drive at.
-    private final double correctionSpeed = 0.1; //
+    private final double MIN_ROBOT_SPEED = 0.40; // The minimum speed we can have our robot to drive at.
+    private final double correctionSpeed = 0.1; //e
+    private final double duckWheelSpeed = 0.65;
+
 
     private final double wheelCircumferenceInInches = (96 / 25.4) * Math.PI;
     // private int maximumRobotTps = 2610;
@@ -310,7 +312,6 @@ public class FreightFrenzyRobot implements iRobot {
         // If the rotate-left button is pressed, rotate left.
         // reaches its minimum height.
         // The speed the wheel to turn the duck carousel moves at.
-        double duckWheelSpeed = 0.65;
         if(direction == 1) {
             power = duckWheelSpeed;
         }
@@ -320,6 +321,19 @@ public class FreightFrenzyRobot implements iRobot {
         }
         // Setting the power the duck wheel motor should move at.
         dwMotor.setPower(power);
+    }
+
+    public void duckWheelAutonomous(int direction, double rotations) {
+        double currentPosition = dwMotor.getCurrentPosition();
+        double desiredPosition = rotations * 360;
+        if(direction < 0) {
+            desiredPosition *= -1;
+        }
+        while(currentPosition <= desiredPosition) {
+            dwMotor.setPower(duckWheelSpeed);
+            currentPosition = dwMotor.getCurrentPosition();
+        }
+        dwMotor.setPower(0);
     }
 
     public void liftMotor(int direction) {

@@ -17,7 +17,7 @@ public class AutoL2DWWH extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()){
             ewok.drive(-75);
-            ewok.duckWheelMotor(1);
+            ewok.duckWheelAutonomous(1, 5);
             ewok.strafe(2);
             ewok.drive(160);
         }
