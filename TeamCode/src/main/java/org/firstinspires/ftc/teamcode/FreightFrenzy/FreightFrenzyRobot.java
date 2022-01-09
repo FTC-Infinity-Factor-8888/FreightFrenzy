@@ -325,17 +325,11 @@ public class FreightFrenzyRobot implements iRobot {
         dwMotor.setPower(power);
     }
 
-    public void duckWheelAutonomous(int direction, double rotations) {
-        double currentPosition = dwMotor.getCurrentPosition();
-        double desiredPosition = rotations * 360;
-        if(direction < 0) {
-            desiredPosition *= -1;
-        }
-        while(currentPosition <= desiredPosition) {
-            dwMotor.setPower(duckWheelSpeed);
-            currentPosition = dwMotor.getCurrentPosition();
-        }
-        dwMotor.setPower(0);
+    public void duckWheelAutonomous(double rotations) {
+        dwMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        dwMotor.setTargetPosition((int)(rotations * 360));
+        dwMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        dwMotor.setPower(duckWheelSpeed);
     }
 
     public void liftMotor(int direction) {
@@ -670,11 +664,6 @@ public class FreightFrenzyRobot implements iRobot {
     private boolean checkMotorPosition(DcMotorEx motor, double distance) {
         //checks to see if we have gotten there yet
         if (distance > 0) {
-            /*
-            if(motor.getCurrentPosition() > motor.getTargetPosition()) {
-                return motor.getCurrentPosition;
-            }
-             */
             return motor.getCurrentPosition() > motor.getTargetPosition();
         }
         else{
