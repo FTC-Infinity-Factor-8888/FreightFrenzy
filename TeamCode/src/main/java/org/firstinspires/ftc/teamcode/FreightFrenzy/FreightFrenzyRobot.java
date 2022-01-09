@@ -31,8 +31,10 @@ public class FreightFrenzyRobot implements iRobot {
 
 
     private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
-    private final double MIN_ROBOT_SPEED = 0.30; // The minimum speed we can have our robot to drive at.
-    private final double correctionSpeed = 0.1; //
+    private final double MIN_ROBOT_SPEED = 0.40; // The minimum speed we can have our robot to drive at.
+    private final double correctionSpeed = 0.1; //e
+    private final double duckWheelSpeed = 0.65;
+
 
     private final double wheelCircumferenceInInches = (96 / 25.4) * Math.PI;
     // private int maximumRobotTps = 2610;
@@ -164,11 +166,6 @@ public class FreightFrenzyRobot implements iRobot {
             decelInches = absDistance / 6;
         }
 
-        if(direction == -1) {
-            accelInches *= -1;
-            decelInches *= -1;
-        }
-
         double wholeAccelSlope = halfSlope / accelInches;
         double wholeDecelSlope = -halfSlope / decelInches;
         if(direction > 0) {
@@ -185,10 +182,17 @@ public class FreightFrenzyRobot implements iRobot {
             if (motorPosition <= accelInches) {
                 power = MIN_ROBOT_SPEED + wholeAccelSlope * motorPosition;
             }
-            else if (motorPosition <= distance - accelInches - decelInches) {
-                power = MAX_ROBOT_SPEED;
+            if (direction == -1) {
+                if (motorPosition <= distance - accelInches + decelInches) {
+                    power = MAX_ROBOT_SPEED;
+                }
             }
-            else if (motorPosition <= distance) {
+            else {
+                if (motorPosition <= distance - accelInches - decelInches) {
+                    power = MAX_ROBOT_SPEED;
+                }
+            }
+            if (motorPosition <= distance) {
                 power = MIN_ROBOT_SPEED + wholeDecelSlope * motorPosition;
             }
             power *= direction;
@@ -310,7 +314,6 @@ public class FreightFrenzyRobot implements iRobot {
         // If the rotate-left button is pressed, rotate left.
         // reaches its minimum height.
         // The speed the wheel to turn the duck carousel moves at.
-        double duckWheelSpeed = 0.65;
         if(direction == 1) {
             power = duckWheelSpeed;
         }
@@ -320,6 +323,13 @@ public class FreightFrenzyRobot implements iRobot {
         }
         // Setting the power the duck wheel motor should move at.
         dwMotor.setPower(power);
+    }
+
+    public void duckWheelAutonomous(double rotations) {
+        dwMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        dwMotor.setTargetPosition((int)(rotations * 360));
+        dwMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        dwMotor.setPower(duckWheelSpeed);
     }
 
     public void liftMotor(int direction) {
@@ -654,11 +664,6 @@ public class FreightFrenzyRobot implements iRobot {
     private boolean checkMotorPosition(DcMotorEx motor, double distance) {
         //checks to see if we have gotten there yet
         if (distance > 0) {
-            /*
-            if(motor.getCurrentPosition() > motor.getTargetPosition()) {
-                return motor.getCurrentPosition;
-            }
-             */
             return motor.getCurrentPosition() > motor.getTargetPosition();
         }
         else{
@@ -666,6 +671,9 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
+    /**
+     * @return returns the distance the robot has traveled in inches
+     */
     private double getMotorPosition() {
         double lfPosition = lfMotor.getCurrentPosition();
         double rfPosition = rfMotor.getCurrentPosition();
