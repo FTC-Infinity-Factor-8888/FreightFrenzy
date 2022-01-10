@@ -1,10 +1,12 @@
-package org.firstinspires.ftc.teamcode.FreightFrenzy;
+package org.firstinspires.ftc.teamcode.FreightFrenzy.Tests;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous (name = "WarehouseLine1")
+import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
+
+@Autonomous (name = "FBDrive")
 public class ForwardBackwardDrive extends LinearOpMode {
     FreightFrenzyRobot ewok;
     //start line 1 is the closest to the warehouse for both alliances (lined up with middle barcode)
@@ -16,8 +18,8 @@ public class ForwardBackwardDrive extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()){
-            ewok.drive(15);
-            ewok.drive(-15);
+            ewok.drive(30);
+            ewok.drive(-30);
         }
     }
 }

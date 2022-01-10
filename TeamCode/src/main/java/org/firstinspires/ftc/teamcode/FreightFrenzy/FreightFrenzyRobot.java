@@ -211,7 +211,10 @@ public class FreightFrenzyRobot implements iRobot {
 
             System.out.println("FLLDrive: motorPosition " + motorPosition + " power " + power);
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-            telemetryDashboard();
+            telemetry.addData("Left Power: ", leftSpeed);
+            telemetry.addData("Right Power: ", rightSpeed);
+            telemetry.update();
+//            telemetryDashboard();
         }
 
         if (!creator.opModeIsActive()) {
@@ -356,6 +359,22 @@ public class FreightFrenzyRobot implements iRobot {
             LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             LiftMotor.setPower(liftSpeed);
         }
+    }
+
+    public void liftMotorOverride(int direction) {
+        LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if(direction == 0) {
+            LiftMotor.setPower(0);
+        }
+        else {
+            if(direction == 1) {
+                LiftMotor.setPower(liftSpeed);
+            }
+            else if(direction == -1) {
+                LiftMotor.setPower(-liftSpeed);
+            }
+        }
+        LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void spinTakeMotor (int direction) {
