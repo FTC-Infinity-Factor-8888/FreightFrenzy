@@ -684,6 +684,7 @@ public class FreightFrenzyRobot implements iRobot {
         //checks to see if we have gotten there yet
         if (distance > 0) {
             return motor.getCurrentPosition() > motor.getTargetPosition();
+
         }
         else{
             return motor.getCurrentPosition() < motor.getTargetPosition();

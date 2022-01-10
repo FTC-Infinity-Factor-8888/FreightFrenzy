@@ -6,7 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 
+<<<<<<< Updated upstream
 @Autonomous (name = "FBDrive")
+=======
+@Autonomous (name = "WarehouseLine1")
+>>>>>>> Stashed changes
 public class ForwardBackwardDrive extends LinearOpMode {
     FreightFrenzyRobot ewok;
     //start line 1 is the closest to the warehouse for both alliances (lined up with middle barcode)
