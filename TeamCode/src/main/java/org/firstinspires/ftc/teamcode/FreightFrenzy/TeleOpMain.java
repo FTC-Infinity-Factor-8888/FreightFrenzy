@@ -54,7 +54,7 @@ public class TeleOpMain extends LinearOpMode {
                 duckWheelClockwise = gamepad2.b; // Controls for moving the duck wheel clockwise.
                 spintakeIntake = gamepad2.y; //Controls for eating up the elements.
                 spintakeOuttake = gamepad2.a; //Controls for vomiting up the elements.
-                liftOverride = gamepad2.dpad_down;
+                liftOverride = gamepad2.dpad_up;
                 /*
                 Lift requirements:
                     The first button pressed sets the direction.
