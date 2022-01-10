@@ -13,16 +13,18 @@ public class TeleOpMain extends LinearOpMode {
     public void runOpMode() {
         // Put initialization blocks here.
 
-        // Declaring the buttons may quickly change.
+        // Declaring the buttons that may quickly change.
         boolean currentLiftUp;
         boolean currentLiftDown;
         boolean duckWheelAntiClockwise;
         boolean duckWheelClockwise;
         boolean spintakeIntake;
         boolean spintakeOuttake;
+        boolean liftOverride;
+
         double accelerator;
 
-        // Declaring the former values of the buttons so we can tell if they changed.
+        // Declaring the former values of the buttons, so we can tell if they changed.
         boolean priorLiftUp = false;
         boolean priorLiftDown = false;
         boolean priorDuckWheelAntiClockwise = false;
@@ -46,12 +48,13 @@ public class TeleOpMain extends LinearOpMode {
 
                 // Controls to allow our robot to reach speeds up to maxSpeed.
                 accelerator = gamepad1.right_trigger;
-                currentLiftUp = gamepad2.right_bumper; // Controls for moving the lift up.
+                currentLiftUp = gamepad2.right_bumper; // Controls for moving the vertical-lift up.
                 currentLiftDown = gamepad2.left_bumper; // Controls for moving the lift down.
                 duckWheelAntiClockwise = gamepad2.x; // Controls for rotating the duck wheel anti-clockwise.
                 duckWheelClockwise = gamepad2.b; // Controls for moving the duck wheel clockwise.
                 spintakeIntake = gamepad2.y; //Controls for eating up the elements.
                 spintakeOuttake = gamepad2.a; //Controls for vomiting up the elements.
+                liftOverride = gamepad2.dpad_down;
                 /*
                 Lift requirements:
                     The first button pressed sets the direction.
@@ -76,7 +79,13 @@ public class TeleOpMain extends LinearOpMode {
                     // 0 = no motion, 1 = up, -1 = down
                     // Checking to see which buttons are pushed.
                     int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0);
-                    yoda.liftMotor(direction);
+
+                    if(liftOverride) {
+                        yoda.liftMotorOverride(direction);
+                    }
+                    else {
+                        yoda.liftMotor(direction);
+                    }
                 }
 
                 // To control the duck wheel.
@@ -101,7 +110,7 @@ public class TeleOpMain extends LinearOpMode {
                 telemetry.addData("Accelerator", accelerator);
                 telemetry.update();
 
-                /* Here we set the current button positions to the prior button position so we have
+                /* Here we set the current button positions to the prior button position, so we have
                 updated data as we loop back.
 
                 Note: This loops multiple times per millisecond.
