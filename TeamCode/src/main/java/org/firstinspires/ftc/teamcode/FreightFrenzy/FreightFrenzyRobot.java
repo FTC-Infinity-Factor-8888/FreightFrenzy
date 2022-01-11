@@ -143,31 +143,33 @@ public class FreightFrenzyRobot implements iRobot {
         double absDistance = Math.abs(distance);
         double direction = (distance > 0) ? 1 : -1;
 
-        double accelInches;
-        double decelInches;
-
         double leftSpeed;
         double rightSpeed;
 
-        double halfSlope = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
+        //rise-over-run code for accel/decel slope
+        double accelRun = 2;
+        double decelRun = 4;
+        double accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
+        double decelRise = 0 - MAX_ROBOT_SPEED;
+        //decel goes from max to 0
 
 
-        if (absDistance / 8 < 2) {
-            accelInches = 2;
-        }
-        else {
-            accelInches = absDistance / 8;
-        }
+//        if (absDistance / 8 < 2) {
+//            accelRun = 2;
+//        }
+//        else {
+//            accelRun = absDistance / 8;
+//        }
+//
+//        if (absDistance / 6 < 3) {
+//            decelRun = 3;
+//        }
+//        else {
+//            decelRun = absDistance / 6;
+//        }
 
-        if (absDistance / 6 < 3) {
-            decelInches = 3;
-        }
-        else {
-            decelInches = absDistance / 6;
-        }
-
-        double wholeAccelSlope = halfSlope / accelInches;
-        double wholeDecelSlope = -halfSlope / decelInches;
+        double accelSlope = accelRise / accelRun;
+        double decelSlope = decelRise / decelRun;
         if(direction > 0) {
             powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
         }
@@ -179,21 +181,21 @@ public class FreightFrenzyRobot implements iRobot {
             double motorPosition = getMotorPosition();
             double power = 0;
 
-            if (motorPosition <= accelInches) {
-                power = MIN_ROBOT_SPEED + wholeAccelSlope * motorPosition;
+            if (motorPosition <= accelRun) {
+                power = MIN_ROBOT_SPEED + accelSlope * motorPosition;
             }
             if (direction == -1) {
-                if (motorPosition <= distance - accelInches + decelInches) {
+                if (motorPosition <= distance - accelRun + decelRun) {
                     power = MAX_ROBOT_SPEED;
                 }
             }
             else {
-                if (motorPosition <= distance - accelInches - decelInches) {
+                if (motorPosition <= distance - accelRun - decelRun) {
                     power = MAX_ROBOT_SPEED;
                 }
             }
             if (motorPosition <= distance) {
-                power = MIN_ROBOT_SPEED + wholeDecelSlope * motorPosition;
+                power = MIN_ROBOT_SPEED + decelSlope * motorPosition;
             }
             power *= direction;
 
@@ -359,22 +361,6 @@ public class FreightFrenzyRobot implements iRobot {
             LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             LiftMotor.setPower(liftSpeed);
         }
-    }
-
-    public void liftMotorOverride(int direction) {
-        LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if(direction == 0) {
-            LiftMotor.setPower(0);
-        }
-        else {
-            if(direction == 1) {
-                LiftMotor.setPower(liftSpeed);
-            }
-            else if(direction == -1) {
-                LiftMotor.setPower(-liftSpeed);
-            }
-        }
-        LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void spinTakeMotor (int direction) {
@@ -684,7 +670,6 @@ public class FreightFrenzyRobot implements iRobot {
         //checks to see if we have gotten there yet
         if (distance > 0) {
             return motor.getCurrentPosition() > motor.getTargetPosition();
-
         }
         else{
             return motor.getCurrentPosition() < motor.getTargetPosition();
