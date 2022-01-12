@@ -31,6 +31,7 @@ public class TeleOpMain extends LinearOpMode {
         boolean priorDuckWheelClockwise = false;
         boolean priorSpintakeIntake = false;
         boolean priorSpintakeOuttake = false;
+        boolean priorLiftOverride = false;
 
         //yoda has arrived.
         yoda = new FreightFrenzyRobot(this);
@@ -79,7 +80,6 @@ public class TeleOpMain extends LinearOpMode {
                     // 0 = no motion, 1 = up, -1 = down
                     // Checking to see which buttons are pushed.
                     int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0);
-
                     if(liftOverride) {
                         yoda.liftMotorOverride(direction);
                     }
@@ -87,6 +87,7 @@ public class TeleOpMain extends LinearOpMode {
                         yoda.liftMotor(direction);
                     }
                 }
+
 
                 // To control the duck wheel.
                 // Checking to see whether the buttons are still pressed.
@@ -121,6 +122,7 @@ public class TeleOpMain extends LinearOpMode {
                 priorDuckWheelClockwise = duckWheelClockwise;
                 priorSpintakeIntake = spintakeIntake;
                 priorSpintakeOuttake = spintakeOuttake;
+                priorLiftOverride = liftOverride;
             }
         }
     }

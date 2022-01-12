@@ -365,7 +365,11 @@ public class FreightFrenzyRobot implements iRobot {
     }
 
     public void liftMotorOverride(int direction) {
+<<<<<<< HEAD
         LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+=======
+        LiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+>>>>>>> master
         if(direction == 0) {
             LiftMotor.setPower(0);
         }
