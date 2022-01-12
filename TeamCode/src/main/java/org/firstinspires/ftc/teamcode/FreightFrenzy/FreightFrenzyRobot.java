@@ -173,6 +173,7 @@ public class FreightFrenzyRobot implements iRobot {
         if(direction > 0) {
             powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
         }
+        //TODO: Does this do what we want it to do? Just Checking...
         else {
             powerTheWheels(-MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED);
         }
@@ -361,6 +362,22 @@ public class FreightFrenzyRobot implements iRobot {
             LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             LiftMotor.setPower(liftSpeed);
         }
+    }
+
+    public void liftMotorOverride(int direction) {
+        LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if(direction == 0) {
+            LiftMotor.setPower(0);
+        }
+        else {
+            if(direction == 1) {
+                LiftMotor.setPower(liftSpeed);
+            }
+            else if(direction == -1) {
+                LiftMotor.setPower(-liftSpeed);
+            }
+        }
+        LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void spinTakeMotor (int direction) {
