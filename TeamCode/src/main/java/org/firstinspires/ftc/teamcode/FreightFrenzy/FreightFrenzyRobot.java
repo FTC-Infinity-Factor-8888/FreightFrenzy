@@ -135,99 +135,179 @@ public class FreightFrenzyRobot implements iRobot {
      */
     @Override
     public void drive(double distance) {
-        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        double desiredHeading = getIMUHeading();
-        // TODO: Might be causing reverse problem
-        setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
+        if (distance == 0) {
+            System.out.println("Success! The robot did not move. The distance entered was 0.");
+        } else {
+            setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            double desiredHeading = getIMUHeading();
+            // TODO: Might be causing reverse problem
+            setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
 
-        double absDistance = Math.abs(distance);
-        double direction = (distance > 0) ? 1 : -1;
-
-        double leftSpeed;
-        double rightSpeed;
-
-        //rise-over-run code for accel/decel slope
-        double accelRun = 2;
-        double decelRun = 4;
-        double accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
-        double decelRise = 0 - MAX_ROBOT_SPEED;
-        //decel goes from max to 0
+            double absDistance = Math.abs(distance);
+            double direction = (distance > 0) ? 1 : -1;
+            boolean isBackwards = (direction == -1) ? true : false;
 
 
-//        if (absDistance / 8 < 2) {
-//            accelRun = 2;
-//        }
-//        else {
-//            accelRun = absDistance / 8;
-//        }
-//
-//        if (absDistance / 6 < 3) {
-//            decelRun = 3;
-//        }
-//        else {
-//            decelRun = absDistance / 6;
-//        }
+            double power;
 
-        double accelSlope = accelRise / accelRun;
-        double decelSlope = decelRise / decelRun;
-        if(direction > 0) {
-            powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
-        }
-        //TODO: Does this do what we want it to do? Just Checking...
-        else {
-            powerTheWheels(-MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED);
-        }
-        telemetryDashboard();
-        while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{1, 1, 1, 1})) {
-            double motorPosition = getMotorPosition();
-            double power = 0;
-
-            if (motorPosition <= accelRun) {
-                power = MIN_ROBOT_SPEED + accelSlope * motorPosition;
-            }
+            double minPower;
             if (direction == -1) {
-                if (motorPosition <= distance - accelRun + decelRun) {
-                    power = MAX_ROBOT_SPEED;
-                }
+                minPower = -1 * (MIN_ROBOT_SPEED);
+            } else if (direction == 1) {
+                minPower = MIN_ROBOT_SPEED;
+            } else {
+                minPower = 0;
             }
-            else {
-                if (motorPosition <= distance - accelRun - decelRun) {
-                    power = MAX_ROBOT_SPEED;
-                }
+            double maxPower;
+            if (direction == -1) {
+                maxPower = -1 * (MAX_ROBOT_SPEED);
+            } else if (direction == 1) {
+                maxPower = MAX_ROBOT_SPEED;
+            } else {
+                maxPower = 0;
             }
-            if (motorPosition <= distance) {
-                power = MIN_ROBOT_SPEED + decelSlope * motorPosition;
-            }
-            power *= direction;
 
-            double currentHeading = getIMUHeading();
-            delta = normalizeHeading(desiredHeading - currentHeading);
-            double adjustSpeed = 0;
-            if (Math.abs(delta) > deltaThreshold) {
-                adjustSpeed = correctionSpeed;
-                if (delta > 0) {
-                    adjustSpeed *= -1;
+
+            double leftSpeed;
+            double rightSpeed;
+
+            //rise-over-run code for accel/decel slope
+            double accelRun = 2; //inches to accelerate up to max speed.
+            double decelRun = 4; //inches to decelerate down to stopping.
+
+            double accelRise;
+            if (direction == -1) {
+                accelRise = -1 * (MAX_ROBOT_SPEED - MIN_ROBOT_SPEED);
+            } else if (direction == 1) {
+                accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
+            } else {
+                accelRise = 0;
+            }
+
+            double decelRise;
+            if (direction == -1) {
+                decelRise = -1 * (0 - MAX_ROBOT_SPEED);
+            } else if (direction == 1) {
+                decelRise = 0 - MAX_ROBOT_SPEED;
+            } else {
+                decelRise = 0;
+            }
+            //decel goes from max to stopped
+
+            double accelSlope = accelRise / accelRun;
+            double decelSlope = decelRise / decelRun;
+
+            //we are checking to make sure it is doing what we think it should be
+            if (direction == -1 && accelSlope > 0) {
+                System.out.println("ERROR: Uh-oh, the robot tried to accelerate forwards when you said" +
+                        "to go backwards. ");
+                return;
+            }
+            if (direction == 1 && accelSlope < 0) {
+                System.out.println("ERROR: Uh-oh, the robot tried to accelerate backwards when you said" +
+                        "to go forward. ");
+                return;
+            }
+            if (direction == 0 && accelSlope != 0) {
+                System.out.println("ERROR: Uh-oh, the robot tried to accelerate when you said" +
+                        "to go nowhere. ");
+                return;
+            }
+            if (direction == -1 && decelSlope < 0) {
+                System.out.println("ERROR: Uh-oh, the robot tried to decelerate backwards when you said" +
+                        "to go backwards. ");
+                return;
+            }
+            if (direction == 1 && decelSlope > 0) {
+                System.out.println("ERROR: Uh-oh, the robot tried to decelerate forwards when you said" +
+                        "to go forwards. ");
+                return;
+            }
+            if (direction == 0 && decelSlope != 0) {
+                System.out.println("ERROR: Uh-oh, the robot tried to decelerate  when you said" +
+                        "to go nowhere. ");
+                return;
+            }
+
+
+            telemetryDashboard();
+            double distanceTraveled = getMotorPosition();
+            while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
+
+                while ( (Math.abs(accelRun)) > (Math.abs(distanceTraveled)) ) {
+                    power = Math.abs(distanceTraveled) * accelSlope + minPower;
+                    powerTheWheels(power,power,power,power);
+                }
+                while ( ((Math.abs(distance)) - (Math.abs(distanceTraveled))) > decelRun ) {
+                    power = maxPower;
+                    powerTheWheels(power,power,power,power);
+                }
+                while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
+                    double distanceToGo = Math.abs(distance - distanceTraveled);
+                    power = distanceToGo * decelSlope + minPower;
+                    powerTheWheels(power,power,power,power);
                 }
             }
-            leftSpeed = power + adjustSpeed;
-            rightSpeed = power - adjustSpeed;
 
-            System.out.println("FLLDrive: motorPosition " + motorPosition + " power " + power);
-            powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-            telemetry.addData("Left Power: ", leftSpeed);
-            telemetry.addData("Right Power: ", rightSpeed);
-            telemetry.update();
+           /* if (direction > 0) {
+                powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
+            } else {
+                powerTheWheels(-MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED);
+            }
+            while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{1, 1, 1, 1})) {
+                System.out.println("You have entered the while loop in drive");
+                double motorPosition = getMotorPosition();
+
+
+                if (motorPosition <= accelRun) {
+                    power = MIN_ROBOT_SPEED + accelSlope * motorPosition;
+                }
+                if (direction == -1) {
+                    if (motorPosition <= distance - accelRun + decelRun) {
+                        power = MAX_ROBOT_SPEED;
+                    }
+                } else {
+                    if (motorPosition <= distance - accelRun - decelRun) {
+                        power = MAX_ROBOT_SPEED;
+                    }
+                }
+                if (motorPosition <= distance) {
+                    power = MIN_ROBOT_SPEED + decelSlope * motorPosition;
+                }
+                power *= direction;
+
+                double currentHeading = getIMUHeading();
+                delta = normalizeHeading(desiredHeading - currentHeading);
+                double adjustSpeed = 0;
+                if (Math.abs(delta) > deltaThreshold) {
+                    adjustSpeed = correctionSpeed;
+                    if (delta > 0) {
+                        adjustSpeed *= -1;
+                    }
+                }
+                leftSpeed = power + adjustSpeed;
+                rightSpeed = power - adjustSpeed;
+
+                System.out.println("FLLDrive: motorPosition " + motorPosition + " power " + power);
+                powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
+                telemetry.addData("Left Power: ", leftSpeed);
+                telemetry.addData("Right Power: ", rightSpeed);
+                telemetry.update();
 //            telemetryDashboard();
-        }
+            }
 
-        if (!creator.opModeIsActive()) {
-            throw new EmergencyStopException("FLLDrive");
-        }
+            if (!creator.opModeIsActive()) {
+                throw new EmergencyStopException("FLLDrive");
+            }
 
-        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        powerTheWheels(0, 0, 0, 0);
+            setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            powerTheWheels(0, 0, 0, 0);
+        }
     }
 
+            */
+        }
+    }
     @Override
     public void strafe(double distance) {
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
