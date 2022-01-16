@@ -147,6 +147,7 @@ public class FreightFrenzyRobot implements iRobot {
 
             double absDistance = Math.abs(distance);
             double direction = (distance > 0) ? 1 : -1;
+            System.out.println("Direction: " + direction);
             boolean isBackwards = (direction == -1) ? true : false;
 
 
@@ -197,7 +198,9 @@ public class FreightFrenzyRobot implements iRobot {
             //decel goes from max to stopped
 
             double accelSlope = accelRise / accelRun;
+            System.out.println("AccelSLope: " + accelSlope);
             double decelSlope = decelRise / decelRun;
+            System.out.println("DecelSLope: " + decelSlope);
 
             //we are checking to make sure it is doing what we think it should be
             if (direction == -1 && accelSlope > 0) {
@@ -237,16 +240,22 @@ public class FreightFrenzyRobot implements iRobot {
             while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
 
                 while ( (Math.abs(accelRun)) > (Math.abs(distanceTraveled)) ) {
+                    distanceTraveled = getMotorPosition();
                     power = Math.abs(distanceTraveled) * accelSlope + minPower;
+                    System.out.println("ACCEL POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
                 while ( ((Math.abs(distance)) - (Math.abs(distanceTraveled))) > decelRun ) {
+                    distanceTraveled = getMotorPosition();
                     power = maxPower;
+                    System.out.println("CRUISE POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
                 while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
+                    distanceTraveled = getMotorPosition();
                     double distanceToGo = Math.abs(distance - distanceTraveled);
                     power = distanceToGo * decelSlope + minPower;
+                    System.out.println("DECEL POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
             }
