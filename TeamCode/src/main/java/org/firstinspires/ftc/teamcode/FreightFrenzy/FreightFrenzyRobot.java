@@ -137,7 +137,9 @@ public class FreightFrenzyRobot implements iRobot {
     public void drive(double distance) {
         if (distance == 0) {
             System.out.println("Success! The robot did not move. The distance entered was 0.");
-        } else {
+            return;
+        } 
+        else {
             setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             double desiredHeading = getIMUHeading();
             // TODO: Might be causing reverse problem
