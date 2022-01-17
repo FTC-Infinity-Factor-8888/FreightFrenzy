@@ -32,7 +32,7 @@ public class FreightFrenzyRobot implements iRobot {
 
     private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
     private final double MIN_ROBOT_SPEED = 0.40; // The minimum speed we can have our robot to drive at.
-    private double correctionSpeed = 0.1;
+    private final double correctionSpeed = 0.1;
     private final double duckWheelSpeed = 0.65;
 
 
@@ -137,7 +137,6 @@ public class FreightFrenzyRobot implements iRobot {
      */
     public boolean driveAsserts(int direction, double accelSlope, double decelSlope) {
         //we are checking to make sure it is doing what we think it should be
-        //noinspection ConstantConditions
         if (direction == -1 && accelSlope > 0) {
             System.out.println("ERROR: Uh-oh, the robot tried to accelerate forwards when you said" +
                     "to go backwards. ");
@@ -180,40 +179,32 @@ public class FreightFrenzyRobot implements iRobot {
     public void drive(double distance) {
         if (distance == 0) {
             System.out.println("Success! The robot did not move. The distance entered was 0.");
-            return;
-        } 
+        }
         else {
             setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            double desiredHeading = getIMUHeading();
-            // TODO: Might be causing reverse problem
+
             setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
 
-            double absDistance = Math.abs(distance);
             int direction = (distance > 0) ? 1 : -1;
             System.out.println("Direction: " + direction);
-            boolean isBackwards = (direction == -1) ? true : false;
 
             double power;
 
             double minPower;
             if (direction == -1) {
                 minPower = -1 * (MIN_ROBOT_SPEED);
-            } else if (direction == 1) {
-                minPower = MIN_ROBOT_SPEED;
-            } else {
-                minPower = 0;
             }
+            else {
+                minPower = MIN_ROBOT_SPEED;
+            }
+
             double maxPower;
             if (direction == -1) {
                 maxPower = -1 * (MAX_ROBOT_SPEED);
-            } else if (direction == 1) {
-                maxPower = MAX_ROBOT_SPEED;
-            } else {
-                maxPower = 0;
             }
-
-            double leftSpeed;
-            double rightSpeed;
+            else {
+                maxPower = MAX_ROBOT_SPEED;
+            }
 
             //rise-over-run code for accel/decel slope
             double accelRun = 2; //inches to accelerate up to max speed.
@@ -222,24 +213,23 @@ public class FreightFrenzyRobot implements iRobot {
             double accelRise;
             if (direction == -1) {
                 accelRise = -1 * (MAX_ROBOT_SPEED - MIN_ROBOT_SPEED);
-            } else if (direction == 1) {
+            }
+            else {
                 accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
-            } else {
-                accelRise = 0;
             }
 
             double decelRise;
             if (direction == -1) {
                 decelRise = -1 * (0 - MAX_ROBOT_SPEED);
-            } else if (direction == 1) {
-                decelRise = 0 - MAX_ROBOT_SPEED;
-            } else {
-                decelRise = 0;
             }
-            //decel goes from max to stopped
+            else {
+                decelRise = 0 - MAX_ROBOT_SPEED;
+            }
 
             double accelSlope = accelRise / accelRun;
             System.out.println("AccelSLope: " + accelSlope);
+
+            //decel goes from max to stopped
             double decelSlope = decelRise / decelRun;
             System.out.println("DecelSLope: " + decelSlope);
 
