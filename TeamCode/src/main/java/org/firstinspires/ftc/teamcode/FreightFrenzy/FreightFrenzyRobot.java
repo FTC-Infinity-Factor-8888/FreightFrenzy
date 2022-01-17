@@ -135,44 +135,41 @@ public class FreightFrenzyRobot implements iRobot {
      * @param decelSlope    The deceleration slope
      * @return Returns 0 if drive should exit, 1 if it may continue
      */
-    public int driveAsserts(int direction, double accelSlope, double decelSlope) {
+    public boolean driveAsserts(int direction, double accelSlope, double decelSlope) {
         //we are checking to make sure it is doing what we think it should be
         //noinspection ConstantConditions
-        if (direction != 1 || direction != 0 || direction != -1) {
-            return 0;
-        }
         if (direction == -1 && accelSlope > 0) {
             System.out.println("ERROR: Uh-oh, the robot tried to accelerate forwards when you said" +
                     "to go backwards. ");
-            return 0;
+            return true;
         }
         if (direction == 1 && accelSlope < 0) {
             System.out.println("ERROR: Uh-oh, the robot tried to accelerate backwards when you said" +
                     "to go forward. ");
-            return 0;
+            return true;
         }
         if (direction == 0 && accelSlope != 0) {
             System.out.println("ERROR: Uh-oh, the robot tried to accelerate when you said" +
                     "to go nowhere. ");
-            return 0;
+            return true;
         }
         if (direction == -1 && decelSlope < 0) {
             System.out.println("ERROR: Uh-oh, the robot tried to decelerate backwards when you said" +
                     "to go backwards. ");
-            return 0;
+            return true;
         }
         if (direction == 1 && decelSlope > 0) {
             System.out.println("ERROR: Uh-oh, the robot tried to decelerate forwards when you said" +
                     "to go forwards. ");
-            return 0;
+            return true;
         }
         if (direction == 0 && decelSlope != 0) {
             System.out.println("ERROR: Uh-oh, the robot tried to decelerate  when you said" +
                     "to go nowhere. ");
-            return 0;
+            return true;
         }
         else {
-            return 1;
+            return false;
         }
     }
 
@@ -281,7 +278,7 @@ public class FreightFrenzyRobot implements iRobot {
             }
 
            /* TODO: Re-implement Delta Correction
-               
+
                 double currentHeading = getIMUHeading();
                 delta = normalizeHeading(desiredHeading - currentHeading);
                 double adjustSpeed = 0;
