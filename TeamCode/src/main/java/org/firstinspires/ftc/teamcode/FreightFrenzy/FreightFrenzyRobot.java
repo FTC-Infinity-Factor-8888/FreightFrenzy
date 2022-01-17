@@ -133,7 +133,7 @@ public class FreightFrenzyRobot implements iRobot {
      * @param direction 1 = forward, 0 = stop, -1 = backwards
      * @param accelSlope The acceleration slope
      * @param decelSlope    The deceleration slope
-     * @return Returns 0 if drive should exit, 1 if it may continue
+     * @return Returns true if drive should exit, false if it may continue
      */
     public boolean driveAsserts(int direction, double accelSlope, double decelSlope) {
         //we are checking to make sure it is doing what we think it should be
@@ -243,7 +243,7 @@ public class FreightFrenzyRobot implements iRobot {
             double decelSlope = decelRise / decelRun;
             System.out.println("DecelSLope: " + decelSlope);
 
-            if(driveAsserts(direction, accelSlope, decelSlope) != 1) {
+            if(driveAsserts(direction, accelSlope, decelSlope)) {
                 return;
             }
 
