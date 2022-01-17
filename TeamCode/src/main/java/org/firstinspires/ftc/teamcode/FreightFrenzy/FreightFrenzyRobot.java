@@ -32,7 +32,7 @@ public class FreightFrenzyRobot implements iRobot {
 
     private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
     private final double MIN_ROBOT_SPEED = 0.40; // The minimum speed we can have our robot to drive at.
-    private final double correctionSpeed = 0.1; //e
+    private double correctionSpeed = 0.1;
     private final double duckWheelSpeed = 0.65;
 
 
@@ -44,7 +44,7 @@ public class FreightFrenzyRobot implements iRobot {
     private final int rrMotorMaxTps = 2615;
     private final double ticksPerMotorRevolution = 530.3;
     private final double ticksPerInch = ticksPerMotorRevolution / wheelCircumferenceInInches;
-    private final double drivePositionPIDF = 5.0; // 4.5
+    private final double drivePositionPIDF = 2.8; // 5.0
     private final static double HOLD_TIME = 1000; // In ms
 
     double liftSpeed = 0.3; // The speed the lift moves at.
@@ -108,7 +108,9 @@ public class FreightFrenzyRobot implements iRobot {
         telemetry.update();
     }
 
-    // TODO: JavaDoc
+    /**
+     * Displays telemetry information on the Driver Hub
+     */
     public void telemetryDashboard() {
         telemetry.addData("Heading", "Desired: %.0f, Current: %.0f, Delta: %.0f",
                 getIMUHeading(), getIMUHeading(), delta);
@@ -126,12 +128,56 @@ public class FreightFrenzyRobot implements iRobot {
         telemetry.update();
     }
 
-    /*
-    TODO: Drive method is not driving backwards.
-    TODO: JavaDoc - Will not accept inches value between -5 and 5
-    Things to check:
-        setMotorDistanceToTravel();
-        Setting the power at the beginning to move forwards regardless of the direction the motors should be moving in.
+    /**
+     *
+     * @param direction 1 = forward, 0 = stop, -1 = backwards
+     * @param accelSlope The acceleration slope
+     * @param decelSlope    The deceleration slope
+     * @return Returns 0 if drive should exit, 1 if it may continue
+     */
+    public int driveAsserts(int direction, double accelSlope, double decelSlope) {
+        //we are checking to make sure it is doing what we think it should be
+        //noinspection ConstantConditions
+        if (direction != 1 || direction != 0 || direction != -1) {
+            return 0;
+        }
+        if (direction == -1 && accelSlope > 0) {
+            System.out.println("ERROR: Uh-oh, the robot tried to accelerate forwards when you said" +
+                    "to go backwards. ");
+            return 0;
+        }
+        if (direction == 1 && accelSlope < 0) {
+            System.out.println("ERROR: Uh-oh, the robot tried to accelerate backwards when you said" +
+                    "to go forward. ");
+            return 0;
+        }
+        if (direction == 0 && accelSlope != 0) {
+            System.out.println("ERROR: Uh-oh, the robot tried to accelerate when you said" +
+                    "to go nowhere. ");
+            return 0;
+        }
+        if (direction == -1 && decelSlope < 0) {
+            System.out.println("ERROR: Uh-oh, the robot tried to decelerate backwards when you said" +
+                    "to go backwards. ");
+            return 0;
+        }
+        if (direction == 1 && decelSlope > 0) {
+            System.out.println("ERROR: Uh-oh, the robot tried to decelerate forwards when you said" +
+                    "to go forwards. ");
+            return 0;
+        }
+        if (direction == 0 && decelSlope != 0) {
+            System.out.println("ERROR: Uh-oh, the robot tried to decelerate  when you said" +
+                    "to go nowhere. ");
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
+
+    /**
+     * @param distance Accepts a positive or negative number representing the number of inches to move
      */
     @Override
     public void drive(double distance) {
@@ -146,10 +192,9 @@ public class FreightFrenzyRobot implements iRobot {
             setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
 
             double absDistance = Math.abs(distance);
-            double direction = (distance > 0) ? 1 : -1;
+            int direction = (distance > 0) ? 1 : -1;
             System.out.println("Direction: " + direction);
             boolean isBackwards = (direction == -1) ? true : false;
-
 
             double power;
 
@@ -169,7 +214,6 @@ public class FreightFrenzyRobot implements iRobot {
             } else {
                 maxPower = 0;
             }
-
 
             double leftSpeed;
             double rightSpeed;
@@ -202,38 +246,9 @@ public class FreightFrenzyRobot implements iRobot {
             double decelSlope = decelRise / decelRun;
             System.out.println("DecelSLope: " + decelSlope);
 
-            //we are checking to make sure it is doing what we think it should be
-            if (direction == -1 && accelSlope > 0) {
-                System.out.println("ERROR: Uh-oh, the robot tried to accelerate forwards when you said" +
-                        "to go backwards. ");
+            if(driveAsserts(direction, accelSlope, decelSlope) != 1) {
                 return;
             }
-            if (direction == 1 && accelSlope < 0) {
-                System.out.println("ERROR: Uh-oh, the robot tried to accelerate backwards when you said" +
-                        "to go forward. ");
-                return;
-            }
-            if (direction == 0 && accelSlope != 0) {
-                System.out.println("ERROR: Uh-oh, the robot tried to accelerate when you said" +
-                        "to go nowhere. ");
-                return;
-            }
-            if (direction == -1 && decelSlope < 0) {
-                System.out.println("ERROR: Uh-oh, the robot tried to decelerate backwards when you said" +
-                        "to go backwards. ");
-                return;
-            }
-            if (direction == 1 && decelSlope > 0) {
-                System.out.println("ERROR: Uh-oh, the robot tried to decelerate forwards when you said" +
-                        "to go forwards. ");
-                return;
-            }
-            if (direction == 0 && decelSlope != 0) {
-                System.out.println("ERROR: Uh-oh, the robot tried to decelerate  when you said" +
-                        "to go nowhere. ");
-                return;
-            }
-
 
             telemetryDashboard();
             double distanceTraveled = getMotorPosition();
@@ -265,51 +280,25 @@ public class FreightFrenzyRobot implements iRobot {
                 }
             }
 
-           /* if (direction > 0) {
-                powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
-            } else {
-                powerTheWheels(-MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED, -MIN_ROBOT_SPEED);
-            }
-            while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{1, 1, 1, 1})) {
-                System.out.println("You have entered the while loop in drive");
-                double motorPosition = getMotorPosition();
-
-
-                if (motorPosition <= accelRun) {
-                    power = MIN_ROBOT_SPEED + accelSlope * motorPosition;
-                }
-                if (direction == -1) {
-                    if (motorPosition <= distance - accelRun + decelRun) {
-                        power = MAX_ROBOT_SPEED;
-                    }
-                } else {
-                    if (motorPosition <= distance - accelRun - decelRun) {
-                        power = MAX_ROBOT_SPEED;
-                    }
-                }
-                if (motorPosition <= distance) {
-                    power = MIN_ROBOT_SPEED + decelSlope * motorPosition;
-                }
-                power *= direction;
-
+           /* TODO: Re-implement Delta Correction
+               
                 double currentHeading = getIMUHeading();
                 delta = normalizeHeading(desiredHeading - currentHeading);
                 double adjustSpeed = 0;
+
                 if (Math.abs(delta) > deltaThreshold) {
                     adjustSpeed = correctionSpeed;
                     if (delta > 0) {
                         adjustSpeed *= -1;
                     }
                 }
+
                 leftSpeed = power + adjustSpeed;
                 rightSpeed = power - adjustSpeed;
 
                 System.out.println("FLLDrive: motorPosition " + motorPosition + " power " + power);
                 powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-                telemetry.addData("Left Power: ", leftSpeed);
-                telemetry.addData("Right Power: ", rightSpeed);
-                telemetry.update();
-//            telemetryDashboard();
+                telemetryDashboard();
             }
 
             if (!creator.opModeIsActive()) {
@@ -320,7 +309,6 @@ public class FreightFrenzyRobot implements iRobot {
             powerTheWheels(0, 0, 0, 0);
         }
     }
-
             */
         }
     }
@@ -347,6 +335,7 @@ public class FreightFrenzyRobot implements iRobot {
             delta = normalizeHeading(desiredHeading - imuHeading);
             double adjustSpeed = 0;
             if (Math.abs(delta) > deltaThreshold) {
+                //e
                 adjustSpeed = correctionSpeed;
                 if (delta > 0) {
                     adjustSpeed *= -1;
