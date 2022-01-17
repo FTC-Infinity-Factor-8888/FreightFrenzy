@@ -251,10 +251,15 @@ public class FreightFrenzyRobot implements iRobot {
                     System.out.println("CRUISE POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
+
+                distanceTraveled = getMotorPosition();
+                distance -= distanceTraveled;
+                setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
+
                 while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
                     distanceTraveled = getMotorPosition();
-                    double distanceToGo = Math.abs(distance - distanceTraveled);
-                    power = distanceToGo * decelSlope + minPower;
+                    power = maxPower + distanceTraveled * decelSlope;
                     System.out.println("DECEL POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
