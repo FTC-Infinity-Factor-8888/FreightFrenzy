@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
 import org.firstinspires.ftc.teamcode.Utilities.EmergencyStopException;
 
 @Autonomous (name = "DancePartyTest")
@@ -22,18 +23,22 @@ public class DancePartyTest extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()){
+            ewok.liftMotorAuto(LiftPosition.DRIVE);
             ewok.drive(15);
             ewok.drive(-15);
             ewok.rotate(100);
             ewok.rotate(-100);
-            ewok.duckWheelMotor(1);
-            ewok.duckWheelMotor(0);
-            ewok.duckWheelMotor(-1);
-            ewok.duckWheelMotor(0);
+            ewok.duckWheelAutonomous(10);
+            ewok.duckWheelAutonomous(-10);
+            ewok.duckWheelAutonomous(5);
+            ewok.duckWheelAutonomous(-5);
             ewok.strafe(15);
             ewok.strafe(-15);
-            ewok.liftMotor(1);
-            ewok.liftMotor(-1);
+            ewok.liftMotorAuto(LiftPosition.FIRST);
+            ewok.liftMotorAuto(LiftPosition.THIRD);
+            ewok.liftMotorAuto(LiftPosition.SECOND);
+            ewok.liftMotorAuto(LiftPosition.CAPPING);
+            ewok.liftMotorAuto(LiftPosition.FLOOR);
             ewok.stopAll();
         }
     }

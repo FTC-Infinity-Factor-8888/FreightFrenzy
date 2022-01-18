@@ -436,6 +436,31 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
+    public void liftMotorAuto (LiftPosition level) {
+        int targetPosition = 0; //floor position
+        switch (level) {
+            case FLOOR:
+                targetPosition = 0;
+                break;
+            case DRIVE:
+                targetPosition = 10;
+                break;
+            case FIRST:
+                targetPosition = 100;
+                break;
+            case SECOND:
+                targetPosition = 250;
+                break;
+            case THIRD:
+                targetPosition = 450;
+                break;
+            case CAPPING:
+                targetPosition = 600;
+                break;
+        }
+        LiftMotor.setTargetPosition(targetPosition);
+    }
+
     public void liftMotorOverride(int direction) {
         LiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

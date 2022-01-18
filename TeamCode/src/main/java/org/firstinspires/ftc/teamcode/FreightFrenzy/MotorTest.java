@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "WheelTest")
-public class WheelTest extends LinearOpMode {
+@TeleOp(name = "MotorTest")
+public class MotorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
         DcMotorEx lfMotor = hardwareMap.get(DcMotorEx.class, "LFMotor");
         DcMotorEx rfMotor = hardwareMap.get(DcMotorEx.class, "RFMotor");
         DcMotorEx lrMotor = hardwareMap.get(DcMotorEx.class, "LRMotor");
@@ -18,6 +19,8 @@ public class WheelTest extends LinearOpMode {
 
         rfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        DcMotorEx LiftMotor = hardwareMap.get(DcMotorEx.class, "LiftMotor");
 
         waitForStart();
 
@@ -30,6 +33,16 @@ public class WheelTest extends LinearOpMode {
     }
 
     public void testAWheel (DcMotorEx motor, String motorName) {
+        if (opModeIsActive()) {
+            motor.setPower(0.5);
+            telemetryDashboard(motor, motorName);
+            motor.setPower(-0.5);
+            telemetryDashboard(motor, motorName);
+            motor.setPower(0.0);
+        }
+    }
+
+    public void testLiftMotor (DcMotorEx motor, String motorName) {
         if (opModeIsActive()) {
             motor.setPower(0.5);
             telemetryDashboard(motor, motorName);
