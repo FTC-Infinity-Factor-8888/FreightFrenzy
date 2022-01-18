@@ -443,19 +443,19 @@ public class FreightFrenzyRobot implements iRobot {
                 targetPosition = 0;
                 break;
             case DRIVE:
-                targetPosition = 10;
+                targetPosition = 20;
                 break;
             case FIRST:
-                targetPosition = 100;
+                targetPosition = 160;
                 break;
             case SECOND:
-                targetPosition = 250;
-                break;
-            case THIRD:
                 targetPosition = 450;
                 break;
+            case THIRD:
+                targetPosition = 750;
+                break;
             case CAPPING:
-                targetPosition = 600;
+                targetPosition = 120;
                 break;
         }
         LiftMotor.setTargetPosition(targetPosition);

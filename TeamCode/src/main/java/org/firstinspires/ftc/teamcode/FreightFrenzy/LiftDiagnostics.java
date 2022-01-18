@@ -61,6 +61,7 @@ public class LiftDiagnostics extends LinearOpMode {
                     int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0);
                     if(liftOverride) {
                         food.liftMotorOverride(direction);
+
                     }
                     else {
                         food.liftMotor(direction);
