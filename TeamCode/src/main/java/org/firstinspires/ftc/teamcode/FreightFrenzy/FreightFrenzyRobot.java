@@ -92,8 +92,7 @@ public class FreightFrenzyRobot implements iRobot {
         initializeIMU();
     }
 
-    @Override
-    public void initializeIMU() {
+    private void initializeIMU() {
         BNO055IMU.Parameters imuParameters;
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -109,7 +108,9 @@ public class FreightFrenzyRobot implements iRobot {
         telemetry.update();
     }
 
-    @Override
+    /**
+     * Displays telemetry information on the Driver Hub
+     */
     public void telemetryDashboard() {
         telemetry.addData("Heading", "Desired: %.0f, Current: %.0f, Delta: %.0f",
                 getIMUHeading(), getIMUHeading(), delta);
@@ -127,7 +128,13 @@ public class FreightFrenzyRobot implements iRobot {
         telemetry.update();
     }
 
-    @Override
+    /**
+     *
+     * @param direction 1 = forward, 0 = stop, -1 = backwards
+     * @param accelSlope The acceleration slope
+     * @param decelSlope    The deceleration slope
+     * @return Returns true if drive should exit, false if it may continue
+     */
     public boolean driveAsserts(int direction, double accelSlope, double decelSlope) {
         //we are checking to make sure it is doing what we think it should be
         if (direction == -1 && accelSlope > 0) {
@@ -165,8 +172,7 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
-    @Override
-    public void driveDelta (double desiredHeading, double power) {
+    private void driveDelta (double desiredHeading, double power) {
         double currentHeading = getIMUHeading();
         delta = normalizeHeading(desiredHeading - currentHeading);
         double adjustSpeed = 0;
@@ -686,8 +692,6 @@ public class FreightFrenzyRobot implements iRobot {
         }
         return heading;
     }
-
-    @Override
     public void hold(double desiredHeading) {
         ElapsedTime timer;
 
@@ -721,23 +725,28 @@ public class FreightFrenzyRobot implements iRobot {
         powerTheWheels(0, 0, 0, 0);
     }
 
-    @Override
-    public double getIMUHeading() {
+    private double getIMUHeading() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,
                 AngleUnit.DEGREES);
         return angles.firstAngle;
     }
 
-    @Override
-    public void setMotorMode(DcMotor.RunMode mode) {
+    private void setMotorMode(DcMotor.RunMode mode) {
         lfMotor.setMode(mode);
         lrMotor.setMode(mode);
         rfMotor.setMode(mode);
         rrMotor.setMode(mode);
     }
 
-    @Override
-    public void setMotorDistanceToTravel(double distance, int[] direction) {
+    /**
+     * Programs all four motors to run to position, based off of distance and direction.
+     *
+     * @param distance The distance you want to drive in inches
+     * @param direction The direction each motor should turn. It is an array consisting of the
+     *                  LfMotor, LrMotor, RfMotor, and RrMotor. The values can be -1 to move backwards,
+     *                  1 to move forwards, or 0 to not move the motor at all.
+     */
+    private void setMotorDistanceToTravel(double distance, int[] direction) {
 
         if(direction.length != 4) {
             throw new IllegalArgumentException("You must provide an array with exactly 4 elements!");
@@ -763,9 +772,20 @@ public class FreightFrenzyRobot implements iRobot {
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-
-    @Override
-    public void powerTheWheels(double lfPower, double lrPower, double rfPower, double rrPower) {
+    /**
+     * Powers all 4 of the robot's wheels.
+     * If the motor mode is set to RUN_USING_ENCODER, then PTW sets the velocity.
+     * If the motor mode is set to RUN_TO_POSITION, then PTW sets the power.
+     *
+     * The robot is only capable of accepting speeds of -1 --> 1.
+     * If you give a value out of that range, PTW will scale down the numbers appropriately.
+     *
+     * @param lfPower power/velocity applied to the left front wheel.
+     * @param lrPower power/velocity applied to the left rear wheel.
+     * @param rfPower power/velocity applied to the right front wheel.
+     * @param rrPower power/velocity applied to the right rear wheel.
+     */
+    private void powerTheWheels(double lfPower, double lrPower, double rfPower, double rrPower) {
         double leftMax = Math.max(Math.abs(lfPower), Math.abs(lrPower));
         double rightMax = Math.max(Math.abs(rfPower), Math.abs(rrPower));
         double max = Math.max (leftMax, rightMax);
@@ -808,8 +828,7 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
-    @Override
-    public boolean motorsShouldContinue(double distance, int[] motorDirection) {
+    private boolean motorsShouldContinue(double distance, int[] motorDirection) {
         boolean motorsAreBusy = lfMotor.isBusy() && rfMotor.isBusy() && lrMotor.isBusy() && rrMotor.isBusy();
         boolean aMotorHasPassedPosition = false;
         if (motorsAreBusy) {
@@ -821,8 +840,7 @@ public class FreightFrenzyRobot implements iRobot {
         return motorsAreBusy && !aMotorHasPassedPosition;
     }
 
-    @Override
-    public boolean checkMotorPosition(DcMotorEx motor, double distance) {
+    private boolean checkMotorPosition(DcMotorEx motor, double distance) {
         //checks to see if we have gotten there yet
         if (distance > 0) {
             return motor.getCurrentPosition() > motor.getTargetPosition();
@@ -832,9 +850,10 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
-
-    @Override
-    public double getMotorPosition() {
+    /**
+     * @return returns the distance the robot has traveled in inches
+     */
+    private double getMotorPosition() {
         double lfPosition = lfMotor.getCurrentPosition();
         double rfPosition = rfMotor.getCurrentPosition();
         double lrPosition = lrMotor.getCurrentPosition();
@@ -845,8 +864,7 @@ public class FreightFrenzyRobot implements iRobot {
         return motorPositionAverage / ticksPerInch;
     }
 
-    @Override
-    public double powerPercentage(double delta) {
+    private double powerPercentage(double delta) {
         double powerPercent = -0.000027 * Math.pow(Math.abs(delta) - 180, 2) + 1;
         if (powerPercent > 1 || powerPercent < 0) {
             System.out.println("*** WARNING! POWER PERCENT IS OUT OF RANGE: delta = " + delta + ", " +
@@ -856,8 +874,7 @@ public class FreightFrenzyRobot implements iRobot {
         return powerPercent;
     }
 
-    @Override
-    public void setPIDFValues(DcMotorEx motor, int tps) {
+    private void setPIDFValues(DcMotorEx motor, int tps) {
         double D = 0;
         double F = 32767.0 / tps;
         double P = 0.1 * F;
