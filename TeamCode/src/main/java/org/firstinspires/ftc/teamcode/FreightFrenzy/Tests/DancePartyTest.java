@@ -4,9 +4,10 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy.Tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.FreightFrenzy.DWDirection;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
-import org.firstinspires.ftc.teamcode.Utilities.EmergencyStopException;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.SpintakeDirection;
 
 @Autonomous (name = "DancePartyTest")
 public class DancePartyTest extends LinearOpMode {
@@ -28,10 +29,12 @@ public class DancePartyTest extends LinearOpMode {
             ewok.drive(-15);
             ewok.rotate(100);
             ewok.rotate(-100);
-            ewok.duckWheelAutonomous(10);
-            ewok.duckWheelAutonomous(-10);
-            ewok.duckWheelAutonomous(5);
-            ewok.duckWheelAutonomous(-5);
+            ewok.duckWheelAuto(10, DWDirection.BLUE);
+            ewok.duckWheelAuto(10, DWDirection.RED);
+            ewok.duckWheelAuto(5, DWDirection.BLUE);
+            ewok.duckWheelAuto(5, DWDirection.RED);
+            ewok.spinTakeAuto(5, SpintakeDirection.INTAKE);
+            ewok.spinTakeAuto(5, SpintakeDirection.OUTTAKE);
             ewok.strafe(15);
             ewok.strafe(-15);
             ewok.liftMotorAuto(LiftPosition.FIRST);
