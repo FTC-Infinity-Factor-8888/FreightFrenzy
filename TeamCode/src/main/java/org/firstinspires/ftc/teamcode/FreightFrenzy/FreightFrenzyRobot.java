@@ -227,11 +227,9 @@ public class FreightFrenzyRobot implements iRobot {
             }
 
             double accelSlope = accelRise / accelRun;
-            System.out.println("AccelSLope: " + accelSlope);
 
             //decel goes from max to stopped
             double decelSlope = decelRise / decelRun;
-            System.out.println("DecelSLope: " + decelSlope);
 
             if(driveAsserts(direction, accelSlope, decelSlope)) {
                 return;
@@ -244,13 +242,11 @@ public class FreightFrenzyRobot implements iRobot {
                 while ( (Math.abs(accelRun)) > (Math.abs(distanceTraveled)) ) {
                     distanceTraveled = getMotorPosition();
                     power = Math.abs(distanceTraveled) * accelSlope + minPower;
-                    System.out.println("ACCEL POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
                 while ( ((Math.abs(distance)) - (Math.abs(distanceTraveled))) > decelRun ) {
                     distanceTraveled = getMotorPosition();
                     power = maxPower;
-                    System.out.println("CRUISE POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
 
@@ -262,7 +258,6 @@ public class FreightFrenzyRobot implements iRobot {
                 while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
                     distanceTraveled = getMotorPosition();
                     power = maxPower + distanceTraveled * decelSlope;
-                    System.out.println("DECEL POWER: " + power);
                     powerTheWheels(power,power,power,power);
                 }
             }
