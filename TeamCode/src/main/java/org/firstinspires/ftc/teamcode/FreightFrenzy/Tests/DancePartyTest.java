@@ -1,6 +1,4 @@
 package org.firstinspires.ftc.teamcode.FreightFrenzy.Tests;
-
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -11,38 +9,37 @@ import org.firstinspires.ftc.teamcode.FreightFrenzy.SpintakeDirection;
 
 @Autonomous (name = "DancePartyTest")
 public class DancePartyTest extends LinearOpMode {
-    FreightFrenzyRobot ewok;
+    FreightFrenzyRobot robot;
     @Override
     public void runOpMode() throws InterruptedException {
-        //we have landed on a moon of Endor.
-        ewok = new FreightFrenzyRobot(this);
-        ewok.initHardware();
+        robot = new FreightFrenzyRobot(this);
+        robot.initHardware();
 
-        waitForStart();        //we have landed on a moon of Endor.
-        ewok = new FreightFrenzyRobot(this);
-        ewok.initHardware();
 
         waitForStart();
         if(opModeIsActive()){
-            ewok.liftMotorAuto(LiftPosition.DRIVE);
-            ewok.drive(15);
-            ewok.drive(-15);
-            ewok.rotate(100);
-            ewok.rotate(-100);
-            ewok.duckWheelAuto(10, DWDirection.BLUE);
-            ewok.duckWheelAuto(10, DWDirection.RED);
-            ewok.duckWheelAuto(5, DWDirection.BLUE);
-            ewok.duckWheelAuto(5, DWDirection.RED);
-            ewok.spinTakeAuto(5, SpintakeDirection.INTAKE);
-            ewok.spinTakeAuto(5, SpintakeDirection.OUTTAKE);
-            ewok.strafe(15);
-            ewok.strafe(-15);
-            ewok.liftMotorAuto(LiftPosition.FIRST);
-            ewok.liftMotorAuto(LiftPosition.THIRD);
-            ewok.liftMotorAuto(LiftPosition.SECOND);
-            ewok.liftMotorAuto(LiftPosition.CAPPING);
-            ewok.liftMotorAuto(LiftPosition.FLOOR);
-            ewok.stopAll();
+            /*DW stands for duck wheel, the wheel that spins the turntable, Spintake is the intake
+            and outtake system on the arm bucket, lift is the elevator lift arm, and robot calls
+            the interface implementation */
+            robot.liftMotorAuto(LiftPosition.DRIVE);
+            robot.drive(15);
+            robot.drive(-15);
+            robot.rotate(100);
+            robot.rotate(-100);
+            robot.duckWheelAuto(10, DWDirection.BLUE);
+            robot.duckWheelAuto(10, DWDirection.RED);
+            robot.duckWheelAuto(5, DWDirection.BLUE);
+            robot.duckWheelAuto(5, DWDirection.RED);
+            robot.spinTakeAuto(5, SpintakeDirection.INTAKE);
+            robot.spinTakeAuto(5, SpintakeDirection.OUTTAKE);
+            robot.strafe(15);
+            robot.strafe(-15);
+            robot.liftMotorAuto(LiftPosition.FIRST);
+            robot.liftMotorAuto(LiftPosition.THIRD);
+            robot.liftMotorAuto(LiftPosition.SECOND);
+            robot.liftMotorAuto(LiftPosition.CAPPING);
+            robot.liftMotorAuto(LiftPosition.FLOOR);
+            robot.stopAll();
         }
     }
 }
