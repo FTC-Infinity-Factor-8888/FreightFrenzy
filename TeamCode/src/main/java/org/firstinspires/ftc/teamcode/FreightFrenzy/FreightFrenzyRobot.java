@@ -185,8 +185,6 @@ public class FreightFrenzyRobot implements iRobot {
             }
         }
 
-
-
         double leftSpeed = power + adjustSpeed;
         double rightSpeed = power - adjustSpeed;
 
@@ -197,6 +195,7 @@ public class FreightFrenzyRobot implements iRobot {
             rightSpeed = MAX_ROBOT_SPEED;
         }
         powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
+        System.out.println("DEBUG: Delta power (left): " + leftSpeed + " (right): " + rightSpeed);
     }
 
     /**
@@ -207,65 +206,80 @@ public class FreightFrenzyRobot implements iRobot {
         double desiredHeading = getIMUHeading();
         if (distance == 0) {
             System.out.println("Success! The robot did not move. The distance entered was 0.");
+            return;
+        }
+
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
+
+        int direction = (distance > 0) ? 1 : -1;
+        System.out.println("Direction: " + direction);
+
+        double power;
+
+        double minPower;
+        if (direction == -1) {
+            minPower = -1 * (MIN_ROBOT_SPEED);
         }
         else {
-            setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            minPower = MIN_ROBOT_SPEED;
+        }
 
-            setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
+        double maxPower;
+        if (direction == -1) {
+            maxPower = -1 * (MAX_ROBOT_SPEED);
+        }
+        else {
+            maxPower = MAX_ROBOT_SPEED;
+        }
 
-            int direction = (distance > 0) ? 1 : -1;
-            System.out.println("Direction: " + direction);
+        //rise-over-run code for accel/decel slope
+        double accelRun = 2; //inches to accelerate up to max speed.
+        double decelRun = 4; //inches to decelerate down to stopping.
+        System.out.println("DEBUG: Distance = " + accelRun + decelRun);
 
-            double power;
+        double accelRise;
+        if (direction == -1) {
+            accelRise = -1 * (MAX_ROBOT_SPEED - MIN_ROBOT_SPEED);
+        }
+        else {
+            accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
+        }
 
-            double minPower;
-            if (direction == -1) {
-                minPower = -1 * (MIN_ROBOT_SPEED);
-            }
-            else {
-                minPower = MIN_ROBOT_SPEED;
-            }
+        double decelRise;
+        if (direction == -1) {
+            decelRise = -1 * (0 - MAX_ROBOT_SPEED);
+        }
+        else {
+            decelRise = 0 - MAX_ROBOT_SPEED;
+        }
 
-            double maxPower;
-            if (direction == -1) {
-                maxPower = -1 * (MAX_ROBOT_SPEED);
-            }
-            else {
-                maxPower = MAX_ROBOT_SPEED;
-            }
+        double accelSlope = accelRise / accelRun;
 
-            //rise-over-run code for accel/decel slope
-            double accelRun = 2; //inches to accelerate up to max speed.
-            double decelRun = 4; //inches to decelerate down to stopping.
+        //decel goes from max to stopped
+        double decelSlope = decelRise / decelRun;
 
-            double accelRise;
-            if (direction == -1) {
-                accelRise = -1 * (MAX_ROBOT_SPEED - MIN_ROBOT_SPEED);
-            }
-            else {
-                accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
-            }
+        if(driveAsserts(direction, accelSlope, decelSlope)) {
+            return;
+        }
 
-            double decelRise;
-            if (direction == -1) {
-                decelRise = -1 * (0 - MAX_ROBOT_SPEED);
-            }
-            else {
-                decelRise = 0 - MAX_ROBOT_SPEED;
-            }
+        telemetryDashboard();
+        double distanceTraveled = getMotorPosition();
 
-            double accelSlope = accelRise / accelRun;
-
-            //decel goes from max to stopped
-            double decelSlope = decelRise / decelRun;
-
-            if(driveAsserts(direction, accelSlope, decelSlope)) {
-                return;
-            }
-
-            telemetryDashboard();
-            double distanceTraveled = getMotorPosition();
+        if(Math.abs(distance) <= accelRun + decelRun) {
+            System.out.println("DEBUG: Going less than 6 inches");
+            //Cruising speed
             while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
+                distanceTraveled = getMotorPosition();
+                System.out.println("Distance Traveled " + distanceTraveled);
+                power = maxPower;
+                System.out.println("DEBUG: " + power);
+                driveDelta(desiredHeading, power);
+            }
+        }
+
+        else {
+            while ((Math.abs(distance)) > (Math.abs(distanceTraveled))) {
                 //Acceleration to cruising speed
                 while ( (Math.abs(accelRun)) > (Math.abs(distanceTraveled)) ) {
                     distanceTraveled = getMotorPosition();
