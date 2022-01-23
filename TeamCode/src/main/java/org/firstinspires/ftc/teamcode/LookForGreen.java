@@ -25,7 +25,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -37,7 +36,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @TeleOp
-public class WebcamExample extends LinearOpMode
+public class LookForGreen extends LinearOpMode
 {
     OpenCvWebcam webcam;
 
@@ -189,9 +188,6 @@ public class WebcamExample extends LinearOpMode
     {
         boolean viewportPaused;
 
-        Mat YCrCb = new Mat();
-        Mat Cb = new Mat();
-
         /*
          * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
          * highly recommended to declare them here as instance variables and re-use them for
@@ -214,34 +210,9 @@ public class WebcamExample extends LinearOpMode
             Mat output = input; //It is the same thing, but we are using output when we are making a
                                 //change to it, and input when we are reading it.
 
-
-            int x = input.cols();
-            int y = input.rows();
-            int w = x/8;
-            int h = y/8;
             /*
              * Draw a simple box around the middle 1/2 of the entire frame
              */
-            Imgproc.rectangle(
-                    output,
-                    new Point(
-                            (x/4) - (2*x/8), //a
-                            (y/2) - y/8),
-                    new Point(
-                            x/4, //b
-                            y/2 - h),
-                    new Scalar(100, 40, 65), 2);
-
-            Imgproc.rectangle(
-                    output,
-                    new Point(
-                            input.cols()/4,//c
-                            input.rows()/4),
-                    new Point(
-                            input.cols()*(3f/4f), //d
-                            input.rows()*(3f/4f)),
-                    new Scalar(0, 255, 0), 4);
-
             Imgproc.rectangle(
                     output,
                     new Point(
@@ -259,17 +230,6 @@ public class WebcamExample extends LinearOpMode
              */
 
             return output;
-        }
-
-        /*
-         * This function takes the RGB frame, converts to YCrCb,
-         * and extracts the Cb channel to the 'Cb' variable
-         * \ (•◡•) /
-         */
-         private void inputToCb(Mat input)
-        {
-            Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
-            Core.extractChannel(YCrCb, Cb, 1);
         }
 
         @Override
@@ -300,8 +260,3 @@ public class WebcamExample extends LinearOpMode
         }
     }
 }
-
-
-/*
-༼ つ ◕_◕ ༽つ
- */
