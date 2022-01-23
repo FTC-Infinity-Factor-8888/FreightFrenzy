@@ -452,6 +452,22 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
+    public void liftMotorOverride(int direction) {
+        LiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if(direction == 0) {
+            LiftMotor.setPower(0);
+        }
+        else {
+            if(direction == 1) {
+                LiftMotor.setPower(liftSpeed);
+            }
+            else if(direction == -1) {
+                LiftMotor.setPower(-liftSpeed);
+            }
+        }
+        LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
     public void liftMotorAuto (LiftPosition level) {
 
         int targetPosition = 0; //floor position
@@ -479,33 +495,14 @@ public class FreightFrenzyRobot implements iRobot {
         LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         if(targetPosition > LiftMotor.getCurrentPosition()) {
-            while (LiftMotor.getCurrentPosition() < targetPosition) {
-                LiftMotor.setPower(liftSpeed);
-            }
+            LiftMotor.setPower(liftSpeed);
         }
         else if (targetPosition < LiftMotor.getCurrentPosition()) {
-            while (LiftMotor.getCurrentPosition() > targetPosition) {
                 LiftMotor.setPower(-liftSpeed);
-            }
         }
-
-    }
-
-    public void liftMotorOverride(int direction) {
-        LiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        if(direction == 0) {
-            LiftMotor.setPower(0);
+        while (LiftMotor.isBusy()) {
+            telemetry.addData("LiftPosition", level);
         }
-        else {
-            if(direction == 1) {
-                LiftMotor.setPower(liftSpeed);
-            }
-            else if(direction == -1) {
-                LiftMotor.setPower(-liftSpeed);
-            }
-        }
-        LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void spinTakeMotor (int direction) {
@@ -544,8 +541,6 @@ public class FreightFrenzyRobot implements iRobot {
                 SpintakeMotor.setPower(spintakeOuttakeSpeed);
             }
         }
-
-
     }
 
     @Override
