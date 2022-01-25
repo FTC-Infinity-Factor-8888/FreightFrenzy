@@ -225,11 +225,11 @@ public class WebcamExample extends LinearOpMode
             Imgproc.rectangle(
                     output,
                     new Point( //a
-                            (x/4) - x/8,
-                            (y/2) + h),
+                            x/4 - x/8,
+                            y/2 + 0.5 * h),
                     new Point( //b
                             x/4,
-                            y/2 - h),
+                            y/2 - 0.5 * h),
                     new Scalar(0, 255, 0), 2);
 
 
@@ -237,21 +237,21 @@ public class WebcamExample extends LinearOpMode
             Imgproc.rectangle(
                     output,
                     new Point( //c
-                            x/2-w,
-                            y/2 + h),
+                            x/2 - 0.5 * w,
+                            y/2 + 0.5 * h),
                     new Point( //d3
-                            x/2 +w,
-                            y/2 - h),
+                            x/2 + 0.5 * w,
+                            y/2 - 0.5 * h),
                     new Scalar(0, 255, 0), 2);
 
             Imgproc.rectangle(
                     output,
                     new Point( //e
-                            3*(x/4) ,
-                            (y/2) + h),
+                            3*x/4,
+                            y/2 + 0.5 * h),
                     new Point( //f
-                            3*(x/4) + w,
-                            y/2 - h),
+                            3*x/4 + w,
+                            y/2 - 0.5 * h),
                     new Scalar(0, 255, 0), 2);
 
             /**
