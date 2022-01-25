@@ -239,7 +239,7 @@ public class WebcamExample extends LinearOpMode
                     new Point( //c
                             x/2-w,
                             y/2 + h),
-                    new Point( //d
+                    new Point( //d3
                             x/2 +w,
                             y/2 - h),
                     new Scalar(0, 255, 0), 2);
