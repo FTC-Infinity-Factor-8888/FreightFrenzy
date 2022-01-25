@@ -269,12 +269,11 @@ public class FreightFrenzyRobot implements iRobot {
         if(Math.abs(distance) <= accelRun + decelRun) {
             System.out.println("DEBUG: Going less than 6 inches");
             //Cruising speed
-            while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
+            while (Math.abs(distance) > Math.abs(distanceTraveled)) {
                 distanceTraveled = getMotorPosition();
-                System.out.println("Distance Traveled " + distanceTraveled);
                 power = maxPower;
                 System.out.println("DEBUG: " + power);
-                driveDelta(desiredHeading, power);
+                powerTheWheels(power,power,power,power);
             }
         }
 
