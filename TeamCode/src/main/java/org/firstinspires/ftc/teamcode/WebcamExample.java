@@ -224,33 +224,35 @@ public class WebcamExample extends LinearOpMode
              */
             Imgproc.rectangle(
                     output,
-                    new Point(
-                            (x/4) - (2*x/8), //a
-                            (y/2) - y/8),
-                    new Point(
-                            x/4, //b
+                    new Point( //a
+                            (x/4) - w,
+                            (y/2) + h),
+                    new Point( //b
+                            x/4,
                             y/2 - h),
-                    new Scalar(100, 40, 65), 2);
+                    new Scalar(0, 255, 0), 2);
+
+
 
             Imgproc.rectangle(
                     output,
-                    new Point(
-                            input.cols()/4,//c
-                            input.rows()/4),
-                    new Point(
-                            input.cols()*(3f/4f), //d
-                            input.rows()*(3f/4f)),
-                    new Scalar(0, 255, 0), 4);
+                    new Point( //c
+                            x/2-w,
+                            y/2 + h),
+                    new Point( //d
+                            x/2 +w,
+                            y/2 - h),
+                    new Scalar(0, 255, 0), 2);
 
             Imgproc.rectangle(
                     output,
-                    new Point(
-                            input.cols()/4,
-                            input.rows()/4),
-                    new Point(
-                            input.cols()*(3f/4f),
-                            input.rows()*(3f/4f)),
-                    new Scalar(0, 255, 0), 4);
+                    new Point( //e
+                            3*(x/4) - w,
+                            (y/2) + h),
+                    new Point( //f
+                            3*(x/4) + w,
+                            y/2 - h),
+                    new Scalar(0, 255, 0), 2);
 
             /**
              * NOTE: to see how to get data from your pipeline to your OpMode as well as how
