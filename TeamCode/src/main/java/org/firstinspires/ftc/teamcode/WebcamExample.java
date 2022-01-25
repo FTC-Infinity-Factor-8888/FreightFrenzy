@@ -225,7 +225,7 @@ public class WebcamExample extends LinearOpMode
             Imgproc.rectangle(
                     output,
                     new Point( //a
-                            (x/4) - w,
+                            (x/4) - x/8,
                             (y/2) + h),
                     new Point( //b
                             x/4,
@@ -247,7 +247,7 @@ public class WebcamExample extends LinearOpMode
             Imgproc.rectangle(
                     output,
                     new Point( //e
-                            3*(x/4) - w,
+                            3*(x/4) ,
                             (y/2) + h),
                     new Point( //f
                             3*(x/4) + w,
