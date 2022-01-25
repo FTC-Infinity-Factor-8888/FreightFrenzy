@@ -17,10 +17,16 @@ apply from: '../build.dependencies.gradle'
 
 android {
 
+<<<<<<< HEAD
 
     packagingOptions {
         jniLibs {
             pickFirsts += ['**/*.so', '**/*.so']
+=======
+    packagingOptions {
+        jniLibs {
+            pickFirsts += ['**/*.so']
+>>>>>>> master
         }
     }
     androidResources {
