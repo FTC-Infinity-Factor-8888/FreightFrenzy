@@ -80,19 +80,17 @@ public class TeleOpMain extends LinearOpMode {
                     // 0 = no motion, 1 = up, -1 = down
                     // Checking to see which buttons are pushed.
                     int direction = (currentLiftUp?1:0) + (currentLiftDown?-1:0);
-                    yoda.liftMotor(direction);
-
                     if(liftOverride) {
                         yoda.liftMotorOverride(direction);
-
                     }
                     else {
                         yoda.liftMotor(direction);
-                        telemetry.addData("Lift:", yoda.getCurrentLiftPosition());
-
-
                     }
+                    telemetry.addData("Lift:", yoda.getCurrentLiftPosition());
+                }
 
+                if(liftOverride != priorLiftOverride && !liftOverride) {
+                    yoda.liftMotorReset(); // Resets the liftMotor's encoder
                 }
 
 
