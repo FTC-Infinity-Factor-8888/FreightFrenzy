@@ -16,17 +16,9 @@ apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
 android {
-
-<<<<<<< HEAD
-
-    packagingOptions {
-        jniLibs {
-            pickFirsts += ['**/*.so', '**/*.so']
-=======
     packagingOptions {
         jniLibs {
             pickFirsts += ['**/*.so']
->>>>>>> master
         }
     }
     androidResources {
