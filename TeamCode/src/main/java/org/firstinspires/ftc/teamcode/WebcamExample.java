@@ -21,6 +21,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -41,6 +43,7 @@ public class WebcamExample extends LinearOpMode
 {
     OpenCvWebcam webcam;
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode()
     {
@@ -211,48 +214,58 @@ public class WebcamExample extends LinearOpMode
              * of this particular frame for later use, you will need to either clone it or copy
              * it to another Mat.
              */
-            Mat output = input; //It is the same thing, but we are using output when we are making a
-                                //change to it, and input when we are reading it.
+            @SuppressWarnings("UnnecessaryLocalVariable") Mat output = input; /*It is the same thing,
+        but we are using output when we are making a change to it, and input when we are reading it. */
 
 
             int x = input.cols();
             int y = input.rows();
             int w = x/8;
             int h = y/8;
+
+            Point box1_pointA = new Point( //a
+                    x/4 - x/8,
+                    y/2 + 0.5 * h);
+            Point box1_pointB = new Point( //b
+                    x/4,
+                    y/2 - 0.5 * h);
+            Point box2_pointC = new Point( //c
+                    x/2 - 0.5 * w,
+                    y/2 + 0.5 * h);
+            Point box2_pointD = new Point( //d
+                    x/2 + 0.5 * w,
+                    y/2 - 0.5 * h);
+            Point box3_pointE = new Point( //e
+                    3*x/4,
+                    y/2 + 0.5 * h);
+            Point box3_pointF = new Point( //f
+                    3*x/4 + w,
+                    y/2 - 0.5 * h);
+
             /*
-             * Draw a simple box around the middle 1/2 of the entire frame
+             * Draw a simple box around the barcode dots.
              */
-            Imgproc.rectangle(
+            Imgproc.rectangle( //box 1 - left
                     output,
-                    new Point( //a
-                            x/4 - x/8,
-                            y/2 + 0.5 * h),
-                    new Point( //b
-                            x/4,
-                            y/2 - 0.5 * h),
+                    box1_pointA,
+                    box1_pointB,
                     new Scalar(0, 255, 0), 2);
 
 
 
-            Imgproc.rectangle(
+            Imgproc.rectangle( //box 2 - middle
                     output,
-                    new Point( //c
-                            x/2 - 0.5 * w,
-                            y/2 + 0.5 * h),
-                    new Point( //d3
-                            x/2 + 0.5 * w,
-                            y/2 - 0.5 * h),
+                    box2_pointC,
+                    box2_pointD,
                     new Scalar(0, 255, 0), 2);
 
-            Imgproc.rectangle(
+            Imgproc.rectangle( // box 3 - right
                     output,
-                    new Point( //e
-                            3*x/4,
-                            y/2 + 0.5 * h),
-                    new Point( //f
-                            3*x/4 + w,
-                            y/2 - 0.5 * h),
+                    box3_pointE,
+                    box3_pointF,
                     new Scalar(0, 255, 0), 2);
+
+                  //add in PutText
 
             /**
              * NOTE: to see how to get data from your pipeline to your OpMode as well as how

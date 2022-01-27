@@ -111,7 +111,7 @@ public class FreightFrenzyRobot implements iRobot {
     /**
      * Displays telemetry information on the Driver Hub
      */
-    public void telemetryDashboard() {
+    public void telemetryDashboard(String msg) {
         telemetry.addData("Heading", "Desired: %.0f, Current: %.0f, Delta: %.0f",
                 getIMUHeading(), getIMUHeading(), delta);
 
@@ -129,10 +129,9 @@ public class FreightFrenzyRobot implements iRobot {
     }
 
     /**
-     *
-     * @param direction 1 = forward, 0 = stop, -1 = backwards
+     * @param direction  1 = forward, 0 = stop, -1 = backwards
      * @param accelSlope The acceleration slope
-     * @param decelSlope    The deceleration slope
+     * @param decelSlope The deceleration slope
      * @return Returns true if drive should exit, false if it may continue
      */
     public boolean driveAsserts(int direction, double accelSlope, double decelSlope) {
@@ -166,13 +165,12 @@ public class FreightFrenzyRobot implements iRobot {
             System.out.println("ERROR: Uh-oh, the robot tried to decelerate  when you said" +
                     "to go nowhere. ");
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    private void driveDelta (double desiredHeading, double power) {
+    private void driveDelta(double desiredHeading, double power) {
         double currentHeading = getIMUHeading();
         delta = normalizeHeading(desiredHeading - currentHeading);
         double adjustSpeed = 0;
@@ -220,16 +218,14 @@ public class FreightFrenzyRobot implements iRobot {
         double minPower;
         if (direction == -1) {
             minPower = -1 * (MIN_ROBOT_SPEED);
-        }
-        else {
+        } else {
             minPower = MIN_ROBOT_SPEED;
         }
 
         double maxPower;
         if (direction == -1) {
             maxPower = -1 * (MAX_ROBOT_SPEED);
-        }
-        else {
+        } else {
             maxPower = MAX_ROBOT_SPEED;
         }
 
@@ -241,16 +237,14 @@ public class FreightFrenzyRobot implements iRobot {
         double accelRise;
         if (direction == -1) {
             accelRise = -1 * (MAX_ROBOT_SPEED - MIN_ROBOT_SPEED);
-        }
-        else {
+        } else {
             accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
         }
 
         double decelRise;
         if (direction == -1) {
             decelRise = -1 * (0 - MAX_ROBOT_SPEED);
-        }
-        else {
+        } else {
             decelRise = 0 - MAX_ROBOT_SPEED;
         }
 
@@ -259,35 +253,33 @@ public class FreightFrenzyRobot implements iRobot {
         //decel goes from max to stopped
         double decelSlope = decelRise / decelRun;
 
-        if(driveAsserts(direction, accelSlope, decelSlope)) {
+        if (driveAsserts(direction, accelSlope, decelSlope)) {
             return;
         }
 
-        telemetryDashboard();
+        telemetryDashboard("");
         double distanceTraveled = getMotorPosition();
 
-        if(Math.abs(distance) <= accelRun + decelRun) {
+        if (Math.abs(distance) <= accelRun + decelRun) {
             System.out.println("DEBUG: Going less than 6 inches");
             //Cruising speed
             while (Math.abs(distance) > Math.abs(distanceTraveled)) {
                 distanceTraveled = getMotorPosition();
                 power = maxPower;
                 System.out.println("DEBUG: " + power);
-                powerTheWheels(power,power,power,power);
+                powerTheWheels(power, power, power, power);
             }
-        }
-
-        else {
+        } else {
             while ((Math.abs(distance)) > (Math.abs(distanceTraveled))) {
                 //Acceleration to cruising speed
-                while ( (Math.abs(accelRun)) > (Math.abs(distanceTraveled)) ) {
+                while ((Math.abs(accelRun)) > (Math.abs(distanceTraveled))) {
                     distanceTraveled = getMotorPosition();
                     power = Math.abs(distanceTraveled) * accelSlope + minPower;
                     driveDelta(desiredHeading, power);
                 }
 
                 //Cruising speed
-                while ( ((Math.abs(distance)) - (Math.abs(distanceTraveled))) > decelRun ) {
+                while (((Math.abs(distance)) - (Math.abs(distanceTraveled))) > decelRun) {
                     distanceTraveled = getMotorPosition();
                     power = maxPower;
                     driveDelta(desiredHeading, power);
@@ -299,13 +291,88 @@ public class FreightFrenzyRobot implements iRobot {
                 setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
 
                 //Deceleration to stopping
-                while ( (Math.abs(distance)) > (Math.abs(distanceTraveled)) ) {
+                while ((Math.abs(distance)) > (Math.abs(distanceTraveled))) {
                     distanceTraveled = getMotorPosition();
                     power = maxPower + distanceTraveled * decelSlope;
                     driveDelta(desiredHeading, power);
                 }
             }
         }
+    }
+
+    public void fllDrive(double distance) {
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        double desiredHeading = getIMUHeading();
+        setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
+
+        double absDistance = Math.abs(distance);
+        double direction = (distance > 0) ? 1 : -1;
+
+        double accelInches;
+        double decelInches;
+
+
+        double leftSpeed;
+        double rightSpeed;
+
+        double halfSlope = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
+
+
+        if (absDistance / 8 < 2) {
+            accelInches = 2;
+        } else {
+            accelInches = absDistance / 8;
+        }
+
+        if (absDistance / 6 < 3) {
+            decelInches = 3;
+        } else {
+            decelInches = absDistance / 6;
+        }
+
+        double wholeAccelSlope = halfSlope / accelInches;
+        double wholeDecelSlope = -halfSlope / decelInches;
+
+        System.out.println("FLLDrive: distance " + distance + ", wholeAccelSlope " + wholeAccelSlope + ", wholeDecelSlope " + wholeDecelSlope);
+
+        powerTheWheels(MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED, MIN_ROBOT_SPEED);
+        telemetryDashboard("FLLDrive" + distance + ")");
+        while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{1, 1, 1, 1})) {
+            double motorPosition = getMotorPosition();
+            double power = 0;
+
+            if (motorPosition <= accelInches) {
+                power = MIN_ROBOT_SPEED + wholeAccelSlope * motorPosition;
+            } else if (motorPosition <= distance - accelInches - decelInches) {
+                power = MAX_ROBOT_SPEED;
+            } else if (motorPosition <= distance) {
+                power = MIN_ROBOT_SPEED + wholeDecelSlope * motorPosition;
+            }
+            power *= direction;
+
+            double currentHeading = getIMUHeading();
+            delta = normalizeHeading(desiredHeading - currentHeading);
+            double adjustSpeed = 0;
+            if (Math.abs(delta) > deltaThreshold) {
+                adjustSpeed = correctionSpeed;
+                if (delta > 0) {
+                    adjustSpeed *= -1;
+                }
+            }
+            leftSpeed = power + adjustSpeed;
+            rightSpeed = power - adjustSpeed;
+
+            System.out.println("FLLDrive: motorPosition " + motorPosition + " power " + power);
+            powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
+            telemetryDashboard("FLLDrive(" + distance + ")");
+        }
+
+        if (!creator.opModeIsActive()) {
+            throw new EmergencyStopException("FLLDrive");
+        }
+
+        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        powerTheWheels(0, 0, 0, 0);
     }
 
     @Override
@@ -325,7 +392,7 @@ public class FreightFrenzyRobot implements iRobot {
         leftSpeed = speed;
         rightSpeed = -speed;
         powerTheWheels(rightSpeed, leftSpeed, leftSpeed, rightSpeed);
-        telemetryDashboard();
+        telemetryDashboard("");
         while (creator.opModeIsActive() && motorsShouldContinue(distance, new int[]{-1, 1, 1, -1})) {
             double imuHeading = getIMUHeading();
             delta = normalizeHeading(desiredHeading - imuHeading);
@@ -340,7 +407,7 @@ public class FreightFrenzyRobot implements iRobot {
             leftSpeed = speed + adjustSpeed;
             rightSpeed = -speed - adjustSpeed;
             powerTheWheels(rightSpeed, leftSpeed, leftSpeed, rightSpeed);
-            telemetryDashboard();
+            telemetryDashboard("");
 
             double strafeRobotSpeed = 0.5;
             if (speed < strafeRobotSpeed) {
@@ -373,7 +440,7 @@ public class FreightFrenzyRobot implements iRobot {
         while (creator.opModeIsActive() && Math.abs(delta) > turnDeltaThreshold && ringingCount <= 3) {
             currentHeading = getIMUHeading();
             delta = normalizeHeading(desiredHeading - currentHeading);
-            double deltaPercentage =  powerPercentage(delta);
+            double deltaPercentage = powerPercentage(delta);
             double turnSpeed = 0.1;
             double currentTurnSpeed = turnSpeed * deltaPercentage + minTurnSpeed;
             if (delta < 0) {
@@ -382,13 +449,13 @@ public class FreightFrenzyRobot implements iRobot {
             leftSpeed = -currentTurnSpeed;
             rightSpeed = currentTurnSpeed;
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
-            telemetryDashboard();
+            telemetryDashboard("");
             if (Math.signum(delta) != Math.signum(priorDelta) && delta != 0 && priorDelta != 0) {
                 ringingCount++;
             }
             priorDelta = delta;
         }
-        if(!creator.opModeIsActive()) {
+        if (!creator.opModeIsActive()) {
             throw new EmergencyStopException("Turn");
         }
 
@@ -401,11 +468,11 @@ public class FreightFrenzyRobot implements iRobot {
         // If the rotate-left button is pressed, rotate left.
         // reaches its minimum height.
         // The speed the wheel to turn the duck carousel moves at.
-        if(direction == 1) {
+        if (direction == 1) {
             power = dwPower;
         }
         // If the rotate-right button is pressed, rotate right.
-        else if(direction == -1) {
+        else if (direction == -1) {
             power = -dwPower;
         }
         // Setting the power the duck wheel motor should move at.
@@ -414,9 +481,10 @@ public class FreightFrenzyRobot implements iRobot {
 
     /**
      * Autonomous program to run the duck wheel
+     *
      * @param rotations number of rotations we want the wheel to turn
-     * @param alliance which alliance turntable we want to spin
-     *  Uses the DWDirection enum
+     * @param alliance  which alliance turntable we want to spin
+     *                  Uses the DWDirection enum
      */
     public void duckWheelAuto(int rotations, DWDirection alliance) {
         int direction = 0;
@@ -442,8 +510,7 @@ public class FreightFrenzyRobot implements iRobot {
     public void liftMotor(int direction) {
         if (direction == 0) {
             LiftMotor.setPower(0);
-        }
-        else {
+        } else {
             // Move to the position as specified above.
 
             // Setting the speed that the lift moves at.
@@ -465,7 +532,7 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
-    public void liftMotorAuto (LiftPosition level) {
+    public void liftMotorAuto(LiftPosition level) {
 
         int targetPosition = 0; //floor position
         switch (level) {
@@ -491,12 +558,11 @@ public class FreightFrenzyRobot implements iRobot {
         LiftMotor.setTargetPosition(targetPosition);
         LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        if(targetPosition > LiftMotor.getCurrentPosition()) {
+        if (targetPosition > LiftMotor.getCurrentPosition()) {
             while (LiftMotor.getCurrentPosition() < targetPosition) {
                 LiftMotor.setPower(liftSpeed);
             }
-        }
-        else if (targetPosition < LiftMotor.getCurrentPosition()) {
+        } else if (targetPosition < LiftMotor.getCurrentPosition()) {
             while (LiftMotor.getCurrentPosition() > targetPosition) {
                 LiftMotor.setPower(-liftSpeed);
             }
@@ -506,14 +572,12 @@ public class FreightFrenzyRobot implements iRobot {
 
     public void liftMotorOverride(int direction) {
         LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if(direction == 0) {
+        if (direction == 0) {
             LiftMotor.setPower(0);
-        }
-        else {
-            if(direction == 1) {
+        } else {
+            if (direction == 1) {
                 LiftMotor.setPower(liftSpeed);
-            }
-            else if(direction == -1) {
+            } else if (direction == -1) {
                 LiftMotor.setPower(-liftSpeed);
             }
         }
@@ -523,18 +587,17 @@ public class FreightFrenzyRobot implements iRobot {
         LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    public void spinTakeMotor (int direction) {
+    public void spinTakeMotor(int direction) {
         double power = 0;
-        if(direction == 1) {
+        if (direction == 1) {
             power = spintakeIntakeSpeed;
-        }
-        else if(direction == -1) {
+        } else if (direction == -1) {
             power = spintakeOuttakeSpeed;
         }
         SpintakeMotor.setPower(power);
     }
 
-    public void spinTakeAuto (int rotations, SpintakeDirection mode) {
+    public void spinTakeAuto(int rotations, SpintakeDirection mode) {
         int direction = 0;
         switch (mode) {
             case INTAKE:
@@ -549,12 +612,11 @@ public class FreightFrenzyRobot implements iRobot {
         SpintakeMotor.setTargetPosition(targetPosition);
         SpintakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        if ( direction == 1 ) { //intake
+        if (direction == 1) { //intake
             while (SpintakeMotor.getCurrentPosition() < targetPosition) {
                 SpintakeMotor.setPower(spintakeIntakeSpeed);
             }
-        }
-        else if ( direction == -1 ) { //outtake
+        } else if (direction == -1) { //outtake
             while (SpintakeMotor.getCurrentPosition() > targetPosition) {
                 SpintakeMotor.setPower(spintakeOuttakeSpeed);
             }
@@ -691,7 +753,7 @@ public class FreightFrenzyRobot implements iRobot {
         armsStop();
     }
 
-    public int getCurrentLiftPosition () {
+    public int getCurrentLiftPosition() {
         return LiftMotor.getCurrentPosition();
     }
 
@@ -700,13 +762,13 @@ public class FreightFrenzyRobot implements iRobot {
         while (heading >= 180.0 || heading < -180.0) {
             if (heading >= 180.0) {
                 heading -= 360.0;
-            }
-            else {
+            } else {
                 heading += 360.0;
             }
         }
         return heading;
     }
+
     public void hold(double desiredHeading) {
         ElapsedTime timer;
 
@@ -728,12 +790,12 @@ public class FreightFrenzyRobot implements iRobot {
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
             creator.sleep(75);
             powerTheWheels(0, 0, 0, 0);
-            telemetryDashboard();
+            telemetryDashboard("");
             currentHeading = getIMUHeading();
             delta = normalizeHeading(desiredHeading - currentHeading);
         }
 
-        if(!creator.opModeIsActive()) {
+        if (!creator.opModeIsActive()) {
             throw new EmergencyStopException("Hold");
         }
 
@@ -756,19 +818,19 @@ public class FreightFrenzyRobot implements iRobot {
     /**
      * Programs all four motors to run to position, based off of distance and direction.
      *
-     * @param distance The distance you want to drive in inches
+     * @param distance  The distance you want to drive in inches
      * @param direction The direction each motor should turn. It is an array consisting of the
      *                  LfMotor, LrMotor, RfMotor, and RrMotor. The values can be -1 to move backwards,
      *                  1 to move forwards, or 0 to not move the motor at all.
      */
     private void setMotorDistanceToTravel(double distance, int[] direction) {
 
-        if(direction.length != 4) {
+        if (direction.length != 4) {
             throw new IllegalArgumentException("You must provide an array with exactly 4 elements!");
         }
 
-        for(int i = 0; i < 4; i++) {
-            if(direction[i] > 1 || direction[i] < -1) {
+        for (int i = 0; i < 4; i++) {
+            if (direction[i] > 1 || direction[i] < -1) {
                 throw new IllegalArgumentException("Elements must be -1, 0, or 1.");
             }
         }
@@ -791,7 +853,7 @@ public class FreightFrenzyRobot implements iRobot {
      * Powers all 4 of the robot's wheels.
      * If the motor mode is set to RUN_USING_ENCODER, then PTW sets the velocity.
      * If the motor mode is set to RUN_TO_POSITION, then PTW sets the power.
-     *
+     * <p>
      * The robot is only capable of accepting speeds of -1 --> 1.
      * If you give a value out of that range, PTW will scale down the numbers appropriately.
      *
@@ -803,7 +865,7 @@ public class FreightFrenzyRobot implements iRobot {
     private void powerTheWheels(double lfPower, double lrPower, double rfPower, double rrPower) {
         double leftMax = Math.max(Math.abs(lfPower), Math.abs(lrPower));
         double rightMax = Math.max(Math.abs(rfPower), Math.abs(rrPower));
-        double max = Math.max (leftMax, rightMax);
+        double max = Math.max(leftMax, rightMax);
 
         if (max > MAX_ROBOT_SPEED) {
             lfPower /= max;
@@ -824,20 +886,17 @@ public class FreightFrenzyRobot implements iRobot {
                 lrMotor.setVelocity(lrVelocity);
                 rfMotor.setVelocity(rfVelocity);
                 rrMotor.setVelocity(rrVelocity);
-            }
-            else {
+            } else {
                 throw new EmergencyStopException("PowerTheWheels");
             }
-        }
-        else {
+        } else {
             // We assume that we will be using RUN_TO_POSITION mode.
-            if(creator.opModeIsActive()) {
+            if (creator.opModeIsActive()) {
                 lfMotor.setPower(lfPower);
                 lrMotor.setPower(lrPower);
                 rfMotor.setPower(rfPower);
                 rrMotor.setPower(rrPower);
-            }
-            else {
+            } else {
                 throw new EmergencyStopException("PowerTheWheels");
             }
         }
@@ -859,8 +918,7 @@ public class FreightFrenzyRobot implements iRobot {
         //checks to see if we have gotten there yet
         if (distance > 0) {
             return motor.getCurrentPosition() > motor.getTargetPosition();
-        }
-        else{
+        } else {
             return motor.getCurrentPosition() < motor.getTargetPosition();
         }
     }
