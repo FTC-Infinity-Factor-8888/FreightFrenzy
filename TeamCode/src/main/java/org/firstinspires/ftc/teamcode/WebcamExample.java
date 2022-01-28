@@ -242,10 +242,33 @@ public class WebcamExample extends LinearOpMode
                     3*x/4 + w,
                     y/2 - 0.5 * h);
 
+
+
+            Point boxY_pointA = new Point( //a
+                    x/4 - x/8,
+                    y/4 + 0.5 * h);
+            Point boxY_pointB = new Point( //b
+                    x/4,
+                    y/4 - 0.5 * h);
+            Point boxCr_pointC = new Point( //c
+                    x/2 - 0.5 * w,
+                    y/4 + 0.5 * h);
+            Point boxCr_pointD = new Point( //d
+                    x/2 + 0.5 * w,
+                    y/4 - 0.5 * h);
+            Point boxCb_pointE = new Point( //e
+                    3*x/4,
+                    y/4 + 0.5 * h);
+            Point boxCb_pointF = new Point( //f
+                    3*x/4 + w,
+                    y/4 - 0.5 * h);
+
+
             /*
              * Draw a simple box around the barcode dots.
              */
             Imgproc.rectangle( //box 1 - left
+
                     output,
                     box1_pointA,
                     box1_pointB,
@@ -260,9 +283,35 @@ public class WebcamExample extends LinearOpMode
                     new Scalar(0, 255, 0), 2);
 
             Imgproc.rectangle( // box 3 - right
+
                     output,
                     box3_pointE,
                     box3_pointF,
+                    new Scalar(0, 255, 0), 2);
+
+                  //add in PutText
+
+
+            Imgproc.rectangle( //box Y - left
+                    output,
+                    boxY_pointA,
+                    boxY_pointB,
+
+                    new Scalar(0, 255, 0), 2);
+
+                  //add in PutText
+
+            Imgproc.rectangle( //box Cr - middle
+                    output,
+                    boxCr_pointC,
+                    boxCr_pointD,
+                    new Scalar(0, 255, 0), 2);
+
+
+            Imgproc.rectangle( // box Cb - right
+                    output,
+                    boxCb_pointE,
+                    boxCb_pointF,
                     new Scalar(0, 255, 0), 2);
 
                   //add in PutText
