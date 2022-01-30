@@ -112,7 +112,7 @@ public class FreightFrenzyRobot implements iRobot {
     /**
      * Displays telemetry information on the Driver Hub
      */
-    public void telemetryDashboard(String msg) {
+    public void telemetryDashboard(@SuppressWarnings("unused") String msg) {
         telemetry.addData("Heading", "Desired: %.0f, Current: %.0f, Delta: %.0f",
                 getIMUHeading(), getIMUHeading(), delta);
 
@@ -608,10 +608,10 @@ public class FreightFrenzyRobot implements iRobot {
         int direction = 0;
         switch (mode) {
             case INTAKE:
-                direction = 1;
+                direction = -1;
                 break;
             case OUTTAKE:
-                direction = -1;
+                direction = 1;
                 break;
         }
         SpintakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

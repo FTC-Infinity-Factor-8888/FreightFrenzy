@@ -6,7 +6,7 @@ package org.firstinspires.ftc.teamcode.Utilities;
  */
 public interface iRobot {
     /**
-     * initHardware maps and initializes neccesary hardware at the beginning of the match.
+     * initHardware maps and initializes necessary hardware at the beginning of the match.
      */
     void initHardware();
 
@@ -32,7 +32,7 @@ public interface iRobot {
      * rotate is a Autonomous method that rotates the robot.
      * All inputs are relative to the front of the robot being 0°.
      *
-     * @param degrees Accepts between -180 and 180 Negative degrees is counterclockwise, and positive degrees is clockwise.
+     * @param degrees Accepts between -180 and 180. Negative degrees is clockwise, and positive degrees is counterclockwise.
      */
     void rotate(double degrees);
 

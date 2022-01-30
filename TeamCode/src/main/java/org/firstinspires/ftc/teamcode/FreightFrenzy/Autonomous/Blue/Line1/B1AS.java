@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Blue.Line1;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.FreightFrenzy.DWDirection;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.SpintakeDirection;
@@ -22,8 +21,8 @@ public class B1AS extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()) {
-            ewok.drive(7);
-            ewok.rotate(45);
+            ewok.fllDrive(7);
+            ewok.rotate(-45);
             ewok.liftMotorAuto(LiftPosition.FIRST);
             ewok.drive(14.5);
             ewok.spinTakeAuto(3, SpintakeDirection.OUTTAKE);
