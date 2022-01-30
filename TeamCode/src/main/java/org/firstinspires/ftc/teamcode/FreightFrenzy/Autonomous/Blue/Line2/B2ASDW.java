@@ -1,8 +1,12 @@
-package org.firstinspires.ftc.teamcode.FreightFrenzy;
+package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Blue.Line2;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.FreightFrenzy.DWDirection;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
 
 @Autonomous (name = "B2ASDW")
 public class B2ASDW extends LinearOpMode {
@@ -18,18 +22,7 @@ public class B2ASDW extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()) {
-            ewok.drive(6.1);
-            System.out.println("DEBUG: Robot drove 6.1 inches");
-            ewok.rotate(-45);
-            System.out.println("DEBUG: Robot turned -45");
-            ewok.liftMotorAuto(LiftPosition.THIRD);
-            System.out.println("DEBUG: Lift moved to third");
-            ewok.strafe(10);
-            System.out.println("DEBUG: Robot strafed 10");
-            ewok.drive(-20);
-            System.out.println("DEBUG: Robot drove -20");
-            ewok.duckWheelAuto(10,DWDirection.BLUE);
-            System.out.println("DEBUG: Robot spun the DW");
+
         }
     }
 }
