@@ -90,6 +90,7 @@ public class FreightFrenzyRobot implements iRobot {
         setPIDFValues(rrMotor, rrMotorMaxTps);
 
         initializeIMU();
+        liftMotorAuto(LiftPosition.DRIVE);
     }
 
     private void initializeIMU() {

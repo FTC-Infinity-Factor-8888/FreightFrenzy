@@ -19,6 +19,7 @@ public class B1WH extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()){
             ewok.drive(27);
+            ewok.strafe(18);
             ewok.done();
         }
     }
