@@ -300,6 +300,12 @@ public class FreightFrenzyRobot implements iRobot {
         }
     }
 
+    public void done() {
+        if(creator.opModeIsActive()) {
+            liftMotorAuto(LiftPosition.FLOOR);
+        }
+    }
+
     public void fllDrive(double distance) {
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         double desiredHeading = getIMUHeading();

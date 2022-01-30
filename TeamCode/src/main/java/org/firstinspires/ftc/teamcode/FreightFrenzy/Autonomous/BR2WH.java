@@ -18,6 +18,7 @@ public class BR2WH extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()){
+            // In seconds
             int countDown = 16; // Decrement happens before display, so start one higher
             while (countDown-- > 0 && opModeIsActive()) {
                 telemetry.addData("Sleeping before moving to Warehouse", countDown);
@@ -28,6 +29,7 @@ public class BR2WH extends LinearOpMode {
             // Check to see if we are still active
             if (opModeIsActive()) {
                 ewok.drive(75);
+                ewok.done();
             }
         }
     }
