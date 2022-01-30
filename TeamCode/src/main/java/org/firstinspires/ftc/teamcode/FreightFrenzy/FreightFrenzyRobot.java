@@ -566,15 +566,15 @@ public class FreightFrenzyRobot implements iRobot {
         LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         if (targetPosition > LiftMotor.getCurrentPosition()) {
-            while (LiftMotor.getCurrentPosition() < targetPosition) {
+            while (LiftMotor.getCurrentPosition() < targetPosition && creator.opModeIsActive()) {
                 LiftMotor.setPower(liftSpeed);
             }
-        } else if (targetPosition < LiftMotor.getCurrentPosition()) {
-            while (LiftMotor.getCurrentPosition() > targetPosition) {
+        }
+        else if (targetPosition < LiftMotor.getCurrentPosition()) {
+            while (LiftMotor.getCurrentPosition() > targetPosition && creator.opModeIsActive()) {
                 LiftMotor.setPower(-liftSpeed);
             }
         }
-
     }
 
     public void liftMotorOverride(int direction) {
