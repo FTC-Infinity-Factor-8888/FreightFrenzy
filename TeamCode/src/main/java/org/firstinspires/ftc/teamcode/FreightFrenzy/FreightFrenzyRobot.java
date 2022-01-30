@@ -548,19 +548,19 @@ public class FreightFrenzyRobot implements iRobot {
                 targetPosition = 0;
                 break;
             case DRIVE:
-                targetPosition = 20;
+                targetPosition = 65;
                 break;
             case FIRST:
-                targetPosition = 160;
+                targetPosition = 130;
                 break;
             case SECOND:
-                targetPosition = 450;
+                targetPosition = 430;
                 break;
             case THIRD:
-                targetPosition = 750;
+                targetPosition = 760;
                 break;
             case CAPPING:
-                targetPosition = 820;
+                targetPosition = 967;
                 break;
         }
         LiftMotor.setTargetPosition(targetPosition);
@@ -925,7 +925,7 @@ public class FreightFrenzyRobot implements iRobot {
     private boolean checkMotorPosition(DcMotorEx motor, double distance) {
         //checks to see if we have gotten there yet
         if (distance > 0) {
-            return motor.getCurrentPosition() + 5 > motor.getTargetPosition();
+            return motor.getCurrentPosition() + 10 > motor.getTargetPosition();
         }
         else {
             return motor.getCurrentPosition() < motor.getTargetPosition();

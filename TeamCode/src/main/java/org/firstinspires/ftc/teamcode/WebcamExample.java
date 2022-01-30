@@ -223,26 +223,36 @@ public class WebcamExample extends LinearOpMode
             int w = x/8;
             int h = y/8;
 
+            int leftX_min = 0;
+            int leftX_max = leftX_min + w;
+
+            int middleX_min = x/2 - w/2 - w/8;
+            int middleX_max = middleX_min + w;
+
+            int rightX_min = x - w;
+            int rightX_max = rightX_min + w;
+
+            int middleY_min = y/2;
+            int middleY_max = middleY_min + h;
+
             Point box1_pointA = new Point( //a
-                    x/4 - x/8,
-                    y/2 + 0.5 * h);
+                    leftX_min,
+                    middleY_min);
             Point box1_pointB = new Point( //b
-                    x/4,
-                    y/2 - 0.5 * h);
+                    leftX_max,
+                    middleY_max);
             Point box2_pointC = new Point( //c
-                    x/2 - 0.5 * w,
-                    y/2 + 0.5 * h);
+                    middleX_min,
+                    middleY_min);
             Point box2_pointD = new Point( //d
-                    x/2 + 0.5 * w,
-                    y/2 - 0.5 * h);
+                    middleX_max,
+                    middleY_max);
             Point box3_pointE = new Point( //e
-                    3*x/4,
-                    y/2 + 0.5 * h);
+                    rightX_min,
+                    middleY_min);
             Point box3_pointF = new Point( //f
-                    3*x/4 + w,
-                    y/2 - 0.5 * h);
-
-
+                    rightX_max,
+                    middleY_max);
 
             Point boxY_pointA = new Point( //a
                     x/4 - x/8,
@@ -289,7 +299,7 @@ public class WebcamExample extends LinearOpMode
                     box3_pointF,
                     new Scalar(0, 255, 0), 2);
 
-                  //add in PutText
+            //add in PutText
 
 
             Imgproc.rectangle( //box Y - left
@@ -299,7 +309,7 @@ public class WebcamExample extends LinearOpMode
 
                     new Scalar(0, 255, 0), 2);
 
-                  //add in PutText
+            //add in PutText
 
             Imgproc.rectangle( //box Cr - middle
                     output,
@@ -314,7 +324,7 @@ public class WebcamExample extends LinearOpMode
                     boxCb_pointF,
                     new Scalar(0, 255, 0), 2);
 
-                  //add in PutText
+            //add in PutText
 
             /**
              * NOTE: to see how to get data from your pipeline to your OpMode as well as how
@@ -330,7 +340,7 @@ public class WebcamExample extends LinearOpMode
          * and extracts the Cb channel to the 'Cb' variable
          * \ (•◡•) /
          */
-         private void inputToCb(Mat input)
+        private void inputToCb(Mat input)
         {
             Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(YCrCb, Cb, 1);

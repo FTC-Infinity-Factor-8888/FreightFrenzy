@@ -21,10 +21,10 @@ public class B1AS extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()) {
-            ewok.fllDrive(7);
-            ewok.rotate(-45);
-            ewok.liftMotorAuto(LiftPosition.FIRST);
-            ewok.drive(14.5);
+            ewok.fllDrive(8);
+            ewok.rotate(-50);
+            ewok.liftMotorAuto(LiftPosition.THIRD);
+            ewok.drive(13.5);
             ewok.spinTakeAuto(3, SpintakeDirection.OUTTAKE);
         }
     }
