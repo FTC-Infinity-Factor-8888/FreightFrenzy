@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Blue.Line2;
+package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

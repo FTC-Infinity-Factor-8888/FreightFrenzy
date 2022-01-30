@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Red.Line1;
+package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Blue.Line1;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 
-@Autonomous (name = "BR1WH")
-public class R1DWSU extends LinearOpMode {
+@Autonomous (name = "R1DWSU")
+public class B1DWSU extends LinearOpMode {
         FreightFrenzyRobot ewok;
         //start line 1 is the closest to the warehouse for both alliances (lined up with middle barcode)
         @Override
