@@ -327,7 +327,8 @@ public class FreightFrenzyRobot implements iRobot {
 
         if (absDistance / 8 < 2) {
             accelInches = 2;
-        } else {
+        }
+        else {
             accelInches = absDistance / 8;
         }
 
@@ -924,8 +925,9 @@ public class FreightFrenzyRobot implements iRobot {
     private boolean checkMotorPosition(DcMotorEx motor, double distance) {
         //checks to see if we have gotten there yet
         if (distance > 0) {
-            return motor.getCurrentPosition() > motor.getTargetPosition();
-        } else {
+            return motor.getCurrentPosition() + 5 > motor.getTargetPosition();
+        }
+        else {
             return motor.getCurrentPosition() < motor.getTargetPosition();
         }
     }
