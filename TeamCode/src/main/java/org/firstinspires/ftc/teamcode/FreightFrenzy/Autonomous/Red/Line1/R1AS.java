@@ -1,0 +1,31 @@
+package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Red.Line1;
+
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.SpintakeDirection;
+
+@Autonomous (name = "R1AS")
+public class R1AS extends LinearOpMode {
+    FreightFrenzyRobot ewok;
+    //start line 1 is the closest to the warehouse for both alliances (lined up with middle barcode)
+    @Override
+    public void runOpMode() throws InterruptedException {
+        //we have landed on a moon of Endor.
+        ewok = new FreightFrenzyRobot(this);
+        ewok.initHardware();
+        System.out.println("Bucket moved to DRIVE Position");
+
+        waitForStart();
+        if(opModeIsActive()) {
+            ewok.fllDrive(7);
+            ewok.rotate(-45);
+            ewok.liftMotorAuto(LiftPosition.FIRST);
+            ewok.drive(14.5);
+            ewok.spinTakeAuto(3, SpintakeDirection.OUTTAKE);
+        }
+    }
+}
