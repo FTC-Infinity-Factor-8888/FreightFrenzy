@@ -48,8 +48,8 @@ public class FreightFrenzyRobot implements iRobot {
     private final static double HOLD_TIME = 1000; // In ms
 
     double liftSpeed = 0.3; // The speed the lift moves at.
-    double spintakeIntakeSpeed = 0.6;
-    double spintakeOuttakeSpeed = -0.4;
+    double spintakeIntakeSpeed = -0.6;
+    double spintakeOuttakeSpeed = 0.4;
 
     private double delta;
     private final double deltaThreshold = 1;
@@ -382,6 +382,7 @@ public class FreightFrenzyRobot implements iRobot {
         setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         powerTheWheels(0, 0, 0, 0);
     }
+
 
     @Override
     public void strafe(double distance) {

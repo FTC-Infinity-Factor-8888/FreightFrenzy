@@ -28,7 +28,7 @@ public class BR2WH extends LinearOpMode {
 
             // Check to see if we are still active
             if (opModeIsActive()) {
-                ewok.drive(75);
+                ewok.drive(78);
                 ewok.done();
             }
         }

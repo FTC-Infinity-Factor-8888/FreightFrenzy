@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Red.Line1;
+package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Red.Line2;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.SpintakeDirection;
 
-@Autonomous (name = "R1AS")
-public class R1AS extends LinearOpMode {
+@Autonomous (name = "R2AS")
+public class R2AS extends LinearOpMode {
     FreightFrenzyRobot ewok;
     //start line 1 is the closest to the warehouse for both alliances (lined up with middle barcode)
     @Override
@@ -21,11 +21,16 @@ public class R1AS extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()) {
-            ewok.fllDrive(7);
-            ewok.rotate(-45);
-            ewok.liftMotorAuto(LiftPosition.FIRST);
-            ewok.drive(14.5);
+            ewok.fllDrive(8);
+            ewok.rotate(-50);
+            ewok.liftMotorAuto(LiftPosition.THIRD);
+            ewok.drive(13.5);
             ewok.spinTakeAuto(3, SpintakeDirection.OUTTAKE);
+            ewok.drive(-13.5);
+            ewok.rotate(140);
+            ewok.strafe(13);
+            ewok.drive(30);
+            ewok.done();
         }
     }
 }

@@ -24,7 +24,7 @@ public interface iRobot {
      * All inputs are relative to the front of the robot (looking at it from behind, as the robot)
      *
      * @param distance Accepts a positive or negative number representing the number of inches to move.
-     *                 Negative is left, and positive is right
+     *                 Positive is left, and negative is right
      */
     void strafe(double distance);
 

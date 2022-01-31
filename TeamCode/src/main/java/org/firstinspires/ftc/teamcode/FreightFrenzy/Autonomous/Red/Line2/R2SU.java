@@ -18,9 +18,9 @@ public class R2SU extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()){
-            ewok.drive(26);
-            ewok.rotate(90);
-            ewok.drive(24);
+            ewok.fllDrive(26);
+//            ewok.rotate(90);
+            ewok.strafe(24);
             ewok.done();
         }
     }
