@@ -430,10 +430,10 @@ public class FreightFrenzyRobot implements iRobot {
         // Reset motor mode
         setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         powerTheWheels(0, 0, 0, 0);
-        lfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
-        rfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
-        lrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
-        rrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+//        lfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+//        rfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+//        lrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+//        rrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
     }
 
     @Override
