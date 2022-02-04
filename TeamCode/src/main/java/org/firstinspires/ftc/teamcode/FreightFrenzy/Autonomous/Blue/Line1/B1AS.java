@@ -27,7 +27,7 @@ public class B1AS extends LinearOpMode {
             ewok.drive(13.5);
             ewok.spinTakeAuto(3, SpintakeDirection.OUTTAKE);
             ewok.drive(-13.5);
-            ewok.rotate(140);
+            ewok.rotate(90);
             ewok.strafe(13);
             ewok.drive(30);
             ewok.done();
