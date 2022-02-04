@@ -30,7 +30,7 @@ public interface iRobot {
 
     /**
      * rotate is a Autonomous method that rotates the robot.
-     * All inputs are relative to the front of the robot being 0°.
+     * All inputs are relative to the direction the robot was facing on initialization (in degrees)
      *
      * @param degrees Accepts between -180 and 180. Negative degrees is clockwise, and positive degrees is counterclockwise.
      */
