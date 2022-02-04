@@ -80,14 +80,14 @@ public class FreightFrenzyRobot implements iRobot {
         rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rrMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        System.out.print("LF: ");
-        setPIDFValues(lfMotor, lfMotorMaxTps);
-        System.out.print("RF: ");
-        setPIDFValues(rfMotor, rfMotorMaxTps);
-        System.out.print("LR: ");
-        setPIDFValues(lrMotor, lrMotorMaxTps);
-        System.out.print("RR: ");
-        setPIDFValues(rrMotor, rrMotorMaxTps);
+//        System.out.print("LF: ");
+//        setPIDFValues(lfMotor, lfMotorMaxTps);
+//        System.out.print("RF: ");
+//        setPIDFValues(rfMotor, rfMotorMaxTps);
+//        System.out.print("LR: ");
+//        setPIDFValues(lrMotor, lrMotorMaxTps);
+//        System.out.print("RR: ");
+//        setPIDFValues(rrMotor, rrMotorMaxTps);
 
         initializeIMU();
         liftMotorAuto(LiftPosition.DRIVE);
