@@ -235,6 +235,13 @@ public class WebcamExample extends LinearOpMode
             int middleY_min = y/2;
             int middleY_max = middleY_min + h;
 
+            int topY_min = (int)(y/4 - 0.5 * h);
+            int topY_max = topY_min + h;
+
+            int bottomY_min = (int)(3 * y/4 - 0.5 * h);
+            int bottomY_max = bottomY_min + h ;
+
+            //Regular boxes
             Point box1_pointA = new Point( //a
                     leftX_min,
                     middleY_min);
@@ -254,24 +261,45 @@ public class WebcamExample extends LinearOpMode
                     rightX_max,
                     middleY_max);
 
+            // YCrCb boxes
             Point boxY_pointA = new Point( //a
-                    x/4 - x/8,
-                    y/4 + 0.5 * h);
+                    leftX_min,
+                    topY_min);
             Point boxY_pointB = new Point( //b
-                    x/4,
-                    y/4 - 0.5 * h);
+                    leftX_max,
+                    topY_max);
             Point boxCr_pointC = new Point( //c
-                    x/2 - 0.5 * w,
-                    y/4 + 0.5 * h);
+                    middleX_min,
+                    topY_min);
             Point boxCr_pointD = new Point( //d
-                    x/2 + 0.5 * w,
-                    y/4 - 0.5 * h);
+                    middleX_max,
+                    topY_max);
             Point boxCb_pointE = new Point( //e
-                    3*x/4,
-                    y/4 + 0.5 * h);
+                    rightX_min,
+                    topY_min);
             Point boxCb_pointF = new Point( //f
-                    3*x/4 + w,
-                    y/4 - 0.5 * h);
+                    rightX_max,
+                    topY_max);
+
+            // HSV boxes
+            Point boxH_pointA = new Point( //a
+                    leftX_min,
+                    bottomY_min);
+            Point boxH_pointB = new Point( //b
+                    leftX_max,
+                    bottomY_max);
+            Point boxS_pointC = new Point( //c
+                    middleX_min,
+                    bottomY_min);
+            Point boxS_pointD = new Point( //d
+                    middleX_max,
+                    bottomY_max);
+            Point boxV_pointE = new Point( //e
+                    rightX_min,
+                    bottomY_min);
+            Point boxV_pointF = new Point( //f
+                    rightX_max,
+                    bottomY_max);
 
 
             /*
@@ -326,7 +354,7 @@ public class WebcamExample extends LinearOpMode
 
             //add in PutText
 
-            /**
+            /*
              * NOTE: to see how to get data from your pipeline to your OpMode as well as how
              * to change which stage of the pipeline is rendered to the viewport when it is
              * tapped, please see {@link PipelineStageSwitchingExample}
