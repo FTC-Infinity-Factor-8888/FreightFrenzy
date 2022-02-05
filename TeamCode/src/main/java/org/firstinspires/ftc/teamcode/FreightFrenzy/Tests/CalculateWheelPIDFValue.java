@@ -42,6 +42,13 @@ public class CalculateWheelPIDFValue extends LinearOpMode {
             lrMotor.setPower(1.0);
             rrMotor.setPower(1.0);
 
+            int count = 1;
+
+            int averageCount = 0;
+            double pAverage = 0;
+            double iAverage = 0;
+            double fAverage = 0;
+
             while (opModeIsActive()) {
                 currentVelocity = lfMotor.getVelocity();
                 if (currentVelocity > lfMaxVelocity) {
@@ -68,36 +75,60 @@ public class CalculateWheelPIDFValue extends LinearOpMode {
                 double D = 0;
                 double F;
 
-                F = 32767 / lfMaxVelocity;
-                P = 0.1 * F;
-                I = 0.1 * P;
+                if(count >= 10) {
+                    F = 32767 / lfMaxVelocity;
+                    P = 0.1 * F;
+                    I = 0.1 * P;
 
-                telemetry.addData("LF", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
-                System.out.printf("LF - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, lfMaxVelocity);
+                    pAverage += P;
+                    iAverage += I;
+                    fAverage += F;
+                    averageCount++;
 
-                F = 32767 / rfMaxVelocity;
-                P = 0.1 * F;
-                I = 0.1 * P;
-
-                telemetry.addData("RF", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
-                System.out.printf("RF - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, rfMaxVelocity);
+                    telemetry.addData("LF", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
+                    System.out.printf("LF - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, lfMaxVelocity);
 
 
-                F = 32767 / lrMaxVelocity;
-                P = 0.1 * F;
-                I = 0.1 * P;
+                    F = 32767 / rfMaxVelocity;
+                    P = 0.1 * F;
+                    I = 0.1 * P;
 
-                telemetry.addData("LR", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
-                System.out.printf("LR - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, lrMaxVelocity);
+                    pAverage += P;
+                    iAverage += I;
+                    fAverage += F;
+                    averageCount++;
 
-                F = 32767 / rrMaxVelocity;
-                P = 0.1 * F;
-                I = 0.1 * P;
+                    telemetry.addData("RF", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
+                    System.out.printf("RF - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, rfMaxVelocity);
 
-                telemetry.addData("RR", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
-                System.out.printf("RR - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, rrMaxVelocity);
 
+                    F = 32767 / lrMaxVelocity;
+                    P = 0.1 * F;
+                    I = 0.1 * P;
+
+                    pAverage += P;
+                    iAverage += I;
+                    fAverage += F;
+                    averageCount++;
+
+                    telemetry.addData("LR", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
+                    System.out.printf("LR - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, lrMaxVelocity);
+
+                    F = 32767 / rrMaxVelocity;
+                    P = 0.1 * F;
+                    I = 0.1 * P;
+
+                    pAverage += P;
+                    iAverage += I;
+                    fAverage += F;
+                    averageCount++;
+
+                    telemetry.addData("RR", "P (%.2f) I (%.3f) D (%.3f) F (%.1f)", P, I, D, F);
+                    System.out.printf("RR - P (%.2f) I (%.3f) D (%.3f) F (%.1f) TPS (%.0f)\n", P, I, D, F, rrMaxVelocity);
+                }
                 telemetry.update();
+                count++;
+                System.out.printf("AVERAGE - P (%.2f) I (%.3f) D (%.3f) F (%.1f)\n", pAverage/averageCount, iAverage/averageCount, 0.0, fAverage/averageCount);
             }
         }
     }
