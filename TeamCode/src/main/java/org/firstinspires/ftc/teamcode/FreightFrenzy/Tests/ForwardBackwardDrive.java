@@ -19,13 +19,14 @@ public class ForwardBackwardDrive extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()){
             System.out.println("ROBOT IS FORWARDING");
-            ewok.fllDrive(30);
+            ewok.drive(13.5);
             System.out.println("ROBOT HAS FINISHED FORWARDING");
             System.out.println("ROBOT IS STOPPING");
             ewok.driveStop();
+            sleep(500);
             System.out.println("ROBOT HAS STOPPED");
             System.out.println("ROBOT IS REVERSING");
-            ewok.fllDrive(-30);
+            ewok.drive(-13.5);
             System.out.println("ROBOT HAS FINISHED REVERSING");
             System.out.println("SUCCESS!");
         }

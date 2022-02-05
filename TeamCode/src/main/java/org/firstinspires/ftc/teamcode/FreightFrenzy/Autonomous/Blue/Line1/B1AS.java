@@ -21,15 +21,24 @@ public class B1AS extends LinearOpMode {
 
         waitForStart();
         if(opModeIsActive()) {
-            ewok.fllDrive(8);
+            ewok.drive(8);
+            System.out.println("DEBUG: Finished drive(8)");
             ewok.rotate(-50);
+            System.out.println("DEBUG: Finished rotate(-50)");
             ewok.liftMotorAuto(LiftPosition.THIRD);
+            System.out.println("DEBUG: Finished lift(THIRD)");
             ewok.drive(13.5);
-            ewok.spinTakeAuto(3, SpintakeDirection.OUTTAKE);
+            System.out.println("DEBUG: Finished drive(13.5)");
+//            ewok.spinTakeAuto(3, SpintakeDirection.OUTTAKE);
+//            System.out.println("DEBUG: Finished outtake");
             ewok.drive(-13.5);
+            System.out.println("DEBUG: Finished drive(-13.5)");
             ewok.rotate(90);
+            System.out.println("DEBUG: Finished rotate(90)");
             ewok.strafe(13);
+            System.out.println("DEBUG: Finished strafe(13)");
             ewok.drive(30);
+            System.out.println("DEBUG: Finished drive(30)");
             ewok.done();
         }
     }

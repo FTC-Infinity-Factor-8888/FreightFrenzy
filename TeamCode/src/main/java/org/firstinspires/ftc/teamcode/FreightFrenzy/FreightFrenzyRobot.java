@@ -38,13 +38,16 @@ public class FreightFrenzyRobot implements iRobot {
 
     private final double wheelCircumferenceInInches = (96 / 25.4) * Math.PI;
     // private int maximumRobotTps = 2610;
+    // TODO: DO NOT CONVERT TO LOCAL
+    // This is showing up as a warning because of the commented out code in strafe
     private final int lfMotorMaxTps = 2655;
     private final int rfMotorMaxTps = 2650;
     private final int lrMotorMaxTps = 2610;
     private final int rrMotorMaxTps = 2615;
     private final double ticksPerMotorRevolution = 530.3;
     private final double ticksPerInch = ticksPerMotorRevolution / wheelCircumferenceInInches;
-    private final double drivePositionPIDF = 2.8; // 5.0
+    private final double drivePositionPIDF1 = 2.0; // For distance >= 20"
+    private final double drivePositionPIDF2 = 4.0; // For distances <= 20"
     private final static double HOLD_TIME = 1000; // In ms
 
     double liftSpeed = 0.3; // The speed the lift moves at.
@@ -80,14 +83,15 @@ public class FreightFrenzyRobot implements iRobot {
         rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rrMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        System.out.print("LF: ");
-//        setPIDFValues(lfMotor, lfMotorMaxTps);
-//        System.out.print("RF: ");
-//        setPIDFValues(rfMotor, rfMotorMaxTps);
-//        System.out.print("LR: ");
-//        setPIDFValues(lrMotor, lrMotorMaxTps);
-//        System.out.print("RR: ");
-//        setPIDFValues(rrMotor, rrMotorMaxTps);
+        // By default we are setting up for distances <= 20
+        System.out.print("LF: ");
+        setPIDFValues(lfMotor, lfMotorMaxTps);
+        System.out.print("RF: ");
+        setPIDFValues(rfMotor, rfMotorMaxTps);
+        System.out.print("LR: ");
+        setPIDFValues(lrMotor, lrMotorMaxTps);
+        System.out.print("RR: ");
+        setPIDFValues(rrMotor, rrMotorMaxTps);
 
         initializeIMU();
         liftMotorAuto(LiftPosition.DRIVE);
@@ -202,6 +206,13 @@ public class FreightFrenzyRobot implements iRobot {
      */
     @Override
     public void drive(double distance) {
+        if(distance >= 20) {
+            setPIDFValues(lfMotor, lfMotorMaxTps);
+            setPIDFValues(rfMotor, rfMotorMaxTps);
+            setPIDFValues(lrMotor, lrMotorMaxTps);
+            setPIDFValues(rrMotor, rrMotorMaxTps);
+        }
+
         double desiredHeading = getIMUHeading();
         if (distance == 0) {
             System.out.println("Success! The robot did not move. The distance entered was 0.");
@@ -301,11 +312,17 @@ public class FreightFrenzyRobot implements iRobot {
                 while ((Math.abs(distance)) > (Math.abs(distanceTraveled))) {
                     distanceTraveled = getMotorPosition();
                     power = maxPower + distanceTraveled * decelSlope;
+                    if(power <= minPower) {
+                        power = minPower;
+                    }
                     driveDelta(desiredHeading, power);
                     System.out.println("DEBUG Speed: " + power + ", Distance Travelled: " + distanceTraveled + ", Desired Distance: " + distance);
                 }
+                System.out.println("DEBUG: Finished decel");
             }
         }
+        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        powerTheWheels(0, 0, 0, 0);
     }
 
     public void done() {
@@ -437,10 +454,10 @@ public class FreightFrenzyRobot implements iRobot {
         // Reset motor mode
         setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         powerTheWheels(0, 0, 0, 0);
-//        lfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
-//        rfMotor.setPositionPIDFCoefficients(drivePositionPIDF);
-//        lrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
-//        rrMotor.setPositionPIDFCoefficients(drivePositionPIDF);
+        lfMotor.setPositionPIDFCoefficients(drivePositionPIDF2);
+        rfMotor.setPositionPIDFCoefficients(drivePositionPIDF2);
+        lrMotor.setPositionPIDFCoefficients(drivePositionPIDF2);
+        rrMotor.setPositionPIDFCoefficients(drivePositionPIDF2);
     }
 
     @Override
@@ -465,6 +482,7 @@ public class FreightFrenzyRobot implements iRobot {
             leftSpeed = -currentTurnSpeed;
             rightSpeed = currentTurnSpeed;
             powerTheWheels(leftSpeed, leftSpeed, rightSpeed, rightSpeed);
+            System.out.println("DEBUG: Current Heading: " + currentHeading + " Desired Heading: " + desiredHeading + " Speed: " + currentTurnSpeed);
             telemetryDashboard("");
             if (Math.signum(delta) != Math.signum(priorDelta) && delta != 0 && priorDelta != 0) {
                 ringingCount++;
@@ -971,6 +989,6 @@ public class FreightFrenzyRobot implements iRobot {
         double I = 0.1 * P;
         System.out.printf("Max %d, P %.4f, I %.4f, D %.0f, F %.4f\n", tps, P, I, D, F);
         motor.setVelocityPIDFCoefficients(P, I, D, F);
-        motor.setPositionPIDFCoefficients(drivePositionPIDF);
+        motor.setPositionPIDFCoefficients(drivePositionPIDF2);
     }
 }

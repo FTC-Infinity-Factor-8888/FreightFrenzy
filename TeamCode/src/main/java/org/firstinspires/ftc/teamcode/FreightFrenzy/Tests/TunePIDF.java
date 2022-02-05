@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.FreightFrenzy.Tests;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +15,7 @@ import java.io.IOException;  // Import the IOException class to handle errors
 @Autonomous(name="TunePIDFTest")
 public class TunePIDF extends LinearOpMode {
 
+    @SuppressLint("SdCardPath")
     public String fileName = "/sdcard/data/TunePIDF";
     public String fileExtension = ".csv";
     public FileWriter fileWriter;
@@ -74,15 +77,15 @@ public class TunePIDF extends LinearOpMode {
         lrMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rrMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        lfMotor.setVelocityPIDFCoefficients(1.22, 0.122, 0, 12.2);
-        rfMotor.setVelocityPIDFCoefficients(1.28, 0.128, 0, 12.8);
-        lrMotor.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
-        rrMotor.setVelocityPIDFCoefficients(1.28, 0.128, 0, 12.8);
+        lfMotor.setVelocityPIDFCoefficients(1.19, 0.119, 0, 11.9);
+        rfMotor.setVelocityPIDFCoefficients(1.20, 0.120, 0, 12.0);
+        lrMotor.setVelocityPIDFCoefficients(1.22, 0.122, 0, 12.2);
+        rrMotor.setVelocityPIDFCoefficients(1.21, 0.121, 0, 12.1);
 
         // Change these to optimize the robot
-        double distance = 70;
-        double positionPIDF = 2.8;
-        double maxPower = 0.75;
+        double distance = 50;
+        double positionPIDF = 4.0;
+        double maxPower = 0.8;
         double power = 0.3;
         double powerIncrement = 0.01;
 
