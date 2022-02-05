@@ -124,6 +124,7 @@ public class WebcamExample extends LinearOpMode
         while (opModeIsActive())
         {
             /*
+             * *:・ﾟ ₍ᐢ•ﻌ•ᐢ₎*:・ﾟ
              * Send some stats to the telemetry
              */
             telemetry.addData("Frame Count", webcam.getFrameCount());
@@ -152,6 +153,12 @@ public class WebcamExample extends LinearOpMode
                  *
                  * NB: calling closeCameraDevice() will internally call stopStreaming() if applicable,
                  * but it doesn't hurt to call it anyway, if for no other reason than clarity.
+                 *
+                 * ૮ ˆﻌˆ ა This is Gilbert, the resident code-dog. If you are confused, just focus on Gilbert and how
+                 *         amazingly adorable he is.
+                 *
+                 * ʕ •ₒ• ʔ This is Fredrick, Gilbert's best friend. He is a bear. A very adorable bear.
+                 *
                  *
                  * NB2: if you are stopping the camera stream to simply save some processing power
                  * (or battery power) for a short while when you do not need your vision pipeline,
@@ -310,7 +317,7 @@ public class WebcamExample extends LinearOpMode
                     output,
                     box1_pointA,
                     box1_pointB,
-                    new Scalar(0, 255, 0), 2);
+                    new Scalar(255, 0, 0), 2);
 
 
 
@@ -318,14 +325,14 @@ public class WebcamExample extends LinearOpMode
                     output,
                     box2_pointC,
                     box2_pointD,
-                    new Scalar(0, 255, 0), 2);
+                    new Scalar(255, 0, 0), 2);
 
             Imgproc.rectangle( // box 3 - right
 
                     output,
                     box3_pointE,
                     box3_pointF,
-                    new Scalar(0, 255, 0), 2);
+                    new Scalar(255, 0, 0), 2);
 
             //add in PutText
 
@@ -353,6 +360,28 @@ public class WebcamExample extends LinearOpMode
                     new Scalar(0, 255, 0), 2);
 
             //add in PutText
+
+            Imgproc.rectangle( //box H - left
+                    output,
+                    boxH_pointA,
+                    boxH_pointB,
+
+                    new Scalar(0, 0, 255), 2);
+
+            //add in PutText
+
+            Imgproc.rectangle( //box S - middle
+                    output,
+                    boxS_pointC,
+                    boxS_pointD,
+                    new Scalar(0, 0, 255), 2);
+
+
+            Imgproc.rectangle( // box V - right
+                    output,
+                    boxV_pointE,
+                    boxV_pointF,
+                    new Scalar(0, 0, 255), 2);
 
             /*
              * NOTE: to see how to get data from your pipeline to your OpMode as well as how
