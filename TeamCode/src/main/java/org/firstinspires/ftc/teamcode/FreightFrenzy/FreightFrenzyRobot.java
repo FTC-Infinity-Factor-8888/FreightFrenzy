@@ -270,20 +270,25 @@ public class FreightFrenzyRobot implements iRobot {
                 System.out.println("DEBUG: " + power);
                 powerTheWheels(power, power, power, power);
             }
-        } else {
+        }
+        else {
             while ((Math.abs(distance)) > (Math.abs(distanceTraveled))) {
                 //Acceleration to cruising speed
+                System.out.println("DEBUG Accelerating: ");
                 while ((Math.abs(accelRun)) > (Math.abs(distanceTraveled))) {
                     distanceTraveled = getMotorPosition();
                     power = Math.abs(distanceTraveled) * accelSlope + minPower;
                     driveDelta(desiredHeading, power);
+                    System.out.println("DEBUG Speed: " + power + ", Distance Travelled: " + distanceTraveled + ", Desired Distance: " + distance);
                 }
 
                 //Cruising speed
+                System.out.println("DEBUG Cruising: ");
                 while (((Math.abs(distance)) - (Math.abs(distanceTraveled))) > decelRun) {
                     distanceTraveled = getMotorPosition();
                     power = maxPower;
                     driveDelta(desiredHeading, power);
+                    System.out.println("DEBUG Speed: " + power + ", Distance Travelled: " + distanceTraveled + ", Desired Distance: " + distance);
                 }
 
                 distanceTraveled = getMotorPosition();
@@ -292,10 +297,12 @@ public class FreightFrenzyRobot implements iRobot {
                 setMotorDistanceToTravel(distance, new int[]{1, 1, 1, 1});
 
                 //Deceleration to stopping
+                System.out.println("DEBUG Decelerating: ");
                 while ((Math.abs(distance)) > (Math.abs(distanceTraveled))) {
                     distanceTraveled = getMotorPosition();
                     power = maxPower + distanceTraveled * decelSlope;
                     driveDelta(desiredHeading, power);
+                    System.out.println("DEBUG Speed: " + power + ", Distance Travelled: " + distanceTraveled + ", Desired Distance: " + distance);
                 }
             }
         }
