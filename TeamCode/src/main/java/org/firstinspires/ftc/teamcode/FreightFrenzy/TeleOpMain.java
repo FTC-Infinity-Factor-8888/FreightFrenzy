@@ -99,7 +99,7 @@ public class TeleOpMain extends LinearOpMode {
                     // 1 = rotate AntiClockwise, -1 = rotate Clockwise, 0 = don't move.
                     // Checking to see which buttons are pressed.
                     int direction = (duckWheelAntiClockwise?1:0) + (duckWheelClockwise?-1:0);
-                    yoda.duckWheelMotor(direction);
+                    yoda.duckWheelMotor(direction, accelerator);
                 }
 
                 if(spintakeIntake != priorSpintakeIntake || spintakeOuttake != priorSpintakeOuttake) {
