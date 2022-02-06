@@ -30,8 +30,8 @@ public class FreightFrenzyRobot implements iRobot {
     private BNO055IMU imu;
 
 
-    private final double MAX_ROBOT_SPEED = 0.8; // The maximum speed we want our robot to drive at.
-    private final double MIN_ROBOT_SPEED = 0.4; // The minimum speed we can have our robot to drive at.
+    private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
+    private final double MIN_ROBOT_SPEED = 0.40; // The minimum speed we can have our robot to drive at.
     private final double correctionSpeed = 0.1;
     private final double dwPower = 0.65;
 
@@ -46,7 +46,6 @@ public class FreightFrenzyRobot implements iRobot {
     private final int rrMotorMaxTps = 2615;
     private final double ticksPerMotorRevolution = 530.3;
     private final double ticksPerInch = ticksPerMotorRevolution / wheelCircumferenceInInches;
-    @SuppressWarnings("FieldCanBeLocal")
     private final double drivePositionPIDF1 = 2.0; // For distance >= 20"
     private final double drivePositionPIDF2 = 4.0; // For distances <= 20"
     private final static double HOLD_TIME = 1000; // In ms
@@ -208,10 +207,10 @@ public class FreightFrenzyRobot implements iRobot {
     @Override
     public void drive(double distance) {
         if(distance >= 20) {
-            lfMotor.setPositionPIDFCoefficients(drivePositionPIDF1);
-            rfMotor.setPositionPIDFCoefficients(drivePositionPIDF1);
-            lrMotor.setPositionPIDFCoefficients(drivePositionPIDF1);
-            rrMotor.setPositionPIDFCoefficients(drivePositionPIDF1);
+            setPIDFValues(lfMotor, lfMotorMaxTps);
+            setPIDFValues(rfMotor, rfMotorMaxTps);
+            setPIDFValues(lrMotor, lrMotorMaxTps);
+            setPIDFValues(rrMotor, rrMotorMaxTps);
         }
 
         double desiredHeading = getIMUHeading();
@@ -498,24 +497,17 @@ public class FreightFrenzyRobot implements iRobot {
         hold(desiredHeading);
     }
 
-    public void duckWheelMotor(int direction, double accelerator) {
+    public void duckWheelMotor(int direction) {
         double power = 0; // By default, the wheel should not rotate.
         // If the rotate-left button is pressed, rotate left.
         // reaches its minimum height.
         // The speed the wheel to turn the duck carousel moves at.
-        double maxDwPower = 0.8;
         if (direction == 1) {
-            power = dwPower + dwPower * accelerator;
-            if (power > maxDwPower) {
-                power = maxDwPower;
-            }
+            power = dwPower;
         }
         // If the rotate-right button is pressed, rotate right.
         else if (direction == -1) {
-            power = -dwPower + -dwPower * accelerator;
-            if (power < -maxDwPower) {
-                power = -maxDwPower;
-            }
+            power = -dwPower;
         }
         // Setting the power the duck wheel motor should move at.
         dwMotor.setPower(power);

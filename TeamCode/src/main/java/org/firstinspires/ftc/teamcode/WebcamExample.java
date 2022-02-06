@@ -30,6 +30,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -200,6 +201,8 @@ public class WebcamExample extends LinearOpMode
         boolean viewportPaused;
 
         Mat YCrCb = new Mat();
+        Mat Y = new Mat();
+        Mat Cr = new Mat();
         Mat Cb = new Mat();
 
         /*
@@ -308,99 +311,69 @@ public class WebcamExample extends LinearOpMode
                     rightX_max,
                     bottomY_max);
 
+            //convert input before trying to draw on the output
+            inputToYCrCb(input);
 
             /*
              * Draw a simple box around the barcode dots.
              */
             Imgproc.rectangle( //box 1 - left
-
-                    output,
-                    box1_pointA,
-                    box1_pointB,
+                    output, box1_pointA, box1_pointB,
                     new Scalar(255, 0, 0), 2);
-
-
-
             Imgproc.rectangle( //box 2 - middle
-                    output,
-                    box2_pointC,
-                    box2_pointD,
+                    output, box2_pointC, box2_pointD,
                     new Scalar(255, 0, 0), 2);
-
             Imgproc.rectangle( // box 3 - right
-
-                    output,
-                    box3_pointE,
-                    box3_pointF,
+                    output, box3_pointE, box3_pointF,
                     new Scalar(255, 0, 0), 2);
-
-            //add in PutText
-
-
+            // Value boxes
             Imgproc.rectangle( //box Y - left
-                    output,
-                    boxY_pointA,
-                    boxY_pointB,
-
+                    output, boxY_pointA, boxY_pointB,
                     new Scalar(0, 255, 0), 2);
-
-            //add in PutText
-
             Imgproc.rectangle( //box Cr - middle
-                    output,
-                    boxCr_pointC,
-                    boxCr_pointD,
+                    output, boxCr_pointC, boxCr_pointD,
                     new Scalar(0, 255, 0), 2);
-
-
             Imgproc.rectangle( // box Cb - right
-                    output,
-                    boxCb_pointE,
-                    boxCb_pointF,
+                    output, boxCb_pointE, boxCb_pointF,
                     new Scalar(0, 255, 0), 2);
-
-            //add in PutText
-
             Imgproc.rectangle( //box H - left
-                    output,
-                    boxH_pointA,
-                    boxH_pointB,
-
+                    output, boxH_pointA, boxH_pointB,
                     new Scalar(0, 0, 255), 2);
-
-            //add in PutText
-
             Imgproc.rectangle( //box S - middle
-                    output,
-                    boxS_pointC,
-                    boxS_pointD,
+                    output, boxS_pointC, boxS_pointD,
                     new Scalar(0, 0, 255), 2);
-
-
             Imgproc.rectangle( // box V - right
-                    output,
-                    boxV_pointE,
-                    boxV_pointF,
+                    output, boxV_pointE, boxV_pointF,
                     new Scalar(0, 0, 255), 2);
 
-            /*
-             * NOTE: to see how to get data from your pipeline to your OpMode as well as how
-             * to change which stage of the pipeline is rendered to the viewport when it is
-             * tapped, please see {@link PipelineStageSwitchingExample}
-             */
+            Mat box1 = Cr.submat(new Rect(box1_pointA,box1_pointB));
+            System.out.printf("Box 1 Cr value average = "+ Core.mean(box1).val[1]);
+            Mat box2 = Cr.submat(new Rect(box2_pointC,box2_pointD));
+            System.out.printf("Box 2 Cr value average = "+ Core.mean(box2).val[1]);
+            Mat box3 = Cr.submat(new Rect(box3_pointE,box3_pointF));
+            System.out.printf("Box 3 Cr value average = "+ Core.mean(box3).val[1]);
+
+            box1 = Cb.submat(new Rect(box1_pointA,box1_pointB));
+            System.out.printf("Box 1 Cb value average = "+ Core.mean(box1).val[2]);
+            box2 = Cb.submat(new Rect(box2_pointC,box2_pointD));
+            System.out.printf("Box 2 Cb value average = "+ Core.mean(box2).val[2]);
+            box3 = Cb.submat(new Rect(box3_pointE,box3_pointF));
+            System.out.printf("Box 3 Cb value average = "+ Core.mean(box3).val[2]);
 
             return output;
         }
 
-        /*
+        /**
          * This function takes the RGB frame, converts to YCrCb,
          * and extracts the Cb channel to the 'Cb' variable
-         * \ (•◡•) /
+         * \ (•◡•) / This is Frank. He is very helpful.
          */
-        private void inputToCb(Mat input)
+        private void inputToYCrCb(Mat input)
         {
             Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
-            Core.extractChannel(YCrCb, Cb, 1);
+            Core.extractChannel(YCrCb, Y, 0);
+            Core.extractChannel(YCrCb, Cr, 1);
+            Core.extractChannel(YCrCb, Cb, 2);
         }
 
         @Override
@@ -434,5 +407,5 @@ public class WebcamExample extends LinearOpMode
 
 
 /*
-༼ つ ◕_◕ ༽つ
+༼ つ ◕_◕ ༽つ = Destiny the blob
  */
