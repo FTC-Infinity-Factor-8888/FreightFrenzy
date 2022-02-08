@@ -22,6 +22,7 @@ public class TeleOpMain extends LinearOpMode {
         boolean liftOverride;
 
         double accelerator;
+        double duckWheelAccelerator;
 
         // Declaring the former values of the buttons, so we can tell if they changed.
         boolean priorLiftUp = false;
@@ -48,10 +49,12 @@ public class TeleOpMain extends LinearOpMode {
 
                 // Controls to allow our robot to reach speeds up to maxSpeed.
                 accelerator = gamepad1.right_trigger;
+                duckWheelAccelerator = gamepad2.right_trigger;
+
                 currentLiftUp = gamepad2.right_bumper; // Controls for moving the vertical-lift up.
                 currentLiftDown = gamepad2.left_bumper; // Controls for moving the lift down.
-                duckWheelAntiClockwise = gamepad2.x; // Controls for rotating the duck wheel anti-clockwise. (blue alliance)
-                duckWheelClockwise = gamepad2.b; // Controls for moving the duck wheel clockwise. (red alliance)
+                duckWheelAntiClockwise = gamepad2.b; // Controls for rotating the duck wheel anti-clockwise. (blue alliance)
+                duckWheelClockwise = gamepad2.x; // Controls for moving the duck wheel clockwise. (red alliance)
                 spintakeIntake = gamepad2.y; //Controls for eating up the elements.
                 spintakeOuttake = gamepad2.a; //Controls for vomiting up the elements.
                 liftOverride = gamepad2.dpad_up;
@@ -95,11 +98,14 @@ public class TeleOpMain extends LinearOpMode {
 
                 // To control the duck wheel.
                 // Checking to see whether the buttons are still pressed.
-                if(duckWheelAntiClockwise != priorDuckWheelAntiClockwise || duckWheelClockwise != priorDuckWheelClockwise) {
+                telemetry.addData("DWCW", duckWheelClockwise);
+                telemetry.addData("DWCCW", duckWheelAntiClockwise);
+                if(duckWheelAntiClockwise != priorDuckWheelAntiClockwise || duckWheelClockwise != priorDuckWheelClockwise || duckWheelClockwise || duckWheelAntiClockwise) {
                     // 1 = rotate AntiClockwise, -1 = rotate Clockwise, 0 = don't move.
                     // Checking to see which buttons are pressed.
                     int direction = (duckWheelAntiClockwise?1:0) + (duckWheelClockwise?-1:0);
-                    yoda.duckWheelMotor(direction, accelerator);
+                    double dwPower = yoda.duckWheelMotor(direction, duckWheelAccelerator);
+                    telemetry.addData("DW Power", dwPower);
                 }
 
                 if(spintakeIntake != priorSpintakeIntake || spintakeOuttake != priorSpintakeOuttake) {

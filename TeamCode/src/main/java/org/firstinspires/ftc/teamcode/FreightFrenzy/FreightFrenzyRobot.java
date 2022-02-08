@@ -498,27 +498,51 @@ public class FreightFrenzyRobot implements iRobot {
         hold(desiredHeading);
     }
 
-    public void duckWheelMotor(int direction, double accelerator) {
+    public double duckWheelMotor(int direction, double accelerator) {
         double power = 0; // By default, the wheel should not rotate.
         // If the rotate-left button is pressed, rotate left.
         // reaches its minimum height.
         // The speed the wheel to turn the duck carousel moves at.
+        double minDwPower = 0.3;
         double maxDwPower = 0.8;
+        double normalPower = 0.65;
+
+        double maxAccelTicks = ticksPerMotorRevolution;
+        double accelSlope = (normalPower - minDwPower);
+
+        if (dwMotor.getPower() == 0.0) {
+            dwMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            dwMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        int currentPosition = dwMotor.getCurrentPosition();
         if (direction == 1) {
-            power = dwPower + dwPower * accelerator;
+            if (currentPosition < maxAccelTicks) {
+                power = minDwPower + accelSlope * (currentPosition / maxAccelTicks);
+            }
+            else {
+                power = dwPower + dwPower * accelerator;
+            }
             if (power > maxDwPower) {
                 power = maxDwPower;
             }
         }
         // If the rotate-right button is pressed, rotate right.
         else if (direction == -1) {
-            power = -dwPower + -dwPower * accelerator;
+            creator.telemetry.addData("DW POS: ", currentPosition);
+            creator.telemetry.addData("DW MAX: ", -maxAccelTicks);
+            if (currentPosition > -maxAccelTicks) {
+                power = -(minDwPower + accelSlope * (currentPosition / maxAccelTicks));
+            }
+            else {
+                power = -(dwPower + dwPower * accelerator);
+            }
             if (power < -maxDwPower) {
                 power = -maxDwPower;
             }
         }
         // Setting the power the duck wheel motor should move at.
         dwMotor.setPower(power);
+        return power;
     }
 
     /**

@@ -42,7 +42,10 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @TeleOp
 public class WebcamExample extends LinearOpMode
 {
-    OpenCvWebcam webcam;
+    String webcam1Name = "Webcam1";
+    String webcam2Name = "Webcam2";
+    OpenCvWebcam webcam1Cv = null; // Define a first camera (the big one)
+    OpenCvWebcam webcam2Cv = null; // Define a second camera (the small one)
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -59,7 +62,32 @@ public class WebcamExample extends LinearOpMode
          * single-parameter constructor instead (commented out below)
          */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+        int[] viewportContainerIds = OpenCvCameraFactory.getInstance() // Splitting the viewport to allow two cameras
+                .splitLayoutForMultipleViewports(
+                        cameraMonitorViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY);
+
+        //Try to find one or more cameras
+        WebcamName webcam1 = null;
+        WebcamName webcam2 = null;
+        try {
+            webcam1 = hardwareMap.get(WebcamName.class, webcam1Name);
+        }
+        catch (Exception e) {
+            System.out.println(webcam1Name + " not found");
+        }
+        try {
+            webcam2 = hardwareMap.get(WebcamName.class, webcam2Name);
+        }
+        catch (Exception e) {
+            System.out.println(webcam2Name + " not found");
+        }
+        if (webcam1 != null) {
+            webcam1Cv = OpenCvCameraFactory.getInstance().createWebcam(webcam1, viewportContainerIds[0]);
+        }
+        if (webcam2 != null) {
+            webcam2Cv = OpenCvCameraFactory.getInstance().createWebcam(webcam2, viewportContainerIds[1]);
+        }
+
 
         // OR...  Do Not Activate the Camera Monitor View
         //webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"));
@@ -69,7 +97,6 @@ public class WebcamExample extends LinearOpMode
          * of a frame from the camera. Note that switching pipelines on-the-fly
          * (while a streaming session is in flight) *IS* supported.
          */
-        webcam.setPipeline(new SamplePipeline());
 
         /*
          * Open the connection to the camera device. New in v1.4.0 is the ability
@@ -80,39 +107,16 @@ public class WebcamExample extends LinearOpMode
          *
          * If you really want to open synchronously, the old method is still available.
          */
-        webcam.setMillisecondsPermissionTimeout(2500); // Timeout for obtaining permission is configurable. Set before opening.
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                /*
-                 * Tell the webcam to start streaming images to us! Note that you must make sure
-                 * the resolution you specify is supported by the camera. If it is not, an exception
-                 * will be thrown.
-                 *
-                 * Keep in mind that the SDK's UVC driver (what OpenCvWebcam uses under the hood) only
-                 * supports streaming from the webcam in the uncompressed YUV image format. This means
-                 * that the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
-                 * Streaming at e.g. 720p will limit you to up to 10FPS and so on and so forth.
-                 *
-                 * Also, we specify the rotation that the webcam is used in. This is so that the image
-                 * from the camera sensor can be rotated such that it is always displayed with the image upright.
-                 * For a front facing camera, rotation is defined assuming the user is looking at the screen.
-                 * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
-                 * away from the user.
-                 */
-                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode)
-            {
-                /*
-                 * This will be called if the camera could not be opened
-                 */
-            }
-        });
+        if (webcam1Cv != null) {
+            webcam1Cv.setPipeline(new SamplePipeline("Big Webcam"));
+            webcam1Cv.setMillisecondsPermissionTimeout(2500); // Timeout for obtaining permission is configurable. Set before opening.
+            webcam1Cv.openCameraDeviceAsync(new MyListener(webcam1Cv));
+        }
+        if (webcam2Cv != null) {
+            webcam2Cv.setPipeline(new SamplePipeline("Little Webcam"));
+            webcam2Cv.setMillisecondsPermissionTimeout(2500); // Timeout for obtaining permission is configurable. Set before opening.
+            webcam2Cv.openCameraDeviceAsync(new MyListener(webcam2Cv));
+        }
 
         telemetry.addLine("Waiting for start");
         telemetry.update();
@@ -128,12 +132,12 @@ public class WebcamExample extends LinearOpMode
              * *:・ﾟ ₍ᐢ•ﻌ•ᐢ₎*:・ﾟ
              * Send some stats to the telemetry
              */
-            telemetry.addData("Frame Count", webcam.getFrameCount());
-            telemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
-            telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
-            telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
-            telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
-            telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
+            telemetry.addData("Frame Count", webcam1Cv.getFrameCount());
+            telemetry.addData("FPS", String.format("%.2f", webcam1Cv.getFps()));
+            telemetry.addData("Total frame time ms", webcam1Cv.getTotalFrameTimeMs());
+            telemetry.addData("Pipeline time ms", webcam1Cv.getPipelineTimeMs());
+            telemetry.addData("Overhead time ms", webcam1Cv.getOverheadTimeMs());
+            telemetry.addData("Theoretical max FPS", webcam1Cv.getCurrentPipelineMaxFps());
             telemetry.update();
 
             /*
@@ -160,6 +164,7 @@ public class WebcamExample extends LinearOpMode
                  *
                  * ʕ •ₒ• ʔ This is Fredrick, Gilbert's best friend. He is a bear. A very adorable bear.
                  *
+                 * Why Helen... Why?!?!
                  *
                  * NB2: if you are stopping the camera stream to simply save some processing power
                  * (or battery power) for a short while when you do not need your vision pipeline,
@@ -168,7 +173,7 @@ public class WebcamExample extends LinearOpMode
                  * time. Of course, this comment is irrelevant in light of the use case described in
                  * the above "important note".
                  */
-                webcam.stopStreaming();
+                webcam1Cv.stopStreaming();
                 //webcam.closeCameraDevice();
             }
 
@@ -198,12 +203,22 @@ public class WebcamExample extends LinearOpMode
      */
     class SamplePipeline extends OpenCvPipeline
     {
+        private final String name;
+
         boolean viewportPaused;
 
         Mat YCrCb = new Mat();
         Mat Y = new Mat();
         Mat Cr = new Mat();
         Mat Cb = new Mat();
+
+        public SamplePipeline() {
+            this.name = "default";
+        }
+
+        public SamplePipeline(String name) {
+            this.name = name;
+        }
 
         /*
          * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
@@ -347,18 +362,18 @@ public class WebcamExample extends LinearOpMode
                     new Scalar(0, 0, 255), 2);
 
             Mat box1 = Cr.submat(new Rect(box1_pointA,box1_pointB));
-            System.out.printf("Box 1 Cr value average = "+ Core.mean(box1).val[1]);
+            System.out.printf(name + " Box 1 Cr value average = "+ Core.mean(box1).val[1]);
             Mat box2 = Cr.submat(new Rect(box2_pointC,box2_pointD));
-            System.out.printf("Box 2 Cr value average = "+ Core.mean(box2).val[1]);
+            System.out.printf(name + " Box 2 Cr value average = "+ Core.mean(box2).val[1]);
             Mat box3 = Cr.submat(new Rect(box3_pointE,box3_pointF));
-            System.out.printf("Box 3 Cr value average = "+ Core.mean(box3).val[1]);
+            System.out.printf(name + " Box 3 Cr value average = "+ Core.mean(box3).val[1]);
 
             box1 = Cb.submat(new Rect(box1_pointA,box1_pointB));
-            System.out.printf("Box 1 Cb value average = "+ Core.mean(box1).val[2]);
+            System.out.printf(name + " Box 1 Cb value average = "+ Core.mean(box1).val[2]);
             box2 = Cb.submat(new Rect(box2_pointC,box2_pointD));
-            System.out.printf("Box 2 Cb value average = "+ Core.mean(box2).val[2]);
+            System.out.printf(name + " Box 2 Cb value average = "+ Core.mean(box2).val[2]);
             box3 = Cb.submat(new Rect(box3_pointE,box3_pointF));
-            System.out.printf("Box 3 Cb value average = "+ Core.mean(box3).val[2]);
+            System.out.printf(name + " Box 3 Cb value average = "+ Core.mean(box3).val[2]);
 
             return output;
         }
@@ -376,8 +391,8 @@ public class WebcamExample extends LinearOpMode
             Core.extractChannel(YCrCb, Cb, 2);
         }
 
-        @Override
-        public void onViewportTapped()
+//        @Override
+        public void doNotRunOnViewportTapped()
         {
             /*
              * The viewport (if one was specified in the constructor) can also be dynamically "paused"
@@ -395,13 +410,52 @@ public class WebcamExample extends LinearOpMode
 
             if(viewportPaused)
             {
-                webcam.pauseViewport();
+                webcam1Cv.pauseViewport();
             }
             else
             {
-                webcam.resumeViewport();
+                webcam1Cv.resumeViewport();
             }
         }
+    }
+
+    class MyListener implements OpenCvCamera.AsyncCameraOpenListener {
+        OpenCvWebcam webcam;
+
+        public MyListener(OpenCvWebcam webcam) {
+            this.webcam = webcam;
+        }
+
+        @Override
+        public void onOpened()
+        {
+            /*
+             * Tell the webcam to start streaming images to us! Note that you must make sure
+             * the resolution you specify is supported by the camera. If it is not, an exception
+             * will be thrown.
+             *
+             * Keep in mind that the SDK's UVC driver (what OpenCvWebcam uses under the hood) only
+             * supports streaming from the webcam in the uncompressed YUV image format. This means
+             * that the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
+             * Streaming at e.g. 720p will limit you to up to 10FPS and so on and so forth.
+             *
+             * Also, we specify the rotation that the webcam is used in. This is so that the image
+             * from the camera sensor can be rotated such that it is always displayed with the image upright.
+             * For a front facing camera, rotation is defined assuming the user is looking at the screen.
+             * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
+             * away from the user.
+             */
+            webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        }
+
+        @Override
+        public void onError(int errorCode)
+        {
+            /*
+             * This will be called if the camera could not be opened
+             */
+        }
+
     }
 }
 
