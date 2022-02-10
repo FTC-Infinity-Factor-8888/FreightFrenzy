@@ -207,10 +207,14 @@ public class WebcamExample extends LinearOpMode
 
         boolean viewportPaused;
 
-        Mat YCrCb = new Mat();
-        Mat Y = new Mat();
-        Mat Cr = new Mat();
-        Mat Cb = new Mat();
+        private Mat YCrCb = new Mat();
+        private Mat Y = new Mat();
+        private Mat Cr = new Mat();
+        private Mat Cb = new Mat();
+
+        private DetectionColor box1detected = DetectionColor.NONE;
+        private DetectionColor box2detected = DetectionColor.NONE;
+        private DetectionColor box3detected = DetectionColor.NONE;
 
         public SamplePipeline() {
             this.name = "default";
@@ -232,6 +236,11 @@ public class WebcamExample extends LinearOpMode
         @Override
         public Mat processFrame(Mat input)
         {
+            Scalar RED = new Scalar(255,0,0);
+            Scalar GREEN = new Scalar(0,255,0);
+            Scalar BLUE = new Scalar(0,0,255);
+            Scalar WHITE = new Scalar(255,255,255);
+            Scalar YELLOW = new Scalar(255,255,0);
             /*
              * IMPORTANT NOTE: the input Mat that is passed in as a parameter to this method
              * will only dereference to the same image for the duration of this particular
@@ -334,14 +343,15 @@ public class WebcamExample extends LinearOpMode
              */
             Imgproc.rectangle( //box 1 - left
                     output, box1_pointA, box1_pointB,
-                    new Scalar(255, 0, 0), 2);
+                    box1detected.getValue(), 2);
             Imgproc.rectangle( //box 2 - middle
                     output, box2_pointC, box2_pointD,
-                    new Scalar(255, 0, 0), 2);
+                    box2detected.getValue(), 2);
             Imgproc.rectangle( // box 3 - right
                     output, box3_pointE, box3_pointF,
-                    new Scalar(255, 0, 0), 2);
+                    box3detected.getValue(), 2);
             // Value boxes
+            /*
             Imgproc.rectangle( //box Y - left
                     output, boxY_pointA, boxY_pointB,
                     new Scalar(0, 255, 0), 2);
@@ -360,6 +370,8 @@ public class WebcamExample extends LinearOpMode
             Imgproc.rectangle( // box V - right
                     output, boxV_pointE, boxV_pointF,
                     new Scalar(0, 0, 255), 2);
+
+             */
 
             Mat box1 = Cr.submat(new Rect(box1_pointA,box1_pointB));
             System.out.printf(name + " Box 1 Cr value average = "+ Core.mean(box1).val[1]);
@@ -457,6 +469,25 @@ public class WebcamExample extends LinearOpMode
         }
 
     }
+
+    enum DetectionColor {
+        NONE (new Scalar(255,0,255)),
+        RED (new Scalar(255,0,0)),
+        BLUE (new Scalar(0,0,255)),
+        GREEN (new Scalar(0,255,0)),
+        WHITE (new Scalar(255,255,255)),
+        YELLOW (new Scalar(255,255,0));
+
+        private final Scalar value;
+
+        DetectionColor(Scalar value) {
+            this.value = value;
+        }
+
+        public Scalar getValue() {
+            return value;
+        }
+}
 }
 
 

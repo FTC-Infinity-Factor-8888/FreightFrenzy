@@ -552,7 +552,7 @@ public class FreightFrenzyRobot implements iRobot {
      * @param alliance  which alliance turntable we want to spin
      *                  Uses the DWDirection enum
      */
-    public void duckWheelAuto(int rotations, DWDirection alliance) {
+    public void duckWheelAuto(int rotations, AllianceColor alliance) {
         int direction = 0;
         switch (alliance) {
             case BLUE:
