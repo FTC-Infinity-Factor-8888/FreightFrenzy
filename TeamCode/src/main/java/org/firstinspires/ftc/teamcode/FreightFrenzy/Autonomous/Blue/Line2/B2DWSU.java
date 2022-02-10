@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Blue.Line2;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.FreightFrenzy.AllianceColor;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 
 
@@ -19,7 +20,10 @@ public class B2DWSU extends LinearOpMode {
 
         waitForStart();
         if (opModeIsActive()) {
-
+            ewok.drive(-26);
+            ewok.duckWheelAuto(4, AllianceColor.BLUE);
+            ewok.strafe(-25);
+            ewok.drive(-8);
         }
     }
 }

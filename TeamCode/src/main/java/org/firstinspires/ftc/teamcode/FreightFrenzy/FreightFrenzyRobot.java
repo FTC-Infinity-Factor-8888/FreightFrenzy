@@ -5,13 +5,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Utilities.EmergencyStopException;
 import org.firstinspires.ftc.teamcode.Utilities.iRobot;
@@ -28,6 +31,9 @@ public class FreightFrenzyRobot implements iRobot {
     private DcMotorEx LiftMotor;
     private DcMotor SpintakeMotor;
     private BNO055IMU imu;
+    private DistanceSensor Distance;
+    private LED GreenLED;
+    private LED RedLED;
 
 
     private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
@@ -73,6 +79,9 @@ public class FreightFrenzyRobot implements iRobot {
         dwMotor = hardwareMap.get(DcMotor.class, "DWMotor");
         LiftMotor = hardwareMap.get(DcMotorEx.class, "LiftMotor"); // Port: 0 exp.d
         SpintakeMotor = hardwareMap.get(DcMotor.class, "SpintakeMotor");
+        Distance = hardwareMap.get(DistanceSensor.class, "Distance");
+        GreenLED = hardwareMap.get(LED.class, "GreenLED");
+        RedLED = hardwareMap.get(LED.class, "RedLED");
         lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         lrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -498,6 +507,17 @@ public class FreightFrenzyRobot implements iRobot {
         hold(desiredHeading);
     }
 
+    public void cargoCheck() {
+        if (Distance.getDistance(DistanceUnit.MM) < 145) {
+            GreenLED.enable(true);
+            RedLED.enable(false);
+        }
+        else {
+            RedLED.enable(true);
+            GreenLED.enable(false);
+        }
+    }
+
     public double duckWheelMotor(int direction, double accelerator) {
         double power = 0; // By default, the wheel should not rotate.
         // If the rotate-left button is pressed, rotate left.
@@ -508,7 +528,7 @@ public class FreightFrenzyRobot implements iRobot {
         double normalPower = 0.65;
 
         double maxAccelTicks = ticksPerMotorRevolution;
-        double accelSlope = (normalPower - minDwPower);
+        double accelRate = (normalPower - minDwPower);
 
         if (dwMotor.getPower() == 0.0) {
             dwMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -517,7 +537,7 @@ public class FreightFrenzyRobot implements iRobot {
         int currentPosition = dwMotor.getCurrentPosition();
         if (direction == 1) {
             if (currentPosition < maxAccelTicks) {
-                power = minDwPower + accelSlope * (currentPosition / maxAccelTicks);
+                power = minDwPower + accelRate * (currentPosition / maxAccelTicks);
             }
             else {
                 power = dwPower + dwPower * accelerator;
@@ -531,7 +551,7 @@ public class FreightFrenzyRobot implements iRobot {
             creator.telemetry.addData("DW POS: ", currentPosition);
             creator.telemetry.addData("DW MAX: ", -maxAccelTicks);
             if (currentPosition > -maxAccelTicks) {
-                power = -(minDwPower + accelSlope * (currentPosition / maxAccelTicks));
+                power = -(minDwPower + accelRate * (currentPosition / maxAccelTicks));
             }
             else {
                 power = -(dwPower + dwPower * accelerator);
