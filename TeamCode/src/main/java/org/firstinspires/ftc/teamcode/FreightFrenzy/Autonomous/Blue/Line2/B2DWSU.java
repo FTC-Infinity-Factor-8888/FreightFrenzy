@@ -20,10 +20,11 @@ public class B2DWSU extends LinearOpMode {
 
         waitForStart();
         if (opModeIsActive()) {
-            ewok.drive(-26);
+            ewok.strafe(-3);
+            ewok.drive(-21);
             ewok.duckWheelAuto(4, AllianceColor.BLUE);
-            ewok.strafe(-25);
-            ewok.drive(-8);
+            ewok.strafe(-27);
+            ewok.drive(-4);
         }
     }
 }
