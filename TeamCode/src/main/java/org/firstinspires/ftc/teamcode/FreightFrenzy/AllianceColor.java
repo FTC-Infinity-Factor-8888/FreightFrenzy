@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.FreightFrenzy;
 
-public enum DWDirection {
+public enum AllianceColor {
     RED,
     BLUE;
 }

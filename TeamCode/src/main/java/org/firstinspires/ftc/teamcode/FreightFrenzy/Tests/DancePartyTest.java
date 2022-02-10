@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy.Tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.FreightFrenzy.DWDirection;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.AllianceColor;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.SpintakeDirection;
@@ -26,10 +26,10 @@ public class DancePartyTest extends LinearOpMode {
             robot.drive(-15);
             robot.rotate(100);
             robot.rotate(-100);
-            robot.duckWheelAuto(10, DWDirection.BLUE);
-            robot.duckWheelAuto(10, DWDirection.RED);
-            robot.duckWheelAuto(5, DWDirection.BLUE);
-            robot.duckWheelAuto(5, DWDirection.RED);
+            robot.duckWheelAuto(10, AllianceColor.BLUE);
+            robot.duckWheelAuto(10, AllianceColor.RED);
+            robot.duckWheelAuto(5, AllianceColor.BLUE);
+            robot.duckWheelAuto(5, AllianceColor.RED);
             robot.spinTakeAuto(5, SpintakeDirection.INTAKE);
             robot.spinTakeAuto(5, SpintakeDirection.OUTTAKE);
             robot.strafe(15);

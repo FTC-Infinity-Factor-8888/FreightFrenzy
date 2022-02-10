@@ -113,8 +113,6 @@ public class TeleOpMain extends LinearOpMode {
                     yoda.spinTakeMotor(direction);
                 }
 
-                yoda.cargoCheck();
-
                 yoda.driveXYRB(strafeInput, forwardInput, rotateInput, accelerator);
 
                 /* Here we show values on the driver hub that may be useful to know while driving
