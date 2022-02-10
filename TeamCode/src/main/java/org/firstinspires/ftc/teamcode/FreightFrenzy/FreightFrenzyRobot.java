@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -32,8 +32,8 @@ public class FreightFrenzyRobot implements iRobot {
     private DcMotor SpintakeMotor;
     private BNO055IMU imu;
     private DistanceSensor Distance;
-    private LED GreenLED;
-    private LED RedLED;
+    private DigitalChannel GreenLED;
+    private DigitalChannel RedLED;
 
 
     private final double MAX_ROBOT_SPEED = 0.80; // The maximum speed we want our robot to drive at.
@@ -80,10 +80,13 @@ public class FreightFrenzyRobot implements iRobot {
         LiftMotor = hardwareMap.get(DcMotorEx.class, "LiftMotor"); // Port: 0 exp.d
         SpintakeMotor = hardwareMap.get(DcMotor.class, "SpintakeMotor");
         Distance = hardwareMap.get(DistanceSensor.class, "Distance");
-        GreenLED = hardwareMap.get(LED.class, "GreenLED");
-        RedLED = hardwareMap.get(LED.class, "RedLED");
+        GreenLED = hardwareMap.get(DigitalChannel.class, "GreenLED");
+        RedLED = hardwareMap.get(DigitalChannel.class, "RedLED");
         lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         lrMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        RedLED.setMode(DigitalChannel.Mode.OUTPUT);
+        GreenLED.setMode(DigitalChannel.Mode.OUTPUT);
 
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -509,12 +512,12 @@ public class FreightFrenzyRobot implements iRobot {
 
     public void cargoCheck() {
         if (Distance.getDistance(DistanceUnit.MM) < 145) {
-            GreenLED.enable(true);
-            RedLED.enable(false);
+            GreenLED.setState(true);
+            RedLED.setState(false);
         }
         else {
-            RedLED.enable(true);
-            GreenLED.enable(false);
+            RedLED.setState(true);
+            GreenLED.setState(false);
         }
     }
 
@@ -551,7 +554,7 @@ public class FreightFrenzyRobot implements iRobot {
             creator.telemetry.addData("DW POS: ", currentPosition);
             creator.telemetry.addData("DW MAX: ", -maxAccelTicks);
             if (currentPosition > -maxAccelTicks) {
-                power = -(minDwPower + accelRate * (currentPosition / maxAccelTicks));
+                power = -(minDwPower + accelRate * (currentPosition / -maxAccelTicks));
             }
             else {
                 power = -(dwPower + dwPower * accelerator);
