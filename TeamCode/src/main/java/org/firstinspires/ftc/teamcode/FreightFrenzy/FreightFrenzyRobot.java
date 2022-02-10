@@ -511,13 +511,13 @@ public class FreightFrenzyRobot implements iRobot {
     }
 
     public void cargoCheck() {
-        if (Distance.getDistance(DistanceUnit.MM) < 145) {
-            GreenLED.setState(true);
-            RedLED.setState(false);
+        if (Distance.getDistance(DistanceUnit.MM) < 144) {
+            GreenLED.setState(false);
+            RedLED.setState(true);
         }
         else {
-            RedLED.setState(true);
-            GreenLED.setState(false);
+            RedLED.setState(false);
+            GreenLED.setState(true);
         }
     }
 
@@ -526,9 +526,9 @@ public class FreightFrenzyRobot implements iRobot {
         // If the rotate-left button is pressed, rotate left.
         // reaches its minimum height.
         // The speed the wheel to turn the duck carousel moves at.
-        double minDwPower = 0.3;
-        double maxDwPower = 0.8;
-        double normalPower = 0.65;
+        double minDwPower = 0.5;
+        double maxDwPower = 1.0;
+        double normalPower = 0.75;
 
         double maxAccelTicks = ticksPerMotorRevolution;
         double accelRate = (normalPower - minDwPower);
