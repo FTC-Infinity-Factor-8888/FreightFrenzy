@@ -258,12 +258,12 @@ public class WebcamExample extends LinearOpMode
             int h = y/8;
 
             int leftX_min = w;
-            int leftX_max = leftX_min + 2*w;
+            int leftX_max = (int)(leftX_min + 0.5*w);
 
             int middleX_min = x/2 - w/2 - w/8;
             int middleX_max = middleX_min + w;
 
-            int rightX_min = x - 4*w;
+            int rightX_min = x - 2*w;
             int rightX_max = rightX_min + w;
 
             int middleY_min = y/2;
