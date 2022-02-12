@@ -23,6 +23,7 @@ public class FreightFrenzyRobot implements iRobot {
     private final LinearOpMode creator;
     private final HardwareMap hardwareMap;
     public Telemetry telemetry;
+    private BarcodeDetector barcodeDetector;
     private DcMotorEx rfMotor;
     private DcMotorEx rrMotor;
     private DcMotorEx lfMotor;
@@ -107,6 +108,7 @@ public class FreightFrenzyRobot implements iRobot {
         setPIDFValues(rrMotor, rrMotorMaxTps);
 
         initializeIMU();
+        barcodeDetector = new BarcodeDetector(hardwareMap);
         liftMotorAuto(LiftPosition.DRIVE);
     }
 
@@ -144,6 +146,16 @@ public class FreightFrenzyRobot implements iRobot {
 
         telemetry.addData("IMU Heading", "%.0f", imuHeading);
         telemetry.update();
+    }
+
+    /**
+     * Provides the detected freight level for autonomous programs to be able to get more points.
+     *
+     * @return The detected freight level from the field barcodes, or the THIRD level if the barcode
+     * cannot be detected, which is the most number of points in that situation.
+     */
+    public LiftPosition getFreightLevel() {
+        return barcodeDetector.getFreightLevel();
     }
 
     /**

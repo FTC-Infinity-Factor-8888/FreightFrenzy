@@ -28,16 +28,24 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @TeleOp
 public class WebcamExample extends LinearOpMode
@@ -212,6 +220,11 @@ public class WebcamExample extends LinearOpMode
         private Mat Cr = new Mat();
         private Mat Cb = new Mat();
 
+        private Mat HSV = new Mat();
+        private Mat H = new Mat();
+        private Mat S = new Mat();
+        private Mat V = new Mat();
+
         private DetectionColor box1detected = DetectionColor.NONE;
         private DetectionColor box2detected = DetectionColor.NONE;
         private DetectionColor box3detected = DetectionColor.NONE;
@@ -255,15 +268,17 @@ public class WebcamExample extends LinearOpMode
             int x = input.cols();
             int y = input.rows();
             int w = x/8;
+            w = w - w/3;
             int h = y/8;
+            h = h - h/3;
 
-            int leftX_min = w;
+            int leftX_min = (int)(1.5*w);
             int leftX_max = leftX_min + w;
 
             int middleX_min = x/2 - w/2 - w/8;
             int middleX_max = middleX_min + w;
 
-            int rightX_min = x - 2*w;
+            int rightX_min = (int)(x - 2.25*w);
             int rightX_max = rightX_min + w;
 
             int middleY_min = y/2;
@@ -336,7 +351,8 @@ public class WebcamExample extends LinearOpMode
                     bottomY_max);
 
             //convert input before trying to draw on the output
-            inputToYCrCb(input);
+            //inputToYCrCb(input);
+            inputToHSV(input);
 
             /*
              * Draw a simple box around the barcode dots.
@@ -373,20 +389,83 @@ public class WebcamExample extends LinearOpMode
 
              */
 
+            // Blue tape: Cr 121,123,126, Cb 142, 139, 137
+            // Red tape: Cr 147,149,142, Cb 126,124,127
+
+            /*
             Mat box1 = Cr.submat(new Rect(box1_pointA,box1_pointB));
-            System.out.printf(name + " Box 1 Cr value average = "+ Core.mean(box1).val[1]);
-            Mat box2 = Cr.submat(new Rect(box2_pointC,box2_pointD));
-            System.out.printf(name + " Box 2 Cr value average = "+ Core.mean(box2).val[1]);
-            Mat box3 = Cr.submat(new Rect(box3_pointE,box3_pointF));
-            System.out.printf(name + " Box 3 Cr value average = "+ Core.mean(box3).val[1]);
-
+            System.out.println(name + " Box 1 Cr value average = ("+ Core.mean(box1).val[0] + ", " + Core.mean(box1).val[1] + ", " + Core.mean(box1).val[2] + ")");
             box1 = Cb.submat(new Rect(box1_pointA,box1_pointB));
-            System.out.printf(name + " Box 1 Cb value average = "+ Core.mean(box1).val[2]);
-            box2 = Cb.submat(new Rect(box2_pointC,box2_pointD));
-            System.out.printf(name + " Box 2 Cb value average = "+ Core.mean(box2).val[2]);
-            box3 = Cb.submat(new Rect(box3_pointE,box3_pointF));
-            System.out.printf(name + " Box 3 Cb value average = "+ Core.mean(box3).val[2]);
+            System.out.println(name + " Box 1 Cb value average = ("+ Core.mean(box1).val[0] + ", " + Core.mean(box1).val[1] + ", " + Core.mean(box1).val[2] + ")");
 
+            Mat box2 = Cr.submat(new Rect(box2_pointC,box2_pointD));
+            System.out.println(name + " Box 2 Cr value average = "+ Core.mean(box2).val[0]);
+            box2 = Cb.submat(new Rect(box2_pointC,box2_pointD));
+            System.out.println(name + " Box 2 Cb value average = "+ Core.mean(box2).val[0]);
+
+            Mat box3 = Cr.submat(new Rect(box3_pointE,box3_pointF));
+            System.out.println(name + " Box 3 Cr value average = "+ Core.mean(box3).val[0]);
+            box3 = Cb.submat(new Rect(box3_pointE,box3_pointF));
+            System.out.println(name + " Box 3 Cb value average = "+ Core.mean(box3).val[0]);
+             */
+
+            // Blue tape Bright: H 105,107,106, S 91,107,88
+            // Blue tape Medium: H 109, 109, 107, S 91,106,88
+            // Blue tape Dim   : H 109,133,78, S 78,92,60
+            // Red tape Osterm: H 122,95,146, S 99,96,102
+            // Red tape Bright: H 101,110,105, S 63,81,56
+            // Red tape Medium: H 120,136,120, S 63,83,56
+            // Red tape Dim   : H 157,162,145, S 58,76,50
+            /*
+            Mat box1 = H.submat(new Rect(box1_pointA,box1_pointB));
+            double hMean = Core.mean(box1).val[0];
+            System.out.println(name + " Box 1 H value average = ("+ hMean + ", " + Core.mean(box1).val[1] + ", " + Core.mean(box1).val[2] + ")");
+            box1 = S.submat(new Rect(box1_pointA,box1_pointB));
+            double sMean = Core.mean(box1).val[0];
+            System.out.println(name + " Box 1 S value average = ("+ sMean + ", " + Core.mean(box1).val[1] + ", " + Core.mean(box1).val[2] + ")");
+            box1detected = detectBlue(hMean, sMean);
+            System.out.println(name + "Box 1 detected " + box1detected);
+
+            Mat box2 = H.submat(new Rect(box2_pointC,box2_pointD));
+            System.out.println(name + " Box 2 H value average = "+ Core.mean(box2).val[0]);
+            box2 = S.submat(new Rect(box2_pointC,box2_pointD));
+            System.out.println(name + " Box 2 S value average = "+ Core.mean(box2).val[0]);
+
+            Mat box3 = H.submat(new Rect(box3_pointE,box3_pointF));
+            System.out.println(name + " Box 3 H value average = "+ Core.mean(box3).val[0]);
+            box3 = S.submat(new Rect(box3_pointE,box3_pointF));
+            System.out.println(name + " Box 3 S value average = "+ Core.mean(box3).val[0]);
+            */
+
+            // Blur the image
+            Imgproc.GaussianBlur(HSV, HSV, new Size(5,5), 0);
+
+            Mat mask = new Mat();
+
+            Scalar LOWER_RED1 = new Scalar(0, 50, 50);
+            Scalar UPPER_RED1 = new Scalar(10, 255, 255);
+            Scalar LOWER_RED2 = new Scalar(170, 50, 50);
+            Scalar UPPER_RED2 = new Scalar(180, 255, 255);
+
+            Core.inRange(HSV, LOWER_RED1, UPPER_RED1, mask);
+            Mat rmask2 = new Mat();
+            Core.inRange(HSV, LOWER_RED2, UPPER_RED2, rmask2);
+            Core.bitwise_or(mask, rmask2, mask);
+
+            List<MatOfPoint> contours = new ArrayList<>();
+            Mat hierarchy = new Mat();
+            Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+
+            MatOfPoint2f points = new MatOfPoint2f();
+            double current_contour;
+            double contourArea = 7;
+            for (int contIdx = 0; contIdx < contours.size(); contIdx++) {
+                current_contour = Imgproc.contourArea(contours.get(contIdx));
+                if (current_contour > contourArea) {
+                    contourArea = current_contour;
+                    contours.get(contIdx).convertTo(points, CvType.CV_32FC2);
+                }
+            }
             return output;
         }
 
@@ -403,7 +482,50 @@ public class WebcamExample extends LinearOpMode
             Core.extractChannel(YCrCb, Cb, 2);
         }
 
-//        @Override
+        /**
+         * This function takes the RGB frame, converts to HSV,
+         * and extracts each channel to individual 'H', 'S'. and 'V' variables
+         * \ (•◡•) / This is Frank. He is very helpful.
+         */
+        private void inputToHSV(Mat input)
+        {
+            Imgproc.cvtColor(input, HSV, Imgproc.COLOR_RGB2HSV_FULL);
+            Core.extractChannel(HSV, H, 0);
+            Core.extractChannel(HSV, S, 1);
+            Core.extractChannel(HSV, V, 2);
+        }
+
+        private DetectionColor detectBlue(double hMean, double sMean) {
+            // Blue tape Bright: H 105,107,106, S 91,107,88
+            // Blue tape Medium: H 109, 109, 107, S 91,106,88
+            // Blue tape Dim   : H 109,133,78, S 78,92,60
+            boolean potentialBlue = false;
+            if (hMean > 75 && hMean < 135) {
+                potentialBlue = true;
+            }
+            if (potentialBlue && sMean > 60 && sMean < 110) {
+                return DetectionColor.BLUE;
+            }
+            return DetectionColor.NONE;
+        }
+
+        private DetectionColor detectRed(double hMean, double sMean) {
+            // Red tape Osterm: H 122,95,146, S 99,96,102
+            // Red tape Bright: H 101,110,105, S 63,81,56
+            // Red tape Medium: H 120,136,120, S 63,83,56
+            // Red tape Dim   : H 157,162,145, S 58,76,50
+            boolean potentialRed = false;
+            if (hMean > 95 && hMean < 160) {
+                potentialRed = true;
+            }
+            if (potentialRed && sMean > 50 && sMean < 110) {
+                return DetectionColor.RED;
+            }
+
+            return DetectionColor.NONE;
+        }
+
+        //        @Override
         public void doNotRunOnViewportTapped()
         {
             /*
