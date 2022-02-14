@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.FreightFrenzy.AllianceColor;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 
 
-@Autonomous(name = "B2DWSU")
+// @Autonomous(name = "B2DWSU")
 public class B2DWSU extends LinearOpMode {
     FreightFrenzyRobot ewok;
 

@@ -2,5 +2,6 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy;
 
 public enum SpintakeDirection {
     INTAKE,
-    OUTTAKE;
+    OUTTAKE,
+    FAST_OUTTAKE;
 }

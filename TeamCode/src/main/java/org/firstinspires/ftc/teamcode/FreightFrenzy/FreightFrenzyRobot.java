@@ -23,7 +23,7 @@ public class FreightFrenzyRobot implements iRobot {
     private final LinearOpMode creator;
     private final HardwareMap hardwareMap;
     public Telemetry telemetry;
-    private BarcodeDetector barcodeDetector;
+    private BarcodeDetector barcodeDetector = null;
     private DcMotorEx rfMotor;
     private DcMotorEx rrMotor;
     private DcMotorEx lfMotor;
@@ -92,6 +92,7 @@ public class FreightFrenzyRobot implements iRobot {
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lrMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -108,8 +109,7 @@ public class FreightFrenzyRobot implements iRobot {
         setPIDFValues(rrMotor, rrMotorMaxTps);
 
         initializeIMU();
-        barcodeDetector = new BarcodeDetector(hardwareMap);
-        liftMotorAuto(LiftPosition.DRIVE);
+//        barcodeDetector = new BarcodeDetector(hardwareMap);
     }
 
     private void initializeIMU() {
@@ -155,6 +155,9 @@ public class FreightFrenzyRobot implements iRobot {
      * cannot be detected, which is the most number of points in that situation.
      */
     public LiftPosition getFreightLevel() {
+        if (barcodeDetector == null) {
+            return LiftPosition.THIRD;
+        }
         return barcodeDetector.getFreightLevel();
     }
 
@@ -230,7 +233,11 @@ public class FreightFrenzyRobot implements iRobot {
      * @param distance Accepts a positive or negative number representing the number of inches to move
      */
     @Override
-    public void drive(double distance) {
+    public void drive (double distance) {
+        drive(distance, MIN_ROBOT_SPEED, MAX_ROBOT_SPEED);
+    }
+
+    public void drive(double distance, double minSpeed, double maxSpeed) {
         if(distance >= 20) {
             lfMotor.setPositionPIDFCoefficients(drivePositionPIDF1);
             rfMotor.setPositionPIDFCoefficients(drivePositionPIDF1);
@@ -254,16 +261,16 @@ public class FreightFrenzyRobot implements iRobot {
 
         double minPower;
         if (direction == -1) {
-            minPower = -1 * (MIN_ROBOT_SPEED);
+            minPower = -1 * (minSpeed);
         } else {
-            minPower = MIN_ROBOT_SPEED;
+            minPower = minSpeed;
         }
 
         double maxPower;
         if (direction == -1) {
-            maxPower = -1 * (MAX_ROBOT_SPEED);
+            maxPower = -1 * (maxSpeed);
         } else {
-            maxPower = MAX_ROBOT_SPEED;
+            maxPower = maxSpeed;
         }
 
         //rise-over-run code for accel/decel slope
@@ -273,16 +280,16 @@ public class FreightFrenzyRobot implements iRobot {
 
         double accelRise;
         if (direction == -1) {
-            accelRise = -1 * (MAX_ROBOT_SPEED - MIN_ROBOT_SPEED);
+            accelRise = -1 * (maxSpeed - minSpeed);
         } else {
-            accelRise = MAX_ROBOT_SPEED - MIN_ROBOT_SPEED;
+            accelRise = maxSpeed - minSpeed;
         }
 
         double decelRise;
         if (direction == -1) {
-            decelRise = -1 * (0 - MAX_ROBOT_SPEED);
+            decelRise = -1 * (0 - maxSpeed);
         } else {
-            decelRise = 0 - MAX_ROBOT_SPEED;
+            decelRise = 0 - maxSpeed;
         }
 
         double accelSlope = accelRise / accelRun;
@@ -666,7 +673,7 @@ public class FreightFrenzyRobot implements iRobot {
         }
         else if (targetPosition < LiftMotor.getCurrentPosition()) {
             while (LiftMotor.getCurrentPosition() > targetPosition && creator.opModeIsActive()) {
-                LiftMotor.setPower(-liftSpeed);
+                LiftMotor.setPower(-0.2);
             }
         }
     }
@@ -715,11 +722,11 @@ public class FreightFrenzyRobot implements iRobot {
 
         if (direction == 1) { //intake
             while (SpintakeMotor.getCurrentPosition() < targetPosition) {
-                SpintakeMotor.setPower(spintakeIntakeSpeed);
+                SpintakeMotor.setPower(spintakeIntakeSpeed + 0.2);
             }
         } else if (direction == -1) { //outtake
             while (SpintakeMotor.getCurrentPosition() > targetPosition) {
-                SpintakeMotor.setPower(spintakeOuttakeSpeed);
+                SpintakeMotor.setPower(spintakeOuttakeSpeed + 0.2);
             }
         }
 

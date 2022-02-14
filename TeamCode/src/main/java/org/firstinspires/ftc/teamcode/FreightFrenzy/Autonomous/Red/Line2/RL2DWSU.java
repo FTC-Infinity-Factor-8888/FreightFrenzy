@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.FreightFrenzy.Autonomous.Red.Line2;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.FreightFrenzy.AllianceColor;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
+import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
 
 
-@Autonomous(name = "R2DWWH")
-public class R2DWWH extends LinearOpMode {
+@Autonomous(name = "RL2DWSU")
+public class RL2DWSU extends LinearOpMode {
     FreightFrenzyRobot ewok;
 
     @Override
@@ -19,7 +21,15 @@ public class R2DWWH extends LinearOpMode {
 
         waitForStart();
         if (opModeIsActive()) {
-
+            ewok.liftMotorAuto(LiftPosition.DRIVE);
+            ewok.strafe(24);
+            ewok.rotate(45);
+            ewok.drive(-28, 0.3, 0.4);
+            ewok.duckWheelAuto(10, AllianceColor.RED);
+            ewok.rotate(0);
+            ewok.strafe(24);
+            ewok.drive(-9);
+            ewok.liftMotorAuto(LiftPosition.FLOOR);
         }
     }
 }

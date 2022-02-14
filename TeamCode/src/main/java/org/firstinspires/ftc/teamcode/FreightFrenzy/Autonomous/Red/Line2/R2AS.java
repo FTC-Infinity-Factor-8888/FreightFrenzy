@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.LiftPosition;
 import org.firstinspires.ftc.teamcode.FreightFrenzy.SpintakeDirection;
 
-@Autonomous (name = "R2AS")
+// @Autonomous (name = "R2AS")
 public class R2AS extends LinearOpMode {
     FreightFrenzyRobot ewok;
     //start line 1 is the closest to the warehouse for both alliances (lined up with middle barcode)

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.FreightFrenzy.FreightFrenzyRobot;
 
-@Autonomous (name = "B2SU")
+// @Autonomous (name = "B2SU")
 public class B2SU extends LinearOpMode {
     FreightFrenzyRobot ewok;
     //start line 1 is the closest to the warehouse for both alliances (lined up with middle barcode)
@@ -19,7 +19,6 @@ public class B2SU extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()){
             ewok.drive(26);
-//            ewok.rotate(-90);
             ewok.strafe(-24);
             ewok.done();
         }
