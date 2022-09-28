@@ -21,13 +21,13 @@ public class CupidShuffle extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()) {
             int shuffleDist = 10;//begin dance
-            dance.strafe(-1*shuffleDist); //to the right
+            dance.strafe(-shuffleDist); //to the right
 
-            dance.strafe(-1*shuffleDist); //to the right
+            dance.strafe(-shuffleDist); //to the right
 
-            dance.strafe(-1*shuffleDist); //to the right
+            dance.strafe(-shuffleDist); //to the right
 
-            dance.strafe(-1*shuffleDist); //to the right
+            dance.strafe(-shuffleDist); //to the right
 
 
             dance.strafe(shuffleDist); //to the left
@@ -44,14 +44,14 @@ public class CupidShuffle extends LinearOpMode {
             dance.liftMotorAuto(LiftPosition.DRIVE);//now kick
 
 
-            dance.drive(10);
-            dance.strafe(10);
-            dance.drive(-10);
-            dance.strafe(-10);
-            dance.drive(10);
-            dance.strafe(10);
-            dance.drive(-10);
-            dance.strafe(-10);
+            dance.drive(20);
+            dance.strafe(20);
+            dance.drive(-20);
+            dance.strafe(-20);
+            dance.drive(20);
+            dance.strafe(20);
+            dance.drive(-20);
+            dance.strafe(-20);
 
 
 
